@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/login/main",
+    "pages/event/main",
+    "pages/addEvent/main",
+    "pages/task/main",
+    "pages/addTask/main"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0081ff",
+    "navigationBarTitleText": "ML TASK",
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "white"
+  }
+}
