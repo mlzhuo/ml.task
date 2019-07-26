@@ -2,8 +2,22 @@
   <view>
     <cu-custom bgcolor="bg-gradual-blue" :isBack="true">
       <block slot="backText">返回</block>
-      <block slot="content">{{event_title}}</block>
+      <block slot="content">事件记录</block>
     </cu-custom>
+    <view class="cu-card dynamic" :class="isCard?'no-card':''">
+      <view class="cu-item shadow">
+        <view class="cu-list menu-avatar">
+          <view class="cu-item">
+            <view class="cu-avatar round lg" :style="{backgroundImage:'url('+avatarUrl+')'}"></view>
+            <view class="content flex-sub">
+              <view>{{event_title}}</view>
+              <view class="text-gray text-sm flex justify-between">{{nickName}}创建于{{date}}</view>
+            </view>
+          </view>
+        </view>
+        <view class="text-content">{{description}}</view>
+      </view>
+    </view>
     <view class="container">
       <navigator
         hover-class="none"
@@ -11,7 +25,7 @@
         navigateTo
         class="cu-btn block bg-green shadow lg add-btn"
       >
-        <text class="cuIcon-add"></text>添加
+        <text class="cuIcon-add"></text>添加记录
       </navigator>
       <div class="cu-timeline" v-if="tasks.length===0">
         <div class="cu-item cur cuIcon-noticefill">
@@ -31,8 +45,8 @@
               <div class="cu-tag" v-if="item.level!==0">
                 <text class="cuIcon-favorfill"></text>
               </div>
-              <text class="cuIcon-edit done-btn edit-btn" @click="editTask(item._id)"></text>
-              <text class="cuIcon-check done-btn" @click="doneTask(item._id)"></text>
+              <text class="cuIcon-edit done-btn edit-btn" @click="editTask(event_id,item._id)"></text>
+              <text class="cuIcon-check done-btn" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
               <div class="cu-tag bg-green">{{item.edit_time}}</div>
@@ -45,41 +59,61 @@
         </div>
       </div>
     </view>
+    <Loading v-if="isShowLoading"></Loading>
   </view>
 </template>
 
 <script>
+import { formatDate } from "../../utils/index";
 export default {
   data() {
     return {
       event_id: "",
       event_title: "",
-      tasks: {}
+      date: "",
+      description: "",
+      avatarUrl: "",
+      nickName: "",
+      tasks: {},
+      isShowLoading: true
     };
   },
   onShow() {
-    this.tasks = {};
-    const { event_id, event_title } = this.$root.$mp.query;
+    this.init();
+    const { event_id, event_title, date, description } = this.$root.$mp.query;
     this.event_id = event_id;
     this.event_title = event_title;
+    this.date = formatDate(new Date(date)).fullDate;
+    this.description = description;
     this.getTasks(event_id);
+    this.avatarUrl = this.globalData.userInfo.avatarUrl;
+    this.nickName = this.globalData.userInfo.nickName;
   },
   methods: {
+    init() {
+      this.event_id = "";
+      this.event_title = "";
+      this.date = "";
+      this.description = "";
+      this.avatarUrl = "";
+      this.tasks = {};
+      this.isShowLoading = true;
+    },
     getTasks(event_id) {
-      const result = this.jsonRequest("GET", `/events/${event_id}/tasks`);
+      const result = this.jsonRequest("GET", `/${event_id}/tasks`);
       result
         .then(res => {
           if (res.state) {
             let temp = res.data;
             let tempObj = {};
             temp.forEach(item => {
-              const formatDateObj = this.formatDate(new Date(item.date));
+              const formatDateObj = formatDate(new Date(item.date));
               item.date = formatDateObj.date;
               item.time = formatDateObj.time;
               item.edit_time =
                 item.edit_time.split("T")[0] === "1970-01-01"
                   ? ""
-                  : this.formatDate(new Date(item.edit_time)).time;
+                  : formatDate(new Date(item.edit_time)).time;
             });
             temp.forEach(item => {
               var objArray = tempObj[item.date] || [];
@@ -87,39 +121,14 @@ export default {
               tempObj[item.date] = objArray;
             });
             this.tasks = tempObj;
+            this.isShowLoading = false;
           }
         })
         .catch(err => {});
     },
-    formatDate: date => {
-      const year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      if (month < 10) {
-        month = "0" + month;
-      }
-      let day = date.getDate();
-      if (day < 10) {
-        day = "0" + day;
-      }
-      let hours = date.getHours();
-      if (hours < 10) {
-        hours = "0" + hours;
-      }
-      let minutes = date.getMinutes();
-      if (minutes < 10) {
-        minutes = "0" + minutes;
-      }
-      let seconds = date.getSeconds();
-      if (seconds < 10) {
-        seconds = "0" + seconds;
-      }
-      return {
-        date: month + "-" + day,
-        time: hours + ":" + minutes
-      };
-    },
-    doneTask(task_id) {
-      const result = this.jsonRequest("POST", "/tasks/edit", {
+    doneTask(event_id, task_id) {
+      const result = this.jsonRequest("PUT", `/${event_id}/tasks`, {
+        event_id,
         task_id,
         state: 1
       });
@@ -132,9 +141,9 @@ export default {
         })
         .catch(err => {});
     },
-    editTask(task_id) {
+    editTask(event_id, task_id) {
       wx.navigateTo({
-        url: `/pages/addTask/main?task_id=${task_id}&pageTitle=编辑`
+        url: `/pages/addTask/main?event_id=${event_id}&task_id=${task_id}&pageTitle=编辑`
       });
     }
   }
@@ -172,5 +181,8 @@ export default {
 }
 .cu-tag {
   border-radius: 3px !important;
+}
+.cu-card > .cu-item {
+  margin: 0 16px !important;
 }
 </style>

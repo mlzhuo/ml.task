@@ -11,7 +11,7 @@
         navigateTo
         class="cu-btn block bg-green shadow lg add-btn"
       >
-        <text class="cuIcon-add"></text>添加
+        <text class="cuIcon-add"></text>添加事件
       </navigator>
       <scroll-view scroll-y>
         <view class="nav-list">
@@ -22,7 +22,8 @@
             :class="'bg-'+item.color"
             v-for="item in events"
             :key="item._id"
-            :url="'/pages/task/main?event_id='+item._id+'&event_title='+item.title"
+            :url="'/pages/task/main?event_id='+item._id+'&event_title='+item.title+'&date='+item.date+'&description='+item.description"
+            @longpress="editEvent(item._id)"
           >
             <view class="nav-title">{{item.title}}</view>
             <!-- <view
@@ -35,6 +36,7 @@
         <view class="cu-tabbar-height"></view>
       </scroll-view>
     </view>
+    <Loading v-if="isShowLoading"></Loading>
   </view>
 </template>
 
@@ -54,7 +56,8 @@ export default {
   data() {
     return {
       user_id: "",
-      events: []
+      events: [],
+      isShowLoading: true
     };
   },
   onShow() {
@@ -64,7 +67,7 @@ export default {
   },
   methods: {
     getEvents(user_id) {
-      const result = this.jsonRequest("GET", `/events/${user_id}`);
+      const result = this.jsonRequest("GET", `/${user_id}/events`);
       for (let i = 1; i < color.length; i++) {
         const random = Math.floor(Math.random() * (i + 1));
         [color[i], color[random]] = [color[random], color[i]];
@@ -87,9 +90,15 @@ export default {
               temp.push(item);
             });
             this.events = temp;
+            this.isShowLoading = false;
           }
         })
         .catch(err => {});
+    },
+    editEvent(event_id) {
+      wx.navigateTo({
+        url: `/pages/addEvent/main?event_id=${event_id}&user_id=${this.user_id}`
+      });
     }
   }
 };

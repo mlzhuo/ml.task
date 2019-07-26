@@ -3,8 +3,10 @@ import App from './App'
 import '../static/css/main.css'
 import '../static/css/icon.css'
 import cuCustom from './components/cu-custom.vue'
+import Loading from './components/loading.vue'
 import { jsonRequest } from "@/utils/api";
 Vue.component('cu-custom', cuCustom)
+Vue.component('Loading', Loading)
 wx.getSystemInfo({
   success: function(e) {
     Vue.prototype.StatusBar = e.statusBarHeight
@@ -107,3 +109,4 @@ App.mpType = 'app'
 
 const app = new Vue(App)
 app.$mount()
+Vue.prototype.globalData = getApp().globalData

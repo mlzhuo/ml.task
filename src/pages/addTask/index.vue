@@ -6,7 +6,7 @@
     </cu-custom>
     <div class="container">
       <view class="cu-form-group align-start">
-        <view class="title">事件描述</view>
+        <view class="title">记录描述</view>
         <textarea maxlength="-1" @input="taskInput" :value="content"></textarea>
       </view>
       <view class="cu-form-group">
@@ -19,11 +19,9 @@
           color="#e54d42"
         ></switch>
       </view>
-      <button
-        class="cu-btn block bg-green shadow lg add-btn"
-        @click="event_id?addTask():editTask()"
-      >{{pageTitle}}</button>
+      <button class="cu-btn block bg-green shadow lg add-btn" @click="taskOperation">{{pageTitle}}</button>
     </div>
+    <Loading v-if="isShowLoading"></Loading>
   </view>
 </template>
 
@@ -35,10 +33,12 @@ export default {
       content: "",
       level: false,
       pageTitle: "添加",
-      task_id: ""
+      task_id: "",
+      isShowLoading: false
     };
   },
   onShow() {
+    this.task_id = "";
     this.content = "";
     this.level = false;
     const { event_id, task_id, pageTitle } = this.$root.$mp.query;
@@ -46,7 +46,8 @@ export default {
     if (task_id && pageTitle) {
       this.task_id = task_id;
       this.pageTitle = pageTitle;
-      this.getTask(task_id);
+      this.isShowLoading = true;
+      this.getTask(event_id, task_id);
     } else {
       this.pageTitle = "添加";
     }
@@ -58,48 +59,38 @@ export default {
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    addTask() {
+    taskOperation() {
       if (!this.content) {
         this.showToast("请输入");
         return;
       }
-      const result = this.jsonRequest("POST", "/tasks/add", {
+      this.isShowLoading = true;
+      const method = this.task_id ? "PUT" : "POST";
+      let data = {
         content: this.content,
         level: this.level ? 1 : 0,
+        task_id: this.task_id,
         event_id: this.event_id
-      });
+      };
+      const result = this.jsonRequest(method, `/${this.event_id}/tasks`, data);
       result
         .then(res => {
-          if (res.state) {
-            this.level = false;
-            wx.navigateBack({ delta: 1 });
-          }
+          this.isShowLoading = false;
           this.showToast(res.message);
-        })
-        .catch(err => {});
-    },
-    editTask() {
-      const result = this.jsonRequest("POST", "/tasks/edit", {
-        content: this.content,
-        level: this.level ? 1 : 0,
-        task_id: this.task_id
-      });
-      result
-        .then(res => {
           if (res.state) {
-            this.showToast(res.message);
             wx.navigateBack({ delta: 1 });
           }
         })
         .catch(err => {});
     },
-    getTask(task_id) {
-      const result = this.jsonRequest("GET", `/tasks/${task_id}`);
+    getTask(event_id, task_id) {
+      const result = this.jsonRequest("GET", `/${event_id}/tasks/${task_id}`);
       result
         .then(res => {
           if (res.state) {
             this.content = res.data.content;
             this.level = res.data.level === 0 ? false : true;
+            this.isShowLoading = false;
           }
         })
         .catch(err => {});

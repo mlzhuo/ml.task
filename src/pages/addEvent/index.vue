@@ -2,16 +2,16 @@
   <view>
     <cu-custom bgcolor="bg-gradual-blue" :isBack="true">
       <block slot="backText">返回</block>
-      <block slot="content">添加</block>
+      <block slot="content">{{pageTitle}}</block>
     </cu-custom>
     <div class="container">
       <view class="cu-form-group">
         <view class="title">事件名称</view>
-        <input name="input" @input="titleInput" />
+        <input name="input" @input="titleInput" :value="title" />
       </view>
       <view class="cu-form-group align-start">
         <view class="title">事件描述</view>
-        <textarea maxlength="-1" @input="descInput"></textarea>
+        <textarea maxlength="-1" @input="descInput" :value="description"></textarea>
       </view>
       <view class="cu-form-group">
         <view class="title">是否优先</view>
@@ -21,10 +21,12 @@
           :class="level?'checked':''"
           :checked="level?true:false"
           color="#e54d42"
+          :value="level"
         ></switch>
       </view>
-      <button class="cu-btn block bg-green shadow lg add-btn" @click="addEvent">添加</button>
+      <button class="cu-btn block bg-green shadow lg add-btn" @click="addEvent">{{btnTitle}}</button>
     </div>
+    <Loading v-if="isShowLoading"></Loading>
   </view>
 </template>
 
@@ -33,17 +35,31 @@ export default {
   data() {
     return {
       user_id: "",
+      event_id: "",
       title: "",
+      pageTitle: "",
+      btnTitle: "",
       description: "",
-      level: false
+      level: false,
+      isShowLoading: false
     };
   },
   onShow() {
     this.title = "";
     this.description = "";
+    this.event_id = "";
     this.level = false;
-    const { user_id } = this.$root.$mp.query;
+    const { user_id, event_id } = this.$root.$mp.query;
     this.user_id = user_id;
+    this.event_id = event_id;
+    if (event_id) {
+      this.pageTitle = "编辑";
+      this.btnTitle = "编辑";
+      this.getEvent(user_id, event_id);
+    } else {
+      this.pageTitle = "添加";
+      this.btnTitle = "添加";
+    }
   },
   methods: {
     titleInput(e) {
@@ -64,19 +80,36 @@ export default {
         this.showToast("简单点，四个字就好");
         return;
       }
-      const result = this.jsonRequest("POST", "/events/add", {
+      this.isShowLoading = true;
+      const method = this.event_id ? "PUT" : "POST";
+      const result = this.jsonRequest(method, `/${this.user_id}/events`, {
         title: this.title,
         description: this.description,
         level: this.level ? 1 : 0,
-        user_id: this.user_id
+        user_id: this.user_id,
+        event_id: this.event_id
       });
       result
         .then(res => {
-          if (res.state) {
-            this.level = false;
-          }
           this.showToast(res.message);
-          wx.navigateBack({ delta: 1 });
+          this.isShowLoading = false;
+          if (res.state) {
+            wx.navigateBack({ delta: 1 });
+          }
+        })
+        .catch(err => {});
+    },
+    getEvent(user_id, event_id) {
+      this.isShowLoading = true;
+      const result = this.jsonRequest("GET", `/${user_id}/events/${event_id}`);
+      result
+        .then(res => {
+          if (res.state) {
+            this.title = res.data.title;
+            this.description = res.data.description;
+            this.level = res.data.level === 0 ? false : true;
+            this.isShowLoading = false;
+          }
         })
         .catch(err => {});
     }

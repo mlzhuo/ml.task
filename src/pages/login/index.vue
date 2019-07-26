@@ -14,6 +14,7 @@
       <p>插画来自 undraw.co</p>
       <p>页面框架 ColorUI</p>
     </view>
+    <Loading v-if="isShowLoading"></Loading>
   </view>
 </template>
 
@@ -21,7 +22,8 @@
 export default {
   data() {
     return {
-      userInfo: {}
+      userInfo: {},
+      isShowLoading: false
     };
   },
   mounted() {
@@ -34,6 +36,7 @@ export default {
     },
     login(obj) {
       const that = this;
+      that.isShowLoading = true;
       const wxCode = wx.login({
         success(wxres) {
           const result = that.jsonRequest("POST", "/login", {
@@ -42,13 +45,14 @@ export default {
           });
           result
             .then(res => {
+              that.showToast(res.message);
+              that.isShowLoading = false;
               if (res.state) {
                 const { _id } = res.data;
                 setTimeout(() => {
                   wx.redirectTo({ url: `/pages/event/main?user_id=${_id}` });
                 }, 200);
               }
-              that.showToast(res.message);
             })
             .catch(err => {});
         }
@@ -63,6 +67,7 @@ export default {
             wx.getUserInfo({
               success: function(res) {
                 that.userInfo = res.userInfo;
+                that.globalData.userInfo = res.userInfo
               }
             });
           }
