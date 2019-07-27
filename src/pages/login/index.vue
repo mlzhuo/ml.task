@@ -11,6 +11,7 @@
       >登录</button>
     </form>
     <view class="tip">
+      <p>版本 {{version}}</p>
       <p>插画来自 undraw.co</p>
       <p>页面框架 ColorUI</p>
     </view>
@@ -19,15 +20,18 @@
 </template>
 
 <script>
+import { version } from "../../config";
 export default {
   data() {
     return {
       userInfo: {},
-      isShowLoading: false
+      isShowLoading: false,
+      version: '1.0.0'
     };
   },
   mounted() {
     this.getSetting();
+    this.version = version
   },
   methods: {
     formSubmit(e) {
@@ -67,7 +71,7 @@ export default {
             wx.getUserInfo({
               success: function(res) {
                 that.userInfo = res.userInfo;
-                that.globalData.userInfo = res.userInfo
+                that.globalData.userInfo = res.userInfo;
               }
             });
           }
@@ -102,7 +106,7 @@ export default {
 .tip p {
   width: 100%;
   text-align: center;
-  color: #666;
+  color: #777;
 }
 form {
   display: block;

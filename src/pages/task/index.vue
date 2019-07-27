@@ -49,7 +49,8 @@
               <text class="cuIcon-check done-btn" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
-              <div class="cu-tag bg-green">{{item.edit_time}}</div>
+              <div class="cu-tag bg-green">完成于</div>
+              <div class="cu-tag line-green">{{item.edit_time}}</div>
               <div class="cu-tag" v-if="item.level!==0">
                 <text class="cuIcon-favorfill"></text>
               </div>
@@ -111,9 +112,11 @@ export default {
               item.date = formatDateObj.date;
               item.time = formatDateObj.time;
               item.edit_time =
-                item.edit_time.split("T")[0] === "1970-01-01"
-                  ? ""
-                  : formatDate(new Date(item.edit_time)).time;
+                formatDate(new Date(item.edit_time)).date === formatDateObj.date
+                  ? formatDate(new Date(item.edit_time)).time
+                  : formatDate(new Date(item.edit_time)).date +
+                    " " +
+                    formatDate(new Date(item.edit_time)).time;
             });
             temp.forEach(item => {
               var objArray = tempObj[item.date] || [];
@@ -179,9 +182,9 @@ export default {
   font-size: 20px;
   color: #e54d42;
 }
-.cu-tag {
+/* .cu-tag {
   border-radius: 3px !important;
-}
+} */
 .cu-card > .cu-item {
   margin: 0 16px !important;
 }

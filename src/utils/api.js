@@ -1,4 +1,4 @@
-import { config } from './config'
+import { config } from '../config'
 import Fly from 'flyio/dist/npm/wx'
 
 const flyFetch = new Fly()
