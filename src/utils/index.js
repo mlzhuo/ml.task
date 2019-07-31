@@ -28,7 +28,8 @@ const formatDate = date => {
   return {
     fullDate: `${year}年${month}月${day}日`,
     date: month + '-' + day,
-    time: hours + ':' + minutes
+    time: hours + ':' + minutes,
+    weekday: '周' + '日一二三四五六'.charAt(date.getDay())
   }
 }
 

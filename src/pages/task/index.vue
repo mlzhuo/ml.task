@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="cu-timeline" v-for="(daySortItem, key) in tasks" :key="key">
-        <div class="cu-time">{{key}}</div>
+        <div class="cu-time">{{key}} {{daySortItem[0].weekday}}</div>
         <div
           v-for="item in daySortItem"
           :key="item._id"
@@ -41,19 +41,14 @@
         >
           <div class="content">
             <div v-if="item.state===0" class="cu-capsule radius">
-              <div class="cu-tag bg-cyan">{{item.time}}</div>
-              <div class="cu-tag" v-if="item.level!==0">
-                <text class="cuIcon-favorfill"></text>
-              </div>
+              <div class="cu-tag bg-cyan borderRadius">{{item.time}}</div>
+              <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon"></text>
               <text class="cuIcon-edit done-btn edit-btn" @click="editTask(event_id,item._id)"></text>
               <text class="cuIcon-check done-btn" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
               <div class="cu-tag bg-green">完成于</div>
               <div class="cu-tag line-green">{{item.edit_time}}</div>
-              <div class="cu-tag" v-if="item.level!==0">
-                <text class="cuIcon-favorfill"></text>
-              </div>
             </div>
             <div class="margin-top">{{item.content}}</div>
           </div>
@@ -109,6 +104,7 @@ export default {
             let tempObj = {};
             temp.forEach(item => {
               const formatDateObj = formatDate(new Date(item.date));
+              item.weekday = formatDateObj.weekday;
               item.date = formatDateObj.date;
               item.time = formatDateObj.time;
               item.edit_time =
@@ -182,10 +178,17 @@ export default {
   font-size: 20px;
   color: #e54d42;
 }
-/* .cu-tag {
+.cu-tag.borderRadius {
   border-radius: 3px !important;
-} */
+}
 .cu-card > .cu-item {
   margin: 0 16px !important;
+}
+.cu-timeline .cu-time {
+  width: 75px !important;
+}
+.favorfillIcon {
+  line-height: 24px;
+  margin-left: 10px;
 }
 </style>
