@@ -117,6 +117,24 @@ export default {
             temp.forEach(item => {
               var objArray = tempObj[item.date] || [];
               objArray.push(item);
+              let isActiveTasks = objArray.filter(v => v.state === 0);
+              let isDoneTasks = objArray.filter(v => v.state === 1);
+              isActiveTasks.sort((a, b) => {
+                if (a.level === b.level) {
+                  return (
+                    new Date(b.date + " " + b.time) -
+                    new Date(a.date + " " + a.time)
+                  );
+                } else {
+                  return b.level - a.level;
+                }
+              });
+              isDoneTasks.sort(
+                (a, b) =>
+                  new Date(b.date + " " + b.time) -
+                  new Date(a.date + " " + a.time)
+              );
+              objArray = isActiveTasks.concat(isDoneTasks);
               tempObj[item.date] = objArray;
             });
             this.tasks = tempObj;
