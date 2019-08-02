@@ -119,6 +119,8 @@ export default {
               objArray.push(item);
               let isActiveTasks = objArray.filter(v => v.state === 0);
               let isDoneTasks = objArray.filter(v => v.state === 1);
+              console.log("isDoneTasks", isDoneTasks);
+
               isActiveTasks.sort((a, b) => {
                 if (a.level === b.level) {
                   return (
@@ -129,11 +131,17 @@ export default {
                   return b.level - a.level;
                 }
               });
-              isDoneTasks.sort(
-                (a, b) =>
-                  new Date(b.date + " " + b.time) -
-                  new Date(a.date + " " + a.time)
-              );
+              isDoneTasks.sort((a, b) => {
+                const editTimeA =
+                  a.edit_time.split(" ").length === 2
+                    ? new Date(a.edit_time)
+                    : new Date(a.date + " " + a.edit_time);
+                const editTimeB =
+                  b.edit_time.split(" ").length === 2
+                    ? new Date(b.edit_time)
+                    : new Date(b.date + " " + b.edit_time);
+                return editTimeB - editTimeA;
+              });
               objArray = isActiveTasks.concat(isDoneTasks);
               tempObj[item.date] = objArray;
             });
