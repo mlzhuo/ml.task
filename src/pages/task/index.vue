@@ -37,7 +37,7 @@
         <div
           v-for="item in daySortItem"
           :key="item._id"
-          :class="{'cu-item':true,'text-green':item.state!==0?true:false}"
+          :class="{'cu-item':true,'text-cyan':item.state===0?true:false}"
         >
           <div class="content">
             <div v-if="item.state===0" class="cu-capsule radius">
@@ -47,10 +47,12 @@
               <text class="cuIcon-check done-btn" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
-              <div class="cu-tag bg-green">完成于</div>
-              <div class="cu-tag line-green">{{item.edit_time}}</div>
+              <div class="cu-tag bg-grey">完成于</div>
+              <div class="cu-tag line-grey">{{item.edit_time}}</div>
             </div>
-            <div class="margin-top">{{item.content}}</div>
+            <div
+              :class="{'margin-top': true,'text-grey':item.state!==0?true:false }"
+            >{{item.content}}</div>
           </div>
         </div>
       </div>
@@ -75,6 +77,21 @@ export default {
     };
   },
   onShow() {
+    const { isReNeedRequest } = this.globalData;
+    if (isReNeedRequest) {
+      this.init();
+      const { event_id, event_title, date, description } = this.$root.$mp.query;
+      this.event_id = event_id;
+      this.event_title = event_title;
+      this.date = formatDate(new Date(date)).fullDate;
+      this.description = description;
+      this.getTasks(event_id);
+      const { avatarUrl, nickName } = this.globalData.userInfo;
+      this.avatarUrl = avatarUrl;
+      this.nickName = nickName;
+    }
+  },
+  mounted() {
     this.init();
     const { event_id, event_title, date, description } = this.$root.$mp.query;
     this.event_id = event_id;
@@ -82,8 +99,9 @@ export default {
     this.date = formatDate(new Date(date)).fullDate;
     this.description = description;
     this.getTasks(event_id);
-    this.avatarUrl = this.globalData.userInfo.avatarUrl;
-    this.nickName = this.globalData.userInfo.nickName;
+    const { avatarUrl, nickName } = this.globalData.userInfo;
+    this.avatarUrl = avatarUrl;
+    this.nickName = nickName;
   },
   methods: {
     init() {
@@ -119,8 +137,6 @@ export default {
               objArray.push(item);
               let isActiveTasks = objArray.filter(v => v.state === 0);
               let isDoneTasks = objArray.filter(v => v.state === 1);
-              console.log("isDoneTasks", isDoneTasks);
-
               isActiveTasks.sort((a, b) => {
                 if (a.level === b.level) {
                   return (

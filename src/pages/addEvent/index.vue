@@ -24,7 +24,7 @@
           :value="level"
         ></switch>
       </view>
-      <button class="cu-btn block bg-green shadow lg add-btn" @click="addEvent">{{btnTitle}}</button>
+      <button class="cu-btn block bg-green shadow lg add-btn" @click="eventOperation">{{btnTitle}}</button>
     </div>
     <Loading v-if="isShowLoading"></Loading>
   </view>
@@ -71,7 +71,7 @@ export default {
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    addEvent() {
+    eventOperation() {
       if (!this.title) {
         this.showToast("请输入");
         return;
@@ -91,8 +91,9 @@ export default {
       });
       result
         .then(res => {
-          this.showToast(res.message);
           this.isShowLoading = false;
+          this.showToast(res.message);
+          this.globalData.isReNeedRequest = true
           if (res.state) {
             wx.navigateBack({ delta: 1 });
           }

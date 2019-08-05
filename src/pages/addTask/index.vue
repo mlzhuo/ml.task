@@ -77,6 +77,7 @@ export default {
         .then(res => {
           this.isShowLoading = false;
           this.showToast(res.message);
+          this.globalData.isReNeedRequest = true
           if (res.state) {
             wx.navigateBack({ delta: 1 });
           }
