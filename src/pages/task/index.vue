@@ -23,13 +23,13 @@
         hover-class="none"
         :url="'/pages/addTask/main?event_id='+event_id"
         navigateTo
-        class="cu-btn block bg-green shadow lg add-btn"
+        class="cu-btn bg-green shadow-blur round lg add-btn"
       >
         <text class="cuIcon-add"></text>添加记录
       </navigator>
-      <div class="cu-timeline" v-if="tasks.length===0">
-        <div class="cu-item cur cuIcon-noticefill">
-          <div class="content bg-grey shadow-blur">暂无记录</div>
+      <div class="cu-timeline" v-if="!isNoTasks">
+        <div class="cu-item text-grey">
+          <div class="content shadow-blur">暂无记录</div>
         </div>
       </div>
       <div class="cu-timeline" v-for="(daySortItem, key) in tasks" :key="key">
@@ -38,6 +38,7 @@
           v-for="item in daySortItem"
           :key="item._id"
           :class="{'cu-item':true,'text-cyan':item.state===0?true:false}"
+          @longpress="showModal(item._id)"
         >
           <div class="content">
             <div v-if="item.state===0" class="cu-capsule radius">
@@ -57,7 +58,24 @@
         </div>
       </div>
     </view>
+    <view class="cu-modal" :class="isShowModal?'show':''" @tap="hideModal">
+      <view class="cu-dialog" @tap.stop>
+        <view class="cu-list menu text-left">
+          <view
+            class="cu-item"
+            v-for="(item,index) in longPressItemArr"
+            :key="index"
+            @click="doSomething"
+          >
+            <label class="flex justify-between align-center flex-sub">
+              <view class="flex-sub">{{item}}</view>
+            </label>
+          </view>
+        </view>
+      </view>
+    </view>
     <Loading v-if="isShowLoading"></Loading>
+    <ReTry v-if="isShowReTry" :retryMethod="['getTasks']" @getTasks="getTasks(event_id)"></ReTry>
   </view>
 </template>
 
@@ -73,7 +91,12 @@ export default {
       avatarUrl: "",
       nickName: "",
       tasks: {},
-      isShowLoading: true
+      isNoTasks: true,
+      isShowLoading: true,
+      isShowReTry: false,
+      isShowModal: false,
+      longPressItemArr: ["未完成功能 ^_^"],
+      longPressTaskId: ""
     };
   },
   onShow() {
@@ -162,10 +185,20 @@ export default {
               tempObj[item.date] = objArray;
             });
             this.tasks = tempObj;
+            this.checkTasks(tempObj);
             this.isShowLoading = false;
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          this.isShowLoading = false;
+          this.isShowReTry = true;
+          this.showToast("请求失败，请重试");
+        });
+    },
+    checkTasks(obj) {
+      Object.keys(obj).length
+        ? (this.isNoTasks = true)
+        : (this.isNoTasks = false);
     },
     doneTask(event_id, task_id) {
       const result = this.jsonRequest("PUT", `/${event_id}/tasks`, {
@@ -186,6 +219,17 @@ export default {
       wx.navigateTo({
         url: `/pages/addTask/main?event_id=${event_id}&task_id=${task_id}&pageTitle=编辑`
       });
+    },
+    showModal(task_id) {
+      this.isShowModal = true;
+      this.longPressTaskId = task_id;
+    },
+    hideModal() {
+      this.isShowModal = false;
+    },
+    doSomething() {
+      this.isShowModal = false;
+      this.showToast("未完成功能 ^_^");
     }
   }
 };
@@ -196,8 +240,12 @@ export default {
   padding: 16px;
 }
 .add-btn {
-  margin: 0 20px 35px;
-  border-radius: 5px;
+  margin-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .cu-capsule {
   position: relative;

@@ -9,7 +9,7 @@
         hover-class="none"
         :url="'/pages/addEvent/main?user_id='+user_id"
         navigateTo
-        class="cu-btn block bg-green shadow lg add-btn"
+        class="cu-btn bg-green shadow-blur round lg add-btn"
       >
         <text class="cuIcon-add"></text>添加事件
       </navigator>
@@ -36,6 +36,12 @@
       </scroll-view>
     </view>
     <Loading v-if="isShowLoading"></Loading>
+    <ReTry
+      v-if="isShowReTry"
+      :retryMethod="['getEvents','getEventStatistics']"
+      @getEvents="getEvents(user_id)"
+      @getEventStatistics="getEventStatistics(user_id)"
+    ></ReTry>
   </view>
 </template>
 
@@ -48,7 +54,8 @@ export default {
       user_id: "",
       events: [],
       eventStatistics: {},
-      isShowLoading: true
+      isShowLoading: true,
+      isShowReTry: false
     };
   },
   onShow() {
@@ -58,7 +65,7 @@ export default {
       this.user_id = user_id;
       this.getEvents(user_id);
       this.getEventStatistics(user_id);
-      this.globalData.isReNeedRequest = false
+      this.globalData.isReNeedRequest = false;
     }
   },
   mounted() {
@@ -95,7 +102,11 @@ export default {
             this.isShowLoading = false;
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          this.isShowLoading = false;
+          this.isShowReTry = true;
+          this.showToast("请求失败，请重试");
+        });
     },
     editEvent(event_id) {
       wx.navigateTo({
@@ -104,17 +115,19 @@ export default {
     },
     getEventStatistics(user_id) {
       const result = this.jsonRequest("GET", `/${user_id}/statistics`);
-      result.then(res => {
-        if (res.state) {
-          this.eventStatistics = res.data;
-          for (const key in res.data) {
-            const { isDone, all } = res.data[key];
-            let event = this.events.find(event => event._id === key);
-            event.isDone = isDone;
-            event.all = all;
+      result
+        .then(res => {
+          if (res.state) {
+            this.eventStatistics = res.data;
+            for (const key in res.data) {
+              const { isDone, all } = res.data[key];
+              let event = this.events.find(event => event._id === key);
+              event.isDone = isDone;
+              event.all = all;
+            }
           }
-        }
-      });
+        })
+        .catch(err => {});
     }
   }
 };
@@ -132,7 +145,11 @@ export default {
   padding: 16px;
 }
 .add-btn {
-  margin: 0 20px 35px;
-  border-radius: 5px;
+  margin-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>

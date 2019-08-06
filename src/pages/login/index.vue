@@ -26,12 +26,12 @@ export default {
     return {
       userInfo: {},
       isShowLoading: false,
-      version: '1.0.0'
+      version: "1.0.0"
     };
   },
   mounted() {
     this.getSetting();
-    this.version = version
+    this.version = version;
   },
   methods: {
     formSubmit(e) {
@@ -58,7 +58,10 @@ export default {
                 }, 200);
               }
             })
-            .catch(err => {});
+            .catch(err => {
+              this.isShowLoading = false;
+              this.showToast("登录失败，请重试");
+            });
         }
       });
     },

@@ -11,6 +11,7 @@ export async function request(method, resource, body) {
       formatedBody,
       {
         method,
+        timeout: 5000,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -28,7 +29,7 @@ export async function jsonRequest(method, resource, body) {
     const response = await request(method, resource, body)
     if (!response) {
       return
-    }    
+    }
     if (response.statusText === 'request:ok') {
       return response.data
     } else {
