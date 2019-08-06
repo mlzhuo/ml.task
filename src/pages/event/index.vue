@@ -36,12 +36,7 @@
       </scroll-view>
     </view>
     <Loading v-if="isShowLoading"></Loading>
-    <ReTry
-      v-if="isShowReTry"
-      :retryMethod="['getEvents','getEventStatistics']"
-      @getEvents="getEvents(user_id)"
-      @getEventStatistics="getEventStatistics(user_id)"
-    ></ReTry>
+    <ReTry v-if="isShowReTry" :retryMethod="['getData']" @getData="getData(user_id)"></ReTry>
   </view>
 </template>
 
@@ -62,82 +57,59 @@ export default {
     if (isReNeedRequest) {
       const { user_id } = this.$root.$mp.query;
       this.user_id = user_id;
-      this.getEvents(user_id);
-      this.getEventStatistics(user_id);
+      this.getData(user_id);
       this.globalData.isReNeedRequest = false;
     }
   },
   mounted() {
     const { user_id } = this.$root.$mp.query;
     this.user_id = user_id;
-    this.getEvents(user_id);
-    this.getEventStatistics(user_id);
+    this.getData(user_id);
   },
   methods: {
-    getEvents(user_id) {
-      const result = this.jsonRequest("GET", `/${user_id}/events`);
+    async getData(user_id) {
+      const eventsResult = await this.jsonRequest("GET", `/${user_id}/events`);
+      const tasksResult = await this.jsonRequest(
+        "GET",
+        `/${user_id}/statistics`
+      );
       for (let i = 1; i < color.length; i++) {
         const random = Math.floor(Math.random() * (i + 1));
         [color[i], color[random]] = [color[random], color[i]];
       }
-      result
-        .then(res => {
-          if (res.state) {
-            let temp = [];
-            let index = 0;
-            res.data.forEach(item => {
-              if (index >= color.length) {
-                index = 0;
-              }
-              item = {
-                ...item,
-                color: color[index],
-                cuIcon: item.level === 0 ? "" : "favorfill"
-              };
-              index++;
-              temp.push(item);
-            });
-            this.events = temp;
-            this.isShowLoading = false;
+      if (eventsResult.state && tasksResult.state) {
+        let temp = [];
+        let index = 0;
+        eventsResult.data.forEach(item => {
+          if (index >= color.length) {
+            index = 0;
           }
-        })
-        .catch(err => {
-          this.isShowLoading = false;
-          this.isShowReTry = true;
-          this.showToast("请求失败，请重试");
+          item = {
+            ...item,
+            color: color[index],
+            cuIcon: item.level === 0 ? "" : "favorfill"
+          };
+          index++;
+          temp.push(item);
         });
+        for (const key in tasksResult.data) {
+          const { isDone, all } = tasksResult.data[key];
+          let event = temp.find(event => event._id === key);
+          event.isDone = isDone;
+          event.all = all;
+        }
+        this.events = temp;
+        this.isShowLoading = false;
+      } else {
+        this.isShowLoading = false;
+        this.isShowReTry = true;
+        this.showToast("请求失败，请重试");
+      }
     },
     editEvent(event_id) {
       wx.navigateTo({
         url: `/pages/addEvent/main?event_id=${event_id}&user_id=${this.user_id}`
       });
-    },
-    getEventStatistics(user_id) {
-      const result = this.jsonRequest("GET", `/${user_id}/statistics`);
-      result
-        .then(res => {
-          if (res.state) {
-            this.eventStatistics = res.data;
-          }
-        })
-        .catch(err => {});
-    }
-  },
-  watch: {
-    eventStatistics: {
-      handler: function(val, oldVal) {
-        if (val === oldVal) {
-          return;
-        }
-        this.eventStatistics = val;
-        for (const key in val) {
-          const { isDone, all } = val[key];
-          let event = this.events.find(event => event._id === key);
-          event.isDone = isDone;
-          event.all = all;
-        }
-      },
-      deep: true
     }
   }
 };

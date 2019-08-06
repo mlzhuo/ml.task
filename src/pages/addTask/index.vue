@@ -59,7 +59,7 @@ export default {
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    taskOperation() {
+    async taskOperation() {
       if (!this.content) {
         this.showToast("请输入");
         return;
@@ -72,29 +72,30 @@ export default {
         task_id: this.task_id,
         event_id: this.event_id
       };
-      const result = this.jsonRequest(method, `/${this.event_id}/tasks`, data);
-      result
-        .then(res => {
-          this.isShowLoading = false;
-          this.showToast(res.message);
-          this.globalData.isReNeedRequest = true
-          if (res.state) {
-            wx.navigateBack({ delta: 1 });
-          }
-        })
-        .catch(err => {});
+      const result = await this.jsonRequest(
+        method,
+        `/${this.event_id}/tasks`,
+        data
+      );
+      const { state, message } = result;
+      this.isShowLoading = false;
+      this.showToast(message);
+      this.globalData.isReNeedRequest = true;
+      if (state) {
+        wx.navigateBack({ delta: 1 });
+      }
     },
-    getTask(event_id, task_id) {
-      const result = this.jsonRequest("GET", `/${event_id}/tasks/${task_id}`);
-      result
-        .then(res => {
-          if (res.state) {
-            this.content = res.data.content;
-            this.level = res.data.level === 0 ? false : true;
-            this.isShowLoading = false;
-          }
-        })
-        .catch(err => {});
+    async getTask(event_id, task_id) {
+      const result = await this.jsonRequest(
+        "GET",
+        `/${event_id}/tasks/${task_id}`
+      );
+      const { state, data } = result;
+      if (state) {
+        this.content = data.content;
+        this.level = data.level === 0 ? false : true;
+        this.isShowLoading = false;
+      }
     }
   }
 };

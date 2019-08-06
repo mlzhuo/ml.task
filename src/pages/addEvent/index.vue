@@ -71,7 +71,7 @@ export default {
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    eventOperation() {
+    async eventOperation() {
       if (!this.title) {
         this.showToast("请输入");
         return;
@@ -82,37 +82,34 @@ export default {
       }
       this.isShowLoading = true;
       const method = this.event_id ? "PUT" : "POST";
-      const result = this.jsonRequest(method, `/${this.user_id}/events`, {
+      const result = await this.jsonRequest(method, `/${this.user_id}/events`, {
         title: this.title,
         description: this.description,
         level: this.level ? 1 : 0,
         user_id: this.user_id,
         event_id: this.event_id
       });
-      result
-        .then(res => {
-          this.isShowLoading = false;
-          this.showToast(res.message);
-          this.globalData.isReNeedRequest = true
-          if (res.state) {
-            wx.navigateBack({ delta: 1 });
-          }
-        })
-        .catch(err => {});
+      const { state, message } = result;
+      this.isShowLoading = false;
+      this.showToast(message);
+      this.globalData.isReNeedRequest = true;
+      if (state) {
+        wx.navigateBack({ delta: 1 });
+      }
     },
-    getEvent(user_id, event_id) {
+    async getEvent(user_id, event_id) {
       this.isShowLoading = true;
-      const result = this.jsonRequest("GET", `/${user_id}/events/${event_id}`);
-      result
-        .then(res => {
-          if (res.state) {
-            this.title = res.data.title;
-            this.description = res.data.description;
-            this.level = res.data.level === 0 ? false : true;
-            this.isShowLoading = false;
-          }
-        })
-        .catch(err => {});
+      const result = await this.jsonRequest(
+        "GET",
+        `/${user_id}/events/${event_id}`
+      );
+      const { state, data } = result;
+      if (state) {
+        this.title = data.title;
+        this.description = data.description;
+        this.level = data.level === 0 ? false : true;
+        this.isShowLoading = false;
+      }
     }
   }
 };

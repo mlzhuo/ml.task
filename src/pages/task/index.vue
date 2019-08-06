@@ -136,84 +136,79 @@ export default {
       this.tasks = {};
       this.isShowLoading = true;
     },
-    getTasks(event_id) {
-      const result = this.jsonRequest("GET", `/${event_id}/tasks`);
-      result
-        .then(res => {
-          if (res.state) {
-            let temp = res.data;
-            let tempObj = {};
-            temp.forEach(item => {
-              const formatDateObj = formatDate(new Date(item.date));
-              item.weekday = formatDateObj.weekday;
-              item.date = formatDateObj.date;
-              item.time = formatDateObj.time;
-              item.edit_time =
-                formatDate(new Date(item.edit_time)).date === formatDateObj.date
-                  ? formatDate(new Date(item.edit_time)).time
-                  : formatDate(new Date(item.edit_time)).date +
-                    " " +
-                    formatDate(new Date(item.edit_time)).time;
-            });
-            temp.forEach(item => {
-              var objArray = tempObj[item.date] || [];
-              objArray.push(item);
-              let isActiveTasks = objArray.filter(v => v.state === 0);
-              let isDoneTasks = objArray.filter(v => v.state === 1);
-              isActiveTasks.sort((a, b) => {
-                if (a.level === b.level) {
-                  return (
-                    new Date(b.date + " " + b.time) -
-                    new Date(a.date + " " + a.time)
-                  );
-                } else {
-                  return b.level - a.level;
-                }
-              });
-              isDoneTasks.sort((a, b) => {
-                const editTimeA =
-                  a.edit_time.split(" ").length === 2
-                    ? new Date(a.edit_time)
-                    : new Date(a.date + " " + a.edit_time);
-                const editTimeB =
-                  b.edit_time.split(" ").length === 2
-                    ? new Date(b.edit_time)
-                    : new Date(b.date + " " + b.edit_time);
-                return editTimeB - editTimeA;
-              });
-              objArray = isActiveTasks.concat(isDoneTasks);
-              tempObj[item.date] = objArray;
-            });
-            this.tasks = tempObj;
-            this.checkTasks(tempObj);
-            this.isShowLoading = false;
-          }
-        })
-        .catch(err => {
-          this.isShowLoading = false;
-          this.isShowReTry = true;
-          this.showToast("请求失败，请重试");
+    async getTasks(event_id) {
+      const result = await this.jsonRequest("GET", `/${event_id}/tasks`);
+      const { state, data } = result;
+      if (state) {
+        let temp = data;
+        let tempObj = {};
+        temp.forEach(item => {
+          const formatDateObj = formatDate(new Date(item.date));
+          item.weekday = formatDateObj.weekday;
+          item.date = formatDateObj.date;
+          item.time = formatDateObj.time;
+          item.edit_time =
+            formatDate(new Date(item.edit_time)).date === formatDateObj.date
+              ? formatDate(new Date(item.edit_time)).time
+              : formatDate(new Date(item.edit_time)).date +
+                " " +
+                formatDate(new Date(item.edit_time)).time;
         });
+        temp.forEach(item => {
+          var objArray = tempObj[item.date] || [];
+          objArray.push(item);
+          let isActiveTasks = objArray.filter(v => v.state === 0);
+          let isDoneTasks = objArray.filter(v => v.state === 1);
+          isActiveTasks.sort((a, b) => {
+            if (a.level === b.level) {
+              return (
+                new Date(b.date + " " + b.time) -
+                new Date(a.date + " " + a.time)
+              );
+            } else {
+              return b.level - a.level;
+            }
+          });
+          isDoneTasks.sort((a, b) => {
+            const editTimeA =
+              a.edit_time.split(" ").length === 2
+                ? new Date(a.edit_time)
+                : new Date(a.date + " " + a.edit_time);
+            const editTimeB =
+              b.edit_time.split(" ").length === 2
+                ? new Date(b.edit_time)
+                : new Date(b.date + " " + b.edit_time);
+            return editTimeB - editTimeA;
+          });
+          objArray = isActiveTasks.concat(isDoneTasks);
+          tempObj[item.date] = objArray;
+        });
+        this.tasks = tempObj;
+        this.checkTasks(tempObj);
+        this.isShowLoading = false;
+      } else {
+        this.isShowLoading = false;
+        this.isShowReTry = true;
+        this.showToast("请求失败，请重试");
+      }
     },
     checkTasks(obj) {
       Object.keys(obj).length
         ? (this.isNoTasks = true)
         : (this.isNoTasks = false);
     },
-    doneTask(event_id, task_id) {
-      const result = this.jsonRequest("PUT", `/${event_id}/tasks`, {
+    async doneTask(event_id, task_id) {
+      const result = await this.jsonRequest("PUT", `/${event_id}/tasks`, {
         event_id,
         task_id,
         state: 1
       });
-      result
-        .then(res => {
-          if (res.state) {
-            this.getTasks(this.event_id);
-            this.showToast(res.message);
-          }
-        })
-        .catch(err => {});
+      const { state, message } = result;
+      if (state) {
+        this.getTasks(this.event_id);
+        this.globalData.isReNeedRequest = true;
+      }
+      this.showToast(message);
     },
     editTask(event_id, task_id) {
       wx.navigateTo({
