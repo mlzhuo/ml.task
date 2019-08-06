@@ -47,7 +47,6 @@
 
 <script>
 let color = ["red", "orange", "olive", "cyan", "blue"];
-let doneColor = "grey"; //玄灰
 export default {
   data() {
     return {
@@ -119,15 +118,26 @@ export default {
         .then(res => {
           if (res.state) {
             this.eventStatistics = res.data;
-            for (const key in res.data) {
-              const { isDone, all } = res.data[key];
-              let event = this.events.find(event => event._id === key);
-              event.isDone = isDone;
-              event.all = all;
-            }
           }
         })
         .catch(err => {});
+    }
+  },
+  watch: {
+    eventStatistics: {
+      handler: function(val, oldVal) {
+        if (val === oldVal) {
+          return;
+        }
+        this.eventStatistics = val;
+        for (const key in val) {
+          const { isDone, all } = val[key];
+          let event = this.events.find(event => event._id === key);
+          event.isDone = isDone;
+          event.all = all;
+        }
+      },
+      deep: true
     }
   }
 };
