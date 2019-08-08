@@ -68,6 +68,7 @@ export default {
   },
   methods: {
     async getData(user_id) {
+      this.isShowLoading = true;
       const eventsResult = await this.jsonRequest("GET", `/${user_id}/events`);
       const tasksResult = await this.jsonRequest(
         "GET",

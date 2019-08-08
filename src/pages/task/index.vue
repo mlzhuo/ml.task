@@ -28,7 +28,7 @@
         <text class="cuIcon-add"></text>添加记录
       </navigator>
       <div class="cu-timeline" v-if="!isNoTasks">
-        <div class="cu-item text-grey">
+        <div class="cu-item">
           <div class="content shadow-blur">暂无记录</div>
         </div>
       </div>
@@ -37,23 +37,21 @@
         <div
           v-for="item in daySortItem"
           :key="item._id"
-          :class="{'cu-item':true,'text-cyan':item.state===0?true:false}"
+          :class="{'cu-item':true,'text-blue':item.state===0?true:false}"
           @longpress="showModal(item._id)"
         >
-          <div class="content">
+          <div class="content light" :class="{'bg-gradual-blue': item.state===0}">
             <div v-if="item.state===0" class="cu-capsule radius">
               <div class="cu-tag bg-cyan borderRadius">{{item.time}}</div>
-              <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon"></text>
-              <text class="cuIcon-edit done-btn edit-btn" @click="editTask(event_id,item._id)"></text>
-              <text class="cuIcon-check done-btn" @click="doneTask(event_id,item._id)"></text>
+              <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon text-yellow"></text>
+              <text class="cuIcon-edit done-btn edit-btn text-white" @click="editTask(event_id,item._id)"></text>
+              <text class="cuIcon-check done-btn text-white" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
               <div class="cu-tag bg-grey">完成于</div>
               <div class="cu-tag line-grey">{{item.edit_time}}</div>
             </div>
-            <div
-              :class="{'margin-top': true,'text-grey':item.state!==0?true:false }"
-            >{{item.content}}</div>
+            <div :class="{'margin-top': true,'':item.state!==0?true:false }">{{item.content}}</div>
           </div>
         </div>
       </div>
@@ -115,7 +113,6 @@ export default {
     }
   },
   mounted() {
-    this.init();
     const { event_id, event_title, date, description } = this.$root.$mp.query;
     this.event_id = event_id;
     this.event_title = event_title;
@@ -127,16 +124,8 @@ export default {
     this.nickName = nickName;
   },
   methods: {
-    init() {
-      this.event_id = "";
-      this.event_title = "";
-      this.date = "";
-      this.description = "";
-      this.avatarUrl = "";
-      this.tasks = {};
-      this.isShowLoading = true;
-    },
     async getTasks(event_id) {
+      this.isShowLoading = true;
       const result = await this.jsonRequest("GET", `/${event_id}/tasks`);
       const { state, data } = result;
       if (state) {
@@ -253,7 +242,6 @@ export default {
   height: 25px;
   line-height: 25px;
   text-align: center;
-  color: #1cbbb4;
   font-weight: 700;
 }
 .cu-capsule .edit-btn {
@@ -261,7 +249,7 @@ export default {
 }
 .cuIcon-favorfill {
   font-size: 20px;
-  color: #e54d42;
+  /* color: #e54d42; */
 }
 .cu-tag.borderRadius {
   border-radius: 3px !important;
