@@ -89,13 +89,16 @@ export default {
         user_id: this.user_id,
         event_id: this.event_id
       });
-      const { state, message } = result;
+      if (!result) {
+        this.isShowLoading = false;
+        this.showToast("请重试");
+        return;
+      }
+      const { message } = result;
       this.isShowLoading = false;
       this.showToast(message);
       this.globalData.isReNeedRequest = true;
-      if (state) {
-        wx.navigateBack({ delta: 1 });
-      }
+      wx.navigateBack({ delta: 1 });
     },
     async getEvent(user_id, event_id) {
       this.isShowLoading = true;
@@ -103,13 +106,16 @@ export default {
         "GET",
         `/${user_id}/events/${event_id}`
       );
-      const { state, data } = result;
-      if (state) {
-        this.title = data.title;
-        this.description = data.description;
-        this.level = data.level === 0 ? false : true;
+      if (!result) {
         this.isShowLoading = false;
+        this.showToast("请重试");
+        return;
       }
+      const { data } = result;
+      this.title = data.title;
+      this.description = data.description;
+      this.level = data.level === 0 ? false : true;
+      this.isShowLoading = false;
     }
   }
 };

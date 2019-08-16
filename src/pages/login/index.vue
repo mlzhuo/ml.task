@@ -42,26 +42,29 @@ export default {
       const that = this;
       that.isShowLoading = true;
       const wxCode = wx.login({
-        success(wxres) {
-          const result = that.jsonRequest("POST", "/login", {
+        timeout: 5000,
+        async success(wxres) {
+          const result = await that.jsonRequest("POST", "/login", {
             ...obj,
             code: wxres.code
           });
-          result
-            .then(res => {
-              that.showToast(res.message);
-              that.isShowLoading = false;
-              if (res.state) {
-                const { _id } = res.data;
-                setTimeout(() => {
-                  wx.redirectTo({ url: `/pages/event/main?user_id=${_id}` });
-                }, 200);
-              }
-            })
-            .catch(err => {
-              this.isShowLoading = false;
-              this.showToast("登录失败，请重试");
-            });
+          if (result) {
+            const { message, state, data } = result;
+            if (state) {
+              that.showToast(message);
+              const { _id } = data;
+              setTimeout(() => {
+                wx.redirectTo({ url: `/pages/event/main?user_id=${_id}` });
+              }, 200);
+            }
+          } else {
+            that.showToast("登录超时");
+          }
+          that.isShowLoading = false;
+        },
+        fail() {
+          that.showToast("登录超时");
+          that.isShowLoading = false;
         }
       });
     },

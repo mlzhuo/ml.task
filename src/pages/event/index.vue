@@ -78,6 +78,12 @@ export default {
         const random = Math.floor(Math.random() * (i + 1));
         [color[i], color[random]] = [color[random], color[i]];
       }
+      if (!eventsResult) {
+        this.isShowLoading = false;
+        this.isShowReTry = true;
+        this.showToast("请求失败，请重试");
+        return;
+      }
       if (eventsResult.state && tasksResult.state) {
         let temp = [];
         let index = 0;

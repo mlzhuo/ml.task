@@ -77,25 +77,32 @@ export default {
         `/${this.event_id}/tasks`,
         data
       );
-      const { state, message } = result;
+      if (!result) {
+        this.isShowLoading = false;
+        this.showToast("请重试");
+        return;
+      }
+      const { message } = result;
       this.isShowLoading = false;
       this.showToast(message);
       this.globalData.isReNeedRequest = true;
-      if (state) {
-        wx.navigateBack({ delta: 1 });
-      }
+
+      wx.navigateBack({ delta: 1 });
     },
     async getTask(event_id, task_id) {
       const result = await this.jsonRequest(
         "GET",
         `/${event_id}/tasks/${task_id}`
       );
-      const { state, data } = result;
-      if (state) {
-        this.content = data.content;
-        this.level = data.level === 0 ? false : true;
+      if (!result) {
         this.isShowLoading = false;
+        this.showToast("请重试");
+        return;
       }
+      const { data } = result;
+      this.content = data.content;
+      this.level = data.level === 0 ? false : true;
+      this.isShowLoading = false;
     }
   }
 };

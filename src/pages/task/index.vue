@@ -44,7 +44,10 @@
             <div v-if="item.state===0" class="cu-capsule radius">
               <div class="cu-tag bg-cyan borderRadius">{{item.time}}</div>
               <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon text-yellow"></text>
-              <text class="cuIcon-edit done-btn edit-btn text-white" @click="editTask(event_id,item._id)"></text>
+              <text
+                class="cuIcon-edit done-btn edit-btn text-white"
+                @click="editTask(event_id,item._id)"
+              ></text>
               <text class="cuIcon-check done-btn text-white" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
@@ -100,7 +103,6 @@ export default {
   onShow() {
     const { isReNeedRequest } = this.globalData;
     if (isReNeedRequest) {
-      this.init();
       const { event_id, event_title, date, description } = this.$root.$mp.query;
       this.event_id = event_id;
       this.event_title = event_title;
@@ -127,59 +129,57 @@ export default {
     async getTasks(event_id) {
       this.isShowLoading = true;
       const result = await this.jsonRequest("GET", `/${event_id}/tasks`);
-      const { state, data } = result;
-      if (state) {
-        let temp = data;
-        let tempObj = {};
-        temp.forEach(item => {
-          const formatDateObj = formatDate(new Date(item.date));
-          item.weekday = formatDateObj.weekday;
-          item.date = formatDateObj.date;
-          item.time = formatDateObj.time;
-          item.edit_time =
-            formatDate(new Date(item.edit_time)).date === formatDateObj.date
-              ? formatDate(new Date(item.edit_time)).time
-              : formatDate(new Date(item.edit_time)).date +
-                " " +
-                formatDate(new Date(item.edit_time)).time;
-        });
-        temp.forEach(item => {
-          var objArray = tempObj[item.date] || [];
-          objArray.push(item);
-          let isActiveTasks = objArray.filter(v => v.state === 0);
-          let isDoneTasks = objArray.filter(v => v.state === 1);
-          isActiveTasks.sort((a, b) => {
-            if (a.level === b.level) {
-              return (
-                new Date(b.date + " " + b.time) -
-                new Date(a.date + " " + a.time)
-              );
-            } else {
-              return b.level - a.level;
-            }
-          });
-          isDoneTasks.sort((a, b) => {
-            const editTimeA =
-              a.edit_time.split(" ").length === 2
-                ? new Date(a.edit_time)
-                : new Date(a.date + " " + a.edit_time);
-            const editTimeB =
-              b.edit_time.split(" ").length === 2
-                ? new Date(b.edit_time)
-                : new Date(b.date + " " + b.edit_time);
-            return editTimeB - editTimeA;
-          });
-          objArray = isActiveTasks.concat(isDoneTasks);
-          tempObj[item.date] = objArray;
-        });
-        this.tasks = tempObj;
-        this.checkTasks(tempObj);
-        this.isShowLoading = false;
-      } else {
+      if (!result) {
         this.isShowLoading = false;
         this.isShowReTry = true;
         this.showToast("请求失败，请重试");
+        return;
       }
+      let temp = result.data;
+      let tempObj = {};
+      temp.forEach(item => {
+        const formatDateObj = formatDate(new Date(item.date));
+        item.weekday = formatDateObj.weekday;
+        item.date = formatDateObj.date;
+        item.time = formatDateObj.time;
+        item.edit_time =
+          formatDate(new Date(item.edit_time)).date === formatDateObj.date
+            ? formatDate(new Date(item.edit_time)).time
+            : formatDate(new Date(item.edit_time)).date +
+              " " +
+              formatDate(new Date(item.edit_time)).time;
+      });
+      temp.forEach(item => {
+        var objArray = tempObj[item.date] || [];
+        objArray.push(item);
+        let isActiveTasks = objArray.filter(v => v.state === 0);
+        let isDoneTasks = objArray.filter(v => v.state === 1);
+        isActiveTasks.sort((a, b) => {
+          if (a.level === b.level) {
+            return (
+              new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
+            );
+          } else {
+            return b.level - a.level;
+          }
+        });
+        isDoneTasks.sort((a, b) => {
+          const editTimeA =
+            a.edit_time.split(" ").length === 2
+              ? new Date(a.edit_time)
+              : new Date(a.date + " " + a.edit_time);
+          const editTimeB =
+            b.edit_time.split(" ").length === 2
+              ? new Date(b.edit_time)
+              : new Date(b.date + " " + b.edit_time);
+          return editTimeB - editTimeA;
+        });
+        objArray = isActiveTasks.concat(isDoneTasks);
+        tempObj[item.date] = objArray;
+      });
+      this.tasks = tempObj;
+      this.checkTasks(tempObj);
+      this.isShowLoading = false;
     },
     checkTasks(obj) {
       Object.keys(obj).length
