@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import App from './App'
+import store from './store'
 import '../static/css/main.css'
 import '../static/css/icon.css'
 import cuCustom from './components/cu-custom.vue'
 import Loading from './components/loading.vue'
 import ReTry from './components/re-try.vue'
-import { jsonRequest } from "@/utils/api";
+import { jsonRequest } from '@/utils/api'
 Vue.component('cu-custom', cuCustom)
 Vue.component('Loading', Loading)
 Vue.component('ReTry', ReTry)
@@ -105,11 +106,38 @@ Vue.prototype.showToast = (title, icon) => {
   })
 }
 Vue.prototype.jsonRequest = jsonRequest
+Vue.prototype.$store = store
 
 Vue.config.productionTip = false
 App.mpType = 'app'
-
-const app = new Vue(App)
+const app = new Vue({
+  ...App,
+  store
+})
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 getApp().globalData.isReNeedRequest = false
+
+// const updateManager = wx.getUpdateManager()
+
+// updateManager.onCheckForUpdate(function(res) {
+//   // 请求完新版本信息的回调
+//   console.log(res.hasUpdate)
+// })
+
+// updateManager.onUpdateReady(function() {
+//   wx.showModal({
+//     title: '更新提示',
+//     content: '新版本已经准备好，是否重启应用？',
+//     success: function(res) {
+//       if (res.confirm) {
+//         // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+//         updateManager.applyUpdate()
+//       }
+//     }
+//   })
+// })
+
+// updateManager.onUpdateFailed(function() {
+//   // 新版本下载失败
+// })
