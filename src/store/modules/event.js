@@ -2,7 +2,6 @@ import {
   GET_EVENTS_DATA,
   STORE_ALL_EVENTS,
   EVENT_OPERATION,
-  GET_EVENT_BY_EVENT_ID,
   STORE_EVENT_BY_EVENT_ID,
   CLEAR_CURRENT_EVENT
 } from '../mutation-types'
@@ -82,19 +81,6 @@ const actions = {
     }
     const { message } = result
     onSuccess(message)
-  },
-  async [GET_EVENT_BY_EVENT_ID](
-    { commit, state },
-    { user_id, event_id, onSuccess, onFailed }
-  ) {
-    const result = await jsonRequest('GET', `/${user_id}/events/${event_id}`)
-    if (!result) {
-      onFailed()
-      return
-    }
-    const { data } = result
-    commit(STORE_EVENT_BY_EVENT_ID, data)
-    onSuccess(data)
   }
 }
 
