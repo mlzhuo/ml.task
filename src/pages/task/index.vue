@@ -44,10 +44,7 @@
             <div v-if="item.state===0" class="cu-capsule radius">
               <div class="cu-tag bg-cyan borderRadius">{{item.time}}</div>
               <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon text-yellow"></text>
-              <text
-                class="cuIcon-edit done-btn edit-btn text-white"
-                @click="editTask(event_id,item._id)"
-              ></text>
+              <text class="cuIcon-edit done-btn edit-btn text-white" @click="editTask(item)"></text>
               <text class="cuIcon-check done-btn text-white" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
@@ -82,7 +79,12 @@
 
 <script>
 import { formatDate } from "@/utils/index";
-import { GET_ALL_TASKS, DONE_TASK } from "@/store/mutation-types";
+import {
+  GET_ALL_TASKS,
+  DONE_TASK,
+  STORE_TASK_BY_TASK_ID,
+  CLEAR_CURRENT_TASK
+} from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -102,42 +104,9 @@ export default {
     };
   },
   onShow() {
-    // const {
-    //   _id,
-    //   title,
-    //   date,
-    //   description
-    // } = this.$store.state.event.currentEvent;
-    // this.event_id = _id;
-    // this.event_title = title;
-    // this.date = formatDate(new Date(date)).fullDate;
-    // this.description = description;
-    // const { avatarUrl, nickName } = this.$store.state.user.userInfo;
-    // this.avatarUrl = avatarUrl;
-    // this.nickName = nickName;
-    // const { isReNeedRequest } = this.globalData;
-    // if (isReNeedRequest) {
-    // const { event_id, event_title, date, description } = this.$root.$mp.query;
-    // this.event_id = event_id;
-    // this.event_title = event_title;
-    // this.date = formatDate(new Date(date)).fullDate;
-    // this.description = description;
-    // this.getTasks(this.event_id);
-    // const { avatarUrl, nickName } = this.globalData.userInfo;
-    // this.avatarUrl = avatarUrl;
-    // this.nickName = nickName;
-    // }
+    this.$store.commit(`task/${CLEAR_CURRENT_TASK}`);
   },
   mounted() {
-    // const { event_id, event_title, date, description } = this.$root.$mp.query;
-    // this.event_id = event_id;
-    // this.event_title = event_title;
-    // this.date = formatDate(new Date(date)).fullDate;
-    // this.description = description;
-    // this.getTasks(event_id);
-    // const { avatarUrl, nickName } = this.globalData.userInfo;
-    // this.avatarUrl = avatarUrl;
-    // this.nickName = nickName;
     const {
       _id,
       title,
@@ -186,12 +155,11 @@ export default {
     },
     doneTaskSuccess(message) {
       this.getTasks(this.event_id);
-      this.showToast(message)
+      this.showToast(message);
     },
-    editTask(event_id, task_id) {
-      wx.navigateTo({
-        url: `/pages/addTask/main?event_id=${event_id}&task_id=${task_id}&pageTitle=编辑`
-      });
+    editTask(task) {
+      this.$store.commit(`task/${STORE_TASK_BY_TASK_ID}`, task);
+      wx.navigateTo({ url: `/pages/addTask/main` });
     },
     showModal(task_id) {
       this.isShowModal = true;

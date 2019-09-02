@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { TASK_OPERATION } from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -38,28 +39,35 @@ export default {
     };
   },
   onShow() {
-    this.task_id = "";
-    this.content = "";
-    this.level = false;
-    const { event_id, task_id, pageTitle } = this.$root.$mp.query;
+    this.initData();
+    const { event, task } = this.$store.state;
+    const event_id = event.currentEvent._id;
+    const task_id = task.currentTask._id;
     this.event_id = event_id;
-    if (task_id && pageTitle) {
+    if (task_id) {
       this.task_id = task_id;
-      this.pageTitle = pageTitle;
-      this.isShowLoading = true;
-      this.getTask(event_id, task_id);
+      this.pageTitle = "编辑";
+      this.getTaskInfo(task.currentTask);
     } else {
       this.pageTitle = "添加";
     }
   },
   methods: {
+    initData() {
+      this.event_id = "";
+      this.content = "";
+      this.level = false;
+      this.pageTitle = "添加";
+      this.task_id = "";
+      this.isShowLoading = false;
+    },
     taskInput(e) {
       this.content = e.target.value;
     },
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    async taskOperation() {
+    taskOperation() {
       if (!this.content) {
         this.showToast("请输入");
         return;
@@ -72,37 +80,27 @@ export default {
         task_id: this.task_id,
         event_id: this.event_id
       };
-      const result = await this.jsonRequest(
+      this.$store.dispatch(`task/${TASK_OPERATION}`, {
         method,
-        `/${this.event_id}/tasks`,
-        data
-      );
-      if (!result) {
-        this.isShowLoading = false;
-        this.showToast("请重试");
-        return;
-      }
-      const { message } = result;
+        event_id: this.event_id,
+        data,
+        onSuccess: this.operationSuccess,
+        onFailed: this.operationFailed
+      });
+    },
+    operationSuccess(message) {
       this.isShowLoading = false;
       this.showToast(message);
       this.globalData.isReNeedRequest = true;
-
       wx.navigateBack({ delta: 1 });
     },
-    async getTask(event_id, task_id) {
-      const result = await this.jsonRequest(
-        "GET",
-        `/${event_id}/tasks/${task_id}`
-      );
-      if (!result) {
-        this.isShowLoading = false;
-        this.showToast("请重试");
-        return;
-      }
-      const { data } = result;
-      this.content = data.content;
-      this.level = data.level === 0 ? false : true;
+    operationFailed() {
       this.isShowLoading = false;
+      this.showToast("请重试");
+    },
+    getTaskInfo(task) {
+      this.content = task.content;
+      this.level = task.level === 0 ? false : true;
     }
   }
 };

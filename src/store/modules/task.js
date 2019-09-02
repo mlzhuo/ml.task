@@ -1,4 +1,11 @@
-import { GET_ALL_TASKS, STORE_ALL_TASKS, DONE_TASK } from '../mutation-types'
+import {
+  GET_ALL_TASKS,
+  STORE_ALL_TASKS,
+  DONE_TASK,
+  STORE_TASK_BY_TASK_ID,
+  CLEAR_CURRENT_TASK,
+  TASK_OPERATION
+} from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 import { formatDate } from '@/utils/index'
 const state = {
@@ -74,12 +81,29 @@ const actions = {
       return
     }
     onFailed()
+  },
+  async [TASK_OPERATION](
+    { commit, state },
+    { method, event_id, data, onSuccess, onFailed }
+  ) {
+    const result = await jsonRequest(method, `/${event_id}/tasks`, data)
+    if (!result) {
+      onFailed()
+      return
+    }
+    onSuccess(result.message)
   }
 }
 
 const mutations = {
   [STORE_ALL_TASKS](state, tasks) {
     state.tasks = tasks
+  },
+  [STORE_TASK_BY_TASK_ID](state, task) {
+    state.currentTask = task
+  },
+  [CLEAR_CURRENT_TASK](state) {
+    state.currentTask = {}
   }
 }
 
