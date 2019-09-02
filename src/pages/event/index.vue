@@ -44,7 +44,8 @@
 import {
   GET_EVENTS_DATA,
   STORE_CURRENT_EVENT_ID,
-  CLEAR_CURRENT_EVENT_ID
+  CLEAR_CURRENT_EVENT_ID,
+  CLEAR_CURRENT_EVENT
 } from "@/store/mutation-types";
 let color = [
   "red",
@@ -70,6 +71,7 @@ export default {
   },
   onShow() {
     this.$store.commit(`event/${CLEAR_CURRENT_EVENT_ID}`);
+    this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
   },
   mounted() {
     this.getData();

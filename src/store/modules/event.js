@@ -2,12 +2,17 @@ import {
   GET_EVENTS_DATA,
   STORE_ALL_EVENTS,
   STORE_CURRENT_EVENT_ID,
-  CLEAR_CURRENT_EVENT_ID
+  CLEAR_CURRENT_EVENT_ID,
+  EVENT_OPERATION,
+  GET_EVENT_BY_EVENT_ID,
+  STORE_EVENT_BY_EVENT_ID,
+  CLEAR_CURRENT_EVENT
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 const state = {
   events: [],
-  currentEventId: ''
+  currentEventId: '',
+  currentEvent: {}
 }
 
 const getters = {}
@@ -53,6 +58,46 @@ const actions = {
     } else {
       onFailed()
     }
+  },
+  async [EVENT_OPERATION](
+    { commit, state },
+    {
+      method,
+      title,
+      description,
+      level,
+      user_id,
+      event_id,
+      onSuccess,
+      onFailed
+    }
+  ) {
+    const result = await jsonRequest(method, `/${user_id}/events`, {
+      title,
+      description,
+      level,
+      user_id,
+      event_id
+    })
+    if (!result) {
+      onFailed()
+      return
+    }
+    const { message } = result
+    onSuccess(message)
+  },
+  async [GET_EVENT_BY_EVENT_ID](
+    { commit, state },
+    { user_id, event_id, onSuccess, onFailed }
+  ) {
+    const result = await jsonRequest('GET', `/${user_id}/events/${event_id}`)
+    if (!result) {
+      onFailed()
+      return
+    }
+    const { data } = result
+    commit(STORE_EVENT_BY_EVENT_ID, data)
+    onSuccess(data)
   }
 }
 
@@ -65,6 +110,12 @@ const mutations = {
   },
   [CLEAR_CURRENT_EVENT_ID](state) {
     state.currentEventId = ''
+  },
+  [STORE_EVENT_BY_EVENT_ID](state, event) {
+    state.currentEvent = event
+  },
+  [CLEAR_CURRENT_EVENT](state) {
+    state.currentEvent = {}
   }
 }
 

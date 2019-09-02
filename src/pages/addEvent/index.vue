@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { GET_EVENT_BY_EVENT_ID, EVENT_OPERATION } from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -49,13 +50,6 @@ export default {
     const { user, event } = this.$store.state;
     this.user_id = user.userInfo.userId;
     this.event_id = event.currentEventId;
-    // this.title = "";
-    // this.description = "";
-    // this.event_id = "";
-    // this.level = false;
-    // const { user_id, event_id } = this.$root.$mp.query;
-    // this.user_id = user_id;
-    // this.event_id = event_id;
     if (this.event_id) {
       this.pageTitle = "编辑";
       this.btnTitle = "编辑";
@@ -85,7 +79,7 @@ export default {
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    async eventOperation() {
+    eventOperation() {
       if (!this.title) {
         this.showToast("请输入");
         return;
@@ -96,40 +90,62 @@ export default {
       }
       this.isShowLoading = true;
       const method = this.event_id ? "PUT" : "POST";
-      const result = await this.jsonRequest(method, `/${this.user_id}/events`, {
+      this.$store.dispatch(`event/${EVENT_OPERATION}`, {
+        method,
         title: this.title,
         description: this.description,
         level: this.level ? 1 : 0,
         user_id: this.user_id,
-        event_id: this.event_id
+        event_id: this.event_id,
+        onSuccess: this.operationSuccess,
+        onFailed: this.operationFailed
       });
-      if (!result) {
-        this.isShowLoading = false;
-        this.showToast("请重试");
-        return;
-      }
-      const { message } = result;
+      // const result = await this.jsonRequest(method, `/${this.user_id}/events`, {
+      //   title: this.title,
+      //   description: this.description,
+      //   level: this.level ? 1 : 0,
+      //   user_id: this.user_id,
+      //   event_id: this.event_id
+      // });
+      // if (!result) {
+      //   this.isShowLoading = false;
+      //   this.showToast("请重试");
+      //   return;
+      // }
+      // const { message } = result;
+      // this.isShowLoading = false;
+      // this.showToast(message);
+      // this.globalData.isReNeedRequest = true;
+      // wx.navigateBack({ delta: 1 });
+    },
+    operationSuccess(message) {
       this.isShowLoading = false;
       this.showToast(message);
       this.globalData.isReNeedRequest = true;
       wx.navigateBack({ delta: 1 });
     },
+    operationFailed() {
+      this.isShowLoading = false;
+      this.showToast("请重试");
+    },
     async getEvent(user_id, event_id) {
       this.isShowLoading = true;
-      const result = await this.jsonRequest(
-        "GET",
-        `/${user_id}/events/${event_id}`
-      );
-      if (!result) {
-        this.isShowLoading = false;
-        this.showToast("请重试");
-        return;
-      }
-      const { data } = result;
+      this.$store.dispatch(`event/${GET_EVENT_BY_EVENT_ID}`, {
+        user_id,
+        event_id,
+        onSuccess: this.getEventSuccess,
+        onFailed: this.getEventFailed
+      });
+    },
+    getEventSuccess(data) {
       this.title = data.title;
       this.description = data.description;
       this.level = data.level === 0 ? false : true;
       this.isShowLoading = false;
+    },
+    getEventFailed() {
+      this.isShowLoading = false;
+      this.showToast("请重试");
     }
   }
 };
