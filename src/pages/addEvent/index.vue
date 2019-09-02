@@ -100,23 +100,6 @@ export default {
         onSuccess: this.operationSuccess,
         onFailed: this.operationFailed
       });
-      // const result = await this.jsonRequest(method, `/${this.user_id}/events`, {
-      //   title: this.title,
-      //   description: this.description,
-      //   level: this.level ? 1 : 0,
-      //   user_id: this.user_id,
-      //   event_id: this.event_id
-      // });
-      // if (!result) {
-      //   this.isShowLoading = false;
-      //   this.showToast("请重试");
-      //   return;
-      // }
-      // const { message } = result;
-      // this.isShowLoading = false;
-      // this.showToast(message);
-      // this.globalData.isReNeedRequest = true;
-      // wx.navigateBack({ delta: 1 });
     },
     operationSuccess(message) {
       this.isShowLoading = false;

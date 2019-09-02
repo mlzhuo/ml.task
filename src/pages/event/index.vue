@@ -23,6 +23,7 @@
             v-for="item in events"
             :key="item._id"
             :url="'/pages/task/main?event_id='+item._id+'&event_title='+item.title+'&date='+item.date+'&description='+item.description"
+            @click="saveCurrentEvent(item)"
             @longpress="editEvent(item._id)"
           >
             <view class="nav-title">{{item.title}}</view>
@@ -45,7 +46,8 @@ import {
   GET_EVENTS_DATA,
   STORE_CURRENT_EVENT_ID,
   CLEAR_CURRENT_EVENT_ID,
-  CLEAR_CURRENT_EVENT
+  CLEAR_CURRENT_EVENT,
+  STORE_EVENT_BY_EVENT_ID
 } from "@/store/mutation-types";
 let color = [
   "red",
@@ -100,6 +102,9 @@ export default {
       wx.navigateTo({
         url: `/pages/addEvent/main`
       });
+    },
+    saveCurrentEvent(event) {
+      this.$store.commit(`event/${STORE_EVENT_BY_EVENT_ID}`, event);
     }
   }
 };

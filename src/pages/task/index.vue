@@ -81,7 +81,8 @@
 </template>
 
 <script>
-import { formatDate } from "../../utils/index";
+import { formatDate } from "@/utils/index";
+import { GET_ALL_TASKS } from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -101,85 +102,75 @@ export default {
     };
   },
   onShow() {
-    const { isReNeedRequest } = this.globalData;
-    if (isReNeedRequest) {
-      const { event_id, event_title, date, description } = this.$root.$mp.query;
-      this.event_id = event_id;
-      this.event_title = event_title;
-      this.date = formatDate(new Date(date)).fullDate;
-      this.description = description;
-      this.getTasks(event_id);
-      const { avatarUrl, nickName } = this.globalData.userInfo;
-      this.avatarUrl = avatarUrl;
-      this.nickName = nickName;
-    }
+    // const {
+    //   _id,
+    //   title,
+    //   date,
+    //   description
+    // } = this.$store.state.event.currentEvent;
+    // this.event_id = _id;
+    // this.event_title = title;
+    // this.date = formatDate(new Date(date)).fullDate;
+    // this.description = description;
+    // const { avatarUrl, nickName } = this.$store.state.user.userInfo;
+    // this.avatarUrl = avatarUrl;
+    // this.nickName = nickName;
+    // const { isReNeedRequest } = this.globalData;
+    // if (isReNeedRequest) {
+    // const { event_id, event_title, date, description } = this.$root.$mp.query;
+    // this.event_id = event_id;
+    // this.event_title = event_title;
+    // this.date = formatDate(new Date(date)).fullDate;
+    // this.description = description;
+    // this.getTasks(this.event_id);
+    // const { avatarUrl, nickName } = this.globalData.userInfo;
+    // this.avatarUrl = avatarUrl;
+    // this.nickName = nickName;
+    // }
   },
   mounted() {
-    const { event_id, event_title, date, description } = this.$root.$mp.query;
-    this.event_id = event_id;
-    this.event_title = event_title;
+    // const { event_id, event_title, date, description } = this.$root.$mp.query;
+    // this.event_id = event_id;
+    // this.event_title = event_title;
+    // this.date = formatDate(new Date(date)).fullDate;
+    // this.description = description;
+    // this.getTasks(event_id);
+    // const { avatarUrl, nickName } = this.globalData.userInfo;
+    // this.avatarUrl = avatarUrl;
+    // this.nickName = nickName;
+    const {
+      _id,
+      title,
+      date,
+      description
+    } = this.$store.state.event.currentEvent;
+    this.event_id = _id;
+    this.event_title = title;
     this.date = formatDate(new Date(date)).fullDate;
     this.description = description;
-    this.getTasks(event_id);
-    const { avatarUrl, nickName } = this.globalData.userInfo;
+    const { avatarUrl, nickName } = this.$store.state.user.userInfo;
     this.avatarUrl = avatarUrl;
     this.nickName = nickName;
+    this.getTasks(this.event_id);
   },
   methods: {
     async getTasks(event_id) {
       this.isShowLoading = true;
-      const result = await this.jsonRequest("GET", `/${event_id}/tasks`);
-      if (!result) {
-        this.isShowLoading = false;
-        this.isShowReTry = true;
-        this.showToast("请求失败，请重试");
-        return;
-      }
-      let temp = result.data;
-      let tempObj = {};
-      temp.forEach(item => {
-        const formatDateObj = formatDate(new Date(item.date));
-        item.weekday = formatDateObj.weekday;
-        item.date = formatDateObj.date;
-        item.time = formatDateObj.time;
-        item.edit_time =
-          formatDate(new Date(item.edit_time)).date === formatDateObj.date
-            ? formatDate(new Date(item.edit_time)).time
-            : formatDate(new Date(item.edit_time)).date +
-              " " +
-              formatDate(new Date(item.edit_time)).time;
+      this.$store.dispatch(`task/${GET_ALL_TASKS}`, {
+        event_id,
+        onSuccess: this.getAllTasksSuccess,
+        onFailed: this.getAllTasksFailed
       });
-      temp.forEach(item => {
-        var objArray = tempObj[item.date] || [];
-        objArray.push(item);
-        let isActiveTasks = objArray.filter(v => v.state === 0);
-        let isDoneTasks = objArray.filter(v => v.state === 1);
-        isActiveTasks.sort((a, b) => {
-          if (a.level === b.level) {
-            return (
-              new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
-            );
-          } else {
-            return b.level - a.level;
-          }
-        });
-        isDoneTasks.sort((a, b) => {
-          const editTimeA =
-            a.edit_time.split(" ").length === 2
-              ? new Date(a.edit_time)
-              : new Date(a.date + " " + a.edit_time);
-          const editTimeB =
-            b.edit_time.split(" ").length === 2
-              ? new Date(b.edit_time)
-              : new Date(b.date + " " + b.edit_time);
-          return editTimeB - editTimeA;
-        });
-        objArray = isActiveTasks.concat(isDoneTasks);
-        tempObj[item.date] = objArray;
-      });
-      this.tasks = tempObj;
-      this.checkTasks(tempObj);
+    },
+    getAllTasksSuccess(tasks) {
+      this.tasks = tasks;
+      this.checkTasks(tasks);
       this.isShowLoading = false;
+    },
+    getAllTasksFailed() {
+      this.isShowLoading = false;
+      this.isShowReTry = true;
+      this.showToast("请求失败，请重试");
     },
     checkTasks(obj) {
       Object.keys(obj).length
