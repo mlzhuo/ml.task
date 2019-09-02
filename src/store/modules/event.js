@@ -1,8 +1,6 @@
 import {
   GET_EVENTS_DATA,
   STORE_ALL_EVENTS,
-  STORE_CURRENT_EVENT_ID,
-  CLEAR_CURRENT_EVENT_ID,
   EVENT_OPERATION,
   GET_EVENT_BY_EVENT_ID,
   STORE_EVENT_BY_EVENT_ID,
@@ -11,7 +9,6 @@ import {
 import { jsonRequest } from '@/utils/api'
 const state = {
   events: [],
-  currentEventId: '',
   currentEvent: {}
 }
 
@@ -104,12 +101,6 @@ const actions = {
 const mutations = {
   [STORE_ALL_EVENTS](state, events) {
     state.events = events
-  },
-  [STORE_CURRENT_EVENT_ID](state, eventId) {
-    state.currentEventId = eventId
-  },
-  [CLEAR_CURRENT_EVENT_ID](state) {
-    state.currentEventId = ''
   },
   [STORE_EVENT_BY_EVENT_ID](state, event) {
     state.currentEvent = event

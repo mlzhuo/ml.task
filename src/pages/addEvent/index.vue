@@ -49,11 +49,11 @@ export default {
     this.initData();
     const { user, event } = this.$store.state;
     this.user_id = user.userInfo.userId;
-    this.event_id = event.currentEventId;
+    this.event_id = event.currentEvent._id;
     if (this.event_id) {
       this.pageTitle = "编辑";
       this.btnTitle = "编辑";
-      this.getEvent(this.user_id, this.event_id);
+      this.getEventInfo(event.currentEvent);
     } else {
       this.pageTitle = "添加";
       this.btnTitle = "添加";
@@ -111,24 +111,10 @@ export default {
       this.isShowLoading = false;
       this.showToast("请重试");
     },
-    async getEvent(user_id, event_id) {
-      this.isShowLoading = true;
-      this.$store.dispatch(`event/${GET_EVENT_BY_EVENT_ID}`, {
-        user_id,
-        event_id,
-        onSuccess: this.getEventSuccess,
-        onFailed: this.getEventFailed
-      });
-    },
-    getEventSuccess(data) {
+    getEventInfo(data) {
       this.title = data.title;
       this.description = data.description;
       this.level = data.level === 0 ? false : true;
-      this.isShowLoading = false;
-    },
-    getEventFailed() {
-      this.isShowLoading = false;
-      this.showToast("请重试");
     }
   }
 };

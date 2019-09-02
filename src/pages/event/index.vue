@@ -24,7 +24,7 @@
             :key="item._id"
             :url="'/pages/task/main?event_id='+item._id+'&event_title='+item.title+'&date='+item.date+'&description='+item.description"
             @click="saveCurrentEvent(item)"
-            @longpress="editEvent(item._id)"
+            @longpress="editEvent(item)"
           >
             <view class="nav-title">{{item.title}}</view>
             <view
@@ -44,8 +44,6 @@
 <script>
 import {
   GET_EVENTS_DATA,
-  STORE_CURRENT_EVENT_ID,
-  CLEAR_CURRENT_EVENT_ID,
   CLEAR_CURRENT_EVENT,
   STORE_EVENT_BY_EVENT_ID
 } from "@/store/mutation-types";
@@ -72,7 +70,6 @@ export default {
     };
   },
   onShow() {
-    this.$store.commit(`event/${CLEAR_CURRENT_EVENT_ID}`);
     this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
   },
   mounted() {
@@ -97,8 +94,8 @@ export default {
       this.isShowReTry = true;
       this.showToast("请求失败，请重试");
     },
-    editEvent(event_id) {
-      this.$store.commit(`event/${STORE_CURRENT_EVENT_ID}`, event_id);
+    editEvent(event) {
+      this.$store.commit(`event/${STORE_EVENT_BY_EVENT_ID}`, event);
       wx.navigateTo({
         url: `/pages/addEvent/main`
       });

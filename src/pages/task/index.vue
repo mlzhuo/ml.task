@@ -82,7 +82,7 @@
 
 <script>
 import { formatDate } from "@/utils/index";
-import { GET_ALL_TASKS } from "@/store/mutation-types";
+import { GET_ALL_TASKS, DONE_TASK } from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -154,7 +154,7 @@ export default {
     this.getTasks(this.event_id);
   },
   methods: {
-    async getTasks(event_id) {
+    getTasks(event_id) {
       this.isShowLoading = true;
       this.$store.dispatch(`task/${GET_ALL_TASKS}`, {
         event_id,
@@ -177,18 +177,16 @@ export default {
         ? (this.isNoTasks = true)
         : (this.isNoTasks = false);
     },
-    async doneTask(event_id, task_id) {
-      const result = await this.jsonRequest("PUT", `/${event_id}/tasks`, {
+    doneTask(event_id, task_id) {
+      this.$store.dispatch(`task/${DONE_TASK}`, {
         event_id,
         task_id,
-        state: 1
+        onSuccess: this.doneTaskSuccess
       });
-      const { state, message } = result;
-      if (state) {
-        this.getTasks(this.event_id);
-        this.globalData.isReNeedRequest = true;
-      }
-      this.showToast(message);
+    },
+    doneTaskSuccess(message) {
+      this.getTasks(this.event_id);
+      this.showToast(message)
     },
     editTask(event_id, task_id) {
       wx.navigateTo({
