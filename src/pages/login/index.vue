@@ -12,19 +12,19 @@
     </form>
     <view class="tip">
       <p>版本 {{version}}</p>
-      <p>插画来自 undraw.co</p>
-      <p>页面框架 ColorUI</p>
+      <p>MPVue ColorUI</p>
+      <p>插画 undraw.co</p>
     </view>
     <Loading v-if="isShowLoading"></Loading>
   </view>
 </template>
 
 <script>
+import { LOGIN, SAVE_USER_INFO } from "@/store/mutation-types";
 import { version } from "../../config";
 export default {
   data() {
     return {
-      userInfo: {},
       isShowLoading: false,
       version: "1.0.0"
     };
@@ -36,36 +36,11 @@ export default {
   methods: {
     formSubmit(e) {
       const { formId } = e.target;
-      this.login({ formId, ...this.userInfo });
-    },
-    login(obj) {
-      const that = this;
-      that.isShowLoading = true;
-      const wxCode = wx.login({
-        timeout: 5000,
-        async success(wxres) {
-          const result = await that.jsonRequest("POST", "/login", {
-            ...obj,
-            code: wxres.code
-          });
-          if (result) {
-            const { message, state, data } = result;
-            if (state) {
-              that.showToast(message);
-              const { _id } = data;
-              setTimeout(() => {
-                wx.redirectTo({ url: `/pages/event/main?user_id=${_id}` });
-              }, 200);
-            }
-          } else {
-            that.showToast("登录超时");
-          }
-          that.isShowLoading = false;
-        },
-        fail() {
-          that.showToast("登录超时");
-          that.isShowLoading = false;
-        }
+      this.isShowLoading = true;
+      this.$store.dispatch(`user/${LOGIN}`, {
+        loginFormObj: { formId, ...this.$store.state.user.userInfo },
+        onSuccess: this.onSuccess,
+        onFailed: this.onFailed
       });
     },
     getSetting() {
@@ -76,8 +51,8 @@ export default {
             //用户已经授权过
             wx.getUserInfo({
               success: function(res) {
-                that.userInfo = res.userInfo;
                 that.globalData.userInfo = res.userInfo;
+                that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
               }
             });
           }
@@ -96,8 +71,21 @@ export default {
     bindGetUserInfo(e) {
       if (e.mp.detail.rawData) {
         //允许授权
-        this.userInfo = JSON.parse(e.mp.detail.rawData);
+        this.$store.dispatch(
+          `user/${SAVE_USER_INFO}`,
+          JSON.parse(e.mp.detail.rawData)
+        );
       }
+    },
+    onSuccess({ message, state, data }) {
+      this.showToast(message);
+      const { _id } = data;
+      wx.redirectTo({ url: `/pages/event/main?user_id=${_id}` });
+      this.isShowLoading = false;
+    },
+    onFailed() {
+      this.showToast("登录超时");
+      this.isShowLoading = false;
     }
   }
 };

@@ -1,12 +1,18 @@
+import {
+  GET_ALL_TASKS,
+  STORE_ALL_TASKS,
+  GET_TASK_BY_TASK_ID,
+  STORE_TASK_BY_TASK_ID,
+  ADD_TASK,
+  DONE_TASK
+} from '../mutation-types'
+import { jsonRequest } from '@/utils/api'
 const state = {}
 
-// getters
 const getters = {}
 
-// actions
 const actions = {}
 
-// mutations
 const mutations = {}
 
 export default {

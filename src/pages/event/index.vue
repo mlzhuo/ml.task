@@ -7,7 +7,7 @@
     <view class="container">
       <navigator
         hover-class="none"
-        :url="'/pages/addEvent/main?user_id='+user_id"
+        url="/pages/addEvent/main"
         navigateTo
         class="cu-btn bg-green shadow-blur round lg add-btn"
       >
@@ -36,86 +36,67 @@
       </scroll-view>
     </view>
     <Loading v-if="isShowLoading"></Loading>
-    <ReTry v-if="isShowReTry" :retryMethod="['getData']" @getData="getData(user_id)"></ReTry>
+    <ReTry v-if="isShowReTry" :retryMethod="['getData']" @getData="getData()"></ReTry>
   </view>
 </template>
 
 <script>
-let color = ["red", "orange", "olive", "cyan", "blue"];
+import {
+  GET_EVENTS_DATA,
+  STORE_CURRENT_EVENT_ID,
+  CLEAR_CURRENT_EVENT_ID
+} from "@/store/mutation-types";
+let color = [
+  "red",
+  "orange",
+  "yellow",
+  "olive",
+  "green",
+  "cyan",
+  "blue",
+  "purple",
+  "mauve",
+  "pink",
+  "brown"
+];
 export default {
   data() {
     return {
       user_id: "",
       events: [],
-      eventStatistics: {},
       isShowLoading: true,
       isShowReTry: false
     };
   },
   onShow() {
-    const { isReNeedRequest } = this.globalData;
-    if (isReNeedRequest) {
-      const { user_id } = this.$root.$mp.query;
-      this.user_id = user_id;
-      this.getData(user_id);
-      this.globalData.isReNeedRequest = false;
-    }
+    this.$store.commit(`event/${CLEAR_CURRENT_EVENT_ID}`);
   },
   mounted() {
-    const { user_id } = this.$root.$mp.query;
-    this.user_id = user_id;
-    this.getData(user_id);
+    this.getData();
   },
   methods: {
-    async getData(user_id) {
-      this.isShowLoading = true;
-      const eventsResult = await this.jsonRequest("GET", `/${user_id}/events`);
-      const tasksResult = await this.jsonRequest(
-        "GET",
-        `/${user_id}/statistics`
-      );
-      for (let i = 1; i < color.length; i++) {
-        const random = Math.floor(Math.random() * (i + 1));
-        [color[i], color[random]] = [color[random], color[i]];
-      }
-      if (!eventsResult) {
-        this.isShowLoading = false;
-        this.isShowReTry = true;
-        this.showToast("请求失败，请重试");
-        return;
-      }
-      if (eventsResult.state && tasksResult.state) {
-        let temp = [];
-        let index = 0;
-        eventsResult.data.forEach(item => {
-          if (index >= color.length) {
-            index = 0;
-          }
-          item = {
-            ...item,
-            color: color[index],
-            cuIcon: item.level === 0 ? "" : "favorfill"
-          };
-          index++;
-          temp.push(item);
-        });
-        for (const key in tasksResult.data) {
-          const { isDone, all } = tasksResult.data[key];
-          let event = temp.find(event => event._id === key);
-          event.isDone = isDone;
-          event.all = all;
-        }
-        this.events = temp;
-        this.isShowLoading = false;
-      } else {
-        this.isShowLoading = false;
-        this.isShowReTry = true;
-        this.showToast("请求失败，请重试");
-      }
+    getData() {
+      this.user_id = this.$store.state.user.userInfo.userId;
+      this.$store.dispatch(`event/${GET_EVENTS_DATA}`, {
+        user_id: this.user_id,
+        onSuccess: this.onSuccess,
+        onFailed: this.onFailed,
+        color
+      });
+    },
+    onSuccess() {
+      this.events = this.$store.state.event.events;
+      this.isShowLoading = false;
+    },
+    onFailed() {
+      this.isShowLoading = false;
+      this.isShowReTry = true;
+      this.showToast("请求失败，请重试");
     },
     editEvent(event_id) {
+      this.$store.commit(`event/${STORE_CURRENT_EVENT_ID}`, event_id);
       wx.navigateTo({
-        url: `/pages/addEvent/main?event_id=${event_id}&user_id=${this.user_id}`
+        url: `/pages/addEvent/main`
       });
     }
   }

@@ -45,23 +45,37 @@ export default {
     };
   },
   onShow() {
-    this.title = "";
-    this.description = "";
-    this.event_id = "";
-    this.level = false;
-    const { user_id, event_id } = this.$root.$mp.query;
-    this.user_id = user_id;
-    this.event_id = event_id;
-    if (event_id) {
+    this.initData();
+    const { user, event } = this.$store.state;
+    this.user_id = user.userInfo.userId;
+    this.event_id = event.currentEventId;
+    // this.title = "";
+    // this.description = "";
+    // this.event_id = "";
+    // this.level = false;
+    // const { user_id, event_id } = this.$root.$mp.query;
+    // this.user_id = user_id;
+    // this.event_id = event_id;
+    if (this.event_id) {
       this.pageTitle = "编辑";
       this.btnTitle = "编辑";
-      this.getEvent(user_id, event_id);
+      this.getEvent(this.user_id, this.event_id);
     } else {
       this.pageTitle = "添加";
       this.btnTitle = "添加";
     }
   },
   methods: {
+    initData() {
+      this.user_id = "";
+      this.event_id = "";
+      this.title = "";
+      this.pageTitle = "";
+      this.btnTitle = "";
+      this.description = "";
+      this.level = false;
+      this.isShowLoading = false;
+    },
     titleInput(e) {
       this.title = e.target.value;
     },
