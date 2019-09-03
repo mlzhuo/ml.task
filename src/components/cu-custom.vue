@@ -24,21 +24,20 @@ export default {
   data() {
     return {
       StatusBar: this.StatusBar,
-      CustomBar: this.CustomBar
+      CustomBar: this.CustomBar,
+      style: {}
     };
   },
   name: "cu-custom",
-  computed: {
-    style() {
-      var StatusBar = this.StatusBar;
-      var CustomBar = this.CustomBar;
-      var bgImage = this.bgImage;
-      var style = `height:${CustomBar}px;padding-top:${StatusBar}px;`;
-      if (this.bgImage) {
-        style = `${style}background-image:url(${bgImage});`;
-      }
-      return style;
+  mounted() {
+    var StatusBar = this.StatusBar;
+    var CustomBar = this.CustomBar;
+    var bgImage = this.bgImage;
+    var style = `height:${CustomBar}px;padding-top:${StatusBar}px;`;
+    if (this.bgImage) {
+      style = `${style}background-image:url(${bgImage});`;
     }
+    this.style = style;
   },
   props: {
     bgcolor: {

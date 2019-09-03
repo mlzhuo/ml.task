@@ -31,7 +31,11 @@
 </template>
 
 <script>
-import { GET_EVENT_BY_EVENT_ID, EVENT_OPERATION } from "@/store/mutation-types";
+import {
+  GET_EVENT_BY_EVENT_ID,
+  EVENT_OPERATION,
+  IS_NEED_REFRESH_EVENT
+} from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -46,7 +50,6 @@ export default {
     };
   },
   onShow() {
-    this.initData();
     const { user, event } = this.$store.state;
     this.user_id = user.userInfo.userId;
     this.event_id = event.currentEvent._id;
@@ -60,16 +63,6 @@ export default {
     }
   },
   methods: {
-    initData() {
-      this.user_id = "";
-      this.event_id = "";
-      this.title = "";
-      this.pageTitle = "";
-      this.btnTitle = "";
-      this.description = "";
-      this.level = false;
-      this.isShowLoading = false;
-    },
     titleInput(e) {
       this.title = e.target.value;
     },
@@ -102,9 +95,9 @@ export default {
       });
     },
     operationSuccess(message) {
+      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
       this.isShowLoading = false;
       this.showToast(message);
-      this.globalData.isReNeedRequest = true;
       wx.navigateBack({ delta: 1 });
     },
     operationFailed() {
@@ -116,6 +109,9 @@ export default {
       this.description = data.description;
       this.level = data.level === 0 ? false : true;
     }
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
   }
 };
 </script>

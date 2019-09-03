@@ -4,7 +4,7 @@
       <block slot="backText">返回</block>
       <block slot="content">事件记录</block>
     </cu-custom>
-    <view class="cu-card dynamic" :class="isCard?'no-card':''">
+    <view class="cu-card">
       <view class="cu-item shadow">
         <view class="cu-list menu-avatar">
           <view class="cu-item">
@@ -83,7 +83,9 @@ import {
   GET_ALL_TASKS,
   DONE_TASK,
   STORE_TASK_BY_TASK_ID,
-  CLEAR_CURRENT_TASK
+  CLEAR_CURRENT_TASK,
+  IS_NEED_REFRESH_EVENT,
+  IS_NEED_REFRESH_TASK
 } from "@/store/mutation-types";
 export default {
   data() {
@@ -96,7 +98,7 @@ export default {
       nickName: "",
       tasks: {},
       isNoTasks: true,
-      isShowLoading: true,
+      isShowLoading: false,
       isShowReTry: false,
       isShowModal: false,
       longPressItemArr: ["未完成功能 ^_^"],
@@ -105,22 +107,26 @@ export default {
   },
   onShow() {
     this.$store.commit(`task/${CLEAR_CURRENT_TASK}`);
-  },
-  mounted() {
-    const {
-      _id,
-      title,
-      date,
-      description
-    } = this.$store.state.event.currentEvent;
+    const { event, task, user } = this.$store.state;
+    const { _id, title, date, description } = event.currentEvent;
     this.event_id = _id;
     this.event_title = title;
     this.date = formatDate(new Date(date)).fullDate;
     this.description = description;
-    const { avatarUrl, nickName } = this.$store.state.user.userInfo;
+    const { avatarUrl, nickName } = user.userInfo;
     this.avatarUrl = avatarUrl;
     this.nickName = nickName;
-    this.getTasks(this.event_id);
+    const isNeedRefresh = task.isNeedRefresh;
+    if (
+      !task.tasks[this.event_id] ||
+      task.isNeedRefresh[this.event_id].isNeed
+    ) {
+      this.isShowLoading = true;
+      this.getTasks(this.event_id);
+    } else {
+      this.tasks = task.tasks[this.event_id];
+      this.checkTasks(this.tasks);
+    }
   },
   methods: {
     getTasks(event_id) {
@@ -132,6 +138,9 @@ export default {
       });
     },
     getAllTasksSuccess(tasks) {
+      this.$store.commit(`task/${IS_NEED_REFRESH_TASK}`, {
+        [this.event_id]: { isNeed: false }
+      });
       this.tasks = tasks;
       this.checkTasks(tasks);
       this.isShowLoading = false;
@@ -156,6 +165,7 @@ export default {
     doneTaskSuccess(message) {
       this.getTasks(this.event_id);
       this.showToast(message);
+      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
     },
     editTask(task) {
       this.$store.commit(`task/${STORE_TASK_BY_TASK_ID}`, task);
@@ -172,6 +182,9 @@ export default {
       this.isShowModal = false;
       this.showToast("未完成功能 ^_^");
     }
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
   }
 };
 </script>

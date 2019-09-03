@@ -4,13 +4,15 @@ import {
   DONE_TASK,
   STORE_TASK_BY_TASK_ID,
   CLEAR_CURRENT_TASK,
-  TASK_OPERATION
+  TASK_OPERATION,
+  IS_NEED_REFRESH_TASK
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 import { formatDate } from '@/utils/index'
 const state = {
   tasks: {},
-  currentTask: {}
+  currentTask: {},
+  isNeedRefresh: {}
 }
 
 const getters = {}
@@ -64,7 +66,7 @@ const actions = {
       objArray = isActiveTasks.concat(isDoneTasks)
       tempObj[item.date] = objArray
     })
-    commit(STORE_ALL_TASKS, tempObj)
+    commit(STORE_ALL_TASKS, { [event_id]: tempObj })
     onSuccess(tempObj)
   },
   async [DONE_TASK](
@@ -97,13 +99,16 @@ const actions = {
 
 const mutations = {
   [STORE_ALL_TASKS](state, tasks) {
-    state.tasks = tasks
+    state.tasks = Object.assign({}, state.tasks, tasks)
   },
   [STORE_TASK_BY_TASK_ID](state, task) {
     state.currentTask = task
   },
   [CLEAR_CURRENT_TASK](state) {
     state.currentTask = {}
+  },
+  [IS_NEED_REFRESH_TASK](state, isNeedRefresh) {
+    state.isNeedRefresh = Object.assign({}, state.isNeedRefresh, isNeedRefresh)
   }
 }
 

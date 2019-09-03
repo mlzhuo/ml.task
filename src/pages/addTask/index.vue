@@ -26,7 +26,11 @@
 </template>
 
 <script>
-import { TASK_OPERATION } from "@/store/mutation-types";
+import {
+  TASK_OPERATION,
+  IS_NEED_REFRESH_EVENT,
+  IS_NEED_REFRESH_TASK
+} from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -39,7 +43,6 @@ export default {
     };
   },
   onShow() {
-    this.initData();
     const { event, task } = this.$store.state;
     const event_id = event.currentEvent._id;
     const task_id = task.currentTask._id;
@@ -53,14 +56,6 @@ export default {
     }
   },
   methods: {
-    initData() {
-      this.event_id = "";
-      this.content = "";
-      this.level = false;
-      this.pageTitle = "添加";
-      this.task_id = "";
-      this.isShowLoading = false;
-    },
     taskInput(e) {
       this.content = e.target.value;
     },
@@ -89,9 +84,12 @@ export default {
       });
     },
     operationSuccess(message) {
+      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
+      this.$store.commit(`task/${IS_NEED_REFRESH_TASK}`, {
+        [this.event_id]: { isNeed: true }
+      });
       this.isShowLoading = false;
       this.showToast(message);
-      this.globalData.isReNeedRequest = true;
       wx.navigateBack({ delta: 1 });
     },
     operationFailed() {
@@ -102,6 +100,9 @@ export default {
       this.content = task.content;
       this.level = task.level === 0 ? false : true;
     }
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
   }
 };
 </script>

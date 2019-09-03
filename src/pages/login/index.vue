@@ -51,7 +51,6 @@ export default {
             //用户已经授权过
             wx.getUserInfo({
               success: function(res) {
-                that.globalData.userInfo = res.userInfo;
                 that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
               }
             });

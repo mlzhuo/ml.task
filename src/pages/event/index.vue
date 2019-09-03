@@ -22,7 +22,7 @@
             :class="'bg-'+item.color"
             v-for="item in events"
             :key="item._id"
-            :url="'/pages/task/main?event_id='+item._id+'&event_title='+item.title+'&date='+item.date+'&description='+item.description"
+            url="/pages/task/main"
             @click="saveCurrentEvent(item)"
             @longpress="editEvent(item)"
           >
@@ -45,7 +45,8 @@
 import {
   GET_EVENTS_DATA,
   CLEAR_CURRENT_EVENT,
-  STORE_EVENT_BY_EVENT_ID
+  STORE_EVENT_BY_EVENT_ID,
+  IS_NEED_REFRESH_EVENT
 } from "@/store/mutation-types";
 let color = [
   "red",
@@ -71,9 +72,10 @@ export default {
   },
   onShow() {
     this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
-  },
-  mounted() {
-    this.getData();
+    const isNeedRefresh = this.$store.state.event.isNeedRefresh;
+    if (isNeedRefresh) {
+      this.getData();
+    }
   },
   methods: {
     getData() {
@@ -88,6 +90,7 @@ export default {
     onSuccess() {
       this.events = this.$store.state.event.events;
       this.isShowLoading = false;
+      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, false);
     },
     onFailed() {
       this.isShowLoading = false;

@@ -3,12 +3,14 @@ import {
   STORE_ALL_EVENTS,
   EVENT_OPERATION,
   STORE_EVENT_BY_EVENT_ID,
-  CLEAR_CURRENT_EVENT
+  CLEAR_CURRENT_EVENT,
+  IS_NEED_REFRESH_EVENT
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 const state = {
   events: [],
-  currentEvent: {}
+  currentEvent: {},
+  isNeedRefresh: true
 }
 
 const getters = {}
@@ -93,6 +95,9 @@ const mutations = {
   },
   [CLEAR_CURRENT_EVENT](state) {
     state.currentEvent = {}
+  },
+  [IS_NEED_REFRESH_EVENT](state, isNeedRefresh) {
+    state.isNeedRefresh = isNeedRefresh
   }
 }
 
