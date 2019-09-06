@@ -4,13 +4,24 @@ import {
   EVENT_OPERATION,
   STORE_EVENT_BY_EVENT_ID,
   CLEAR_CURRENT_EVENT,
-  IS_NEED_REFRESH_EVENT
+  IS_NEED_REFRESH_EVENT,
+  GET_ALL_TASKS,
+  STORE_ALL_TASKS,
+  DONE_TASK,
+  STORE_TASK_BY_TASK_ID,
+  CLEAR_CURRENT_TASK,
+  TASK_OPERATION,
+  IS_NEED_REFRESH_TASK
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
+import { formatDate } from '@/utils/index'
 const state = {
   events: [],
   currentEvent: {},
-  isNeedRefresh: true
+  isNeedRefreshEvent: true,
+  tasks: {},
+  currentTask: {},
+  isNeedRefreshTask: {}
 }
 
 const getters = {}
@@ -22,10 +33,6 @@ const actions = {
   ) {
     const eventsResult = await jsonRequest('GET', `/${user_id}/events`)
     const tasksResult = await jsonRequest('GET', `/${user_id}/statistics`)
-    for (let i = 1; i < color.length; i++) {
-      const random = Math.floor(Math.random() * (i + 1))
-      ;[color[i], color[random]] = [color[random], color[i]]
-    }
     if (!eventsResult) {
       onFailed()
       return
@@ -83,6 +90,83 @@ const actions = {
     }
     const { message } = result
     onSuccess(message)
+  },
+  async [GET_ALL_TASKS]({ commit, state }, { event_id, onSuccess, onFailed }) {
+    const result = await jsonRequest('GET', `/${event_id}/tasks`)
+    if (!result) {
+      onFailed()
+      return
+    }
+    let temp = result.data
+    let tempObj = {}
+    temp.forEach(item => {
+      const formatDateObj = formatDate(new Date(item.date))
+      item.weekday = formatDateObj.weekday
+      item.date = formatDateObj.date
+      item.time = formatDateObj.time
+      item.edit_time =
+        formatDate(new Date(item.edit_time)).date === formatDateObj.date
+          ? formatDate(new Date(item.edit_time)).time
+          : formatDate(new Date(item.edit_time)).date +
+            ' ' +
+            formatDate(new Date(item.edit_time)).time
+    })
+    temp.forEach(item => {
+      var objArray = tempObj[item.date] || []
+      objArray.push(item)
+      let isActiveTasks = objArray.filter(v => v.state === 0)
+      let isDoneTasks = objArray.filter(v => v.state === 1)
+      isActiveTasks.sort((a, b) => {
+        if (a.level === b.level) {
+          return (
+            new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+          )
+        } else {
+          return b.level - a.level
+        }
+      })
+      isDoneTasks.sort((a, b) => {
+        const editTimeA =
+          a.edit_time.split(' ').length === 2
+            ? new Date(a.edit_time)
+            : new Date(a.date + ' ' + a.edit_time)
+        const editTimeB =
+          b.edit_time.split(' ').length === 2
+            ? new Date(b.edit_time)
+            : new Date(b.date + ' ' + b.edit_time)
+        return editTimeB - editTimeA
+      })
+      objArray = isActiveTasks.concat(isDoneTasks)
+      tempObj[item.date] = objArray
+    })
+    commit(STORE_ALL_TASKS, { [event_id]: tempObj })
+    onSuccess(tempObj)
+  },
+  async [DONE_TASK](
+    { commit, state },
+    { event_id, task_id, onSuccess, onFailed }
+  ) {
+    const result = await jsonRequest('PUT', `/${event_id}/tasks`, {
+      event_id,
+      task_id,
+      state: 1
+    })
+    if (result.state) {
+      onSuccess(result.message)
+      return
+    }
+    onFailed()
+  },
+  async [TASK_OPERATION](
+    { commit, state },
+    { method, event_id, data, onSuccess, onFailed }
+  ) {
+    const result = await jsonRequest(method, `/${event_id}/tasks`, data)
+    if (!result) {
+      onFailed()
+      return
+    }
+    onSuccess(result.message)
   }
 }
 
@@ -96,8 +180,24 @@ const mutations = {
   [CLEAR_CURRENT_EVENT](state) {
     state.currentEvent = {}
   },
-  [IS_NEED_REFRESH_EVENT](state, isNeedRefresh) {
-    state.isNeedRefresh = isNeedRefresh
+  [IS_NEED_REFRESH_EVENT](state, isNeedRefreshEvent) {
+    state.isNeedRefreshEvent = isNeedRefreshEvent
+  },
+  [STORE_ALL_TASKS](state, tasks) {
+    state.tasks = Object.assign({}, state.tasks, tasks)
+  },
+  [STORE_TASK_BY_TASK_ID](state, task) {
+    state.currentTask = task
+  },
+  [CLEAR_CURRENT_TASK](state) {
+    state.currentTask = {}
+  },
+  [IS_NEED_REFRESH_TASK](state, isNeedRefreshTask) {
+    state.isNeedRefreshTask = Object.assign(
+      {},
+      state.isNeedRefreshTask,
+      isNeedRefreshTask
+    )
   }
 }
 

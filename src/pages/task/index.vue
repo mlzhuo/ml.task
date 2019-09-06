@@ -21,9 +21,9 @@
     <view class="container">
       <navigator
         hover-class="none"
-        :url="'/pages/addTask/main?event_id='+event_id"
+        url="/pages/task_add/main"
         navigateTo
-        class="cu-btn bg-green shadow-blur round lg add-btn"
+        class="cu-btn bg-gradual-blue shadow-blur round lg add-btn"
       >
         <text class="cuIcon-add"></text>添加记录
       </navigator>
@@ -106,8 +106,8 @@ export default {
     };
   },
   onShow() {
-    this.$store.commit(`task/${CLEAR_CURRENT_TASK}`);
-    const { event, task, user } = this.$store.state;
+    this.$store.commit(`event/${CLEAR_CURRENT_TASK}`);
+    const { event, user } = this.$store.state;
     const { _id, title, date, description } = event.currentEvent;
     this.event_id = _id;
     this.event_title = title;
@@ -116,29 +116,29 @@ export default {
     const { avatarUrl, nickName } = user.userInfo;
     this.avatarUrl = avatarUrl;
     this.nickName = nickName;
-    const isNeedRefresh = task.isNeedRefresh;
+    const isNeedRefreshTask = event.isNeedRefreshTask;
     if (
-      !task.tasks[this.event_id] ||
-      task.isNeedRefresh[this.event_id].isNeed
+      !event.tasks[this.event_id] ||
+      event.isNeedRefreshTask[this.event_id].isNeed
     ) {
       this.isShowLoading = true;
       this.getTasks(this.event_id);
     } else {
-      this.tasks = task.tasks[this.event_id];
+      this.tasks = event.tasks[this.event_id];
       this.checkTasks(this.tasks);
     }
   },
   methods: {
     getTasks(event_id) {
       this.isShowLoading = true;
-      this.$store.dispatch(`task/${GET_ALL_TASKS}`, {
+      this.$store.dispatch(`event/${GET_ALL_TASKS}`, {
         event_id,
         onSuccess: this.getAllTasksSuccess,
         onFailed: this.getAllTasksFailed
       });
     },
     getAllTasksSuccess(tasks) {
-      this.$store.commit(`task/${IS_NEED_REFRESH_TASK}`, {
+      this.$store.commit(`event/${IS_NEED_REFRESH_TASK}`, {
         [this.event_id]: { isNeed: false }
       });
       this.tasks = tasks;
@@ -156,7 +156,7 @@ export default {
         : (this.isNoTasks = false);
     },
     doneTask(event_id, task_id) {
-      this.$store.dispatch(`task/${DONE_TASK}`, {
+      this.$store.dispatch(`event/${DONE_TASK}`, {
         event_id,
         task_id,
         onSuccess: this.doneTaskSuccess
@@ -168,8 +168,8 @@ export default {
       this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
     },
     editTask(task) {
-      this.$store.commit(`task/${STORE_TASK_BY_TASK_ID}`, task);
-      wx.navigateTo({ url: `/pages/addTask/main` });
+      this.$store.commit(`event/${STORE_TASK_BY_TASK_ID}`, task);
+      wx.navigateTo({ url: `/pages/task_add/main` });
     },
     showModal(task_id) {
       this.isShowModal = true;

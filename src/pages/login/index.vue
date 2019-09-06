@@ -1,13 +1,13 @@
 <template>
   <view>
-    <image src="/static/images/bg.svg" mode="widthFix" class="response" />
+    <image :src="bgUrl" mode="widthFix" class="response" />
     <form @submit="formSubmit" report-submit>
       <button
         form-type="submit"
         open-type="getUserInfo"
         @getuserinfo="bindGetUserInfo"
         @click="wxCanIUse"
-        class="wx-login-btn cu-btn bg-cyan"
+        class="wx-login-btn cu-btn bg-gradual-blue"
       >登录</button>
     </form>
     <view class="tip">
@@ -21,17 +21,18 @@
 
 <script>
 import { LOGIN, SAVE_USER_INFO } from "@/store/mutation-types";
-import { version } from "../../config";
+import { config } from "@/config";
 export default {
   data() {
     return {
       isShowLoading: false,
-      version: "1.0.0"
+      version: "1.0.0",
+      bgUrl: "/static/images/login_bg_m.svg"
     };
   },
   mounted() {
     this.getSetting();
-    this.version = version;
+    this.version = config.version;
   },
   methods: {
     formSubmit(e) {
@@ -52,6 +53,10 @@ export default {
             wx.getUserInfo({
               success: function(res) {
                 that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
+                const { gender } = res.userInfo;
+                if (gender === 2) {
+                  that.bgUrl = "/static/images/login_bg_f.svg";
+                }
               }
             });
           }
@@ -76,10 +81,9 @@ export default {
         );
       }
     },
-    onSuccess({ message, state, data }) {
+    onSuccess({ message }) {
       this.showToast(message);
-      const { _id } = data;
-      wx.redirectTo({ url: `/pages/event/main?user_id=${_id}` });
+      wx.reLaunch({ url: "/pages/event/main" });
       this.isShowLoading = false;
     },
     onFailed() {

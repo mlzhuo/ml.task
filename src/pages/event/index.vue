@@ -7,9 +7,9 @@
     <view class="container">
       <navigator
         hover-class="none"
-        url="/pages/addEvent/main"
+        url="/pages/event_add/main"
         navigateTo
-        class="cu-btn bg-green shadow-blur round lg add-btn"
+        class="cu-btn bg-gradual-blue shadow-blur round lg add-btn"
       >
         <text class="cuIcon-add"></text>添加事件
       </navigator>
@@ -24,7 +24,7 @@
             :key="item._id"
             url="/pages/task/main"
             @click="saveCurrentEvent(item)"
-            @longpress="editEvent(item)"
+            @longpress="showModal(item)"
           >
             <view class="nav-title">{{item.title}}</view>
             <view
@@ -35,6 +35,22 @@
         </view>
         <view class="cu-tabbar-height"></view>
       </scroll-view>
+    </view>
+    <view class="cu-modal" :class="isShowModal?'show':''" @tap="hideModal">
+      <view class="cu-dialog" @tap.stop>
+        <view class="cu-list menu text-left">
+          <view
+            class="cu-item"
+            v-for="(item,index) in longPressItemArr"
+            :key="index"
+            @click="doSomething(index)"
+          >
+            <label class="flex justify-between align-center flex-sub">
+              <view class="flex-sub">{{item}}</view>
+            </label>
+          </view>
+        </view>
+      </view>
     </view>
     <Loading v-if="isShowLoading"></Loading>
     <ReTry v-if="isShowReTry" :retryMethod="['getData']" @getData="getData()"></ReTry>
@@ -48,32 +64,23 @@ import {
   STORE_EVENT_BY_EVENT_ID,
   IS_NEED_REFRESH_EVENT
 } from "@/store/mutation-types";
-let color = [
-  "red",
-  "orange",
-  "yellow",
-  "olive",
-  "green",
-  "cyan",
-  "blue",
-  "purple",
-  "mauve",
-  "pink",
-  "brown"
-];
+let color = ["red", "orange", "cyan"];
 export default {
   data() {
     return {
       user_id: "",
       events: [],
       isShowLoading: true,
-      isShowReTry: false
+      isShowReTry: false,
+      isShowModal: false,
+      longPressItemArr: ["编辑", "未完成功能 ^_^"],
+      longPressEventId: ""
     };
   },
   onShow() {
     this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
-    const isNeedRefresh = this.$store.state.event.isNeedRefresh;
-    if (isNeedRefresh) {
+    const isNeedRefreshEvent = this.$store.state.event.isNeedRefreshEvent;
+    if (isNeedRefreshEvent) {
       this.getData();
     }
   },
@@ -97,14 +104,31 @@ export default {
       this.isShowReTry = true;
       this.showToast("请求失败，请重试");
     },
-    editEvent(event) {
-      this.$store.commit(`event/${STORE_EVENT_BY_EVENT_ID}`, event);
+    editEvent() {
       wx.navigateTo({
-        url: `/pages/addEvent/main`
+        url: `/pages/event_add/main`
       });
     },
     saveCurrentEvent(event) {
       this.$store.commit(`event/${STORE_EVENT_BY_EVENT_ID}`, event);
+    },
+    showModal(event) {
+      this.saveCurrentEvent(event);
+      this.isShowModal = true;
+    },
+    hideModal() {
+      this.isShowModal = false;
+    },
+    doSomething(index) {
+      this.isShowModal = false;
+      switch (index) {
+        case 0:
+          this.editEvent();
+          break;
+        default:
+          this.showToast("未完成功能 ^_^");
+          break;
+      }
     }
   }
 };

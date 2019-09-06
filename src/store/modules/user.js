@@ -27,7 +27,7 @@ const actions = {
           if (state) {
             const { _id } = data
             commit(LOGIN_SUCCESS, { userId: _id })
-            onSuccess({ message, state, data })
+            onSuccess({ message })
           }
         } else {
           commit(LOGIN_FAILED)

@@ -2,10 +2,34 @@
   "pages": [
     "pages/login/main",
     "pages/event/main",
-    "pages/addEvent/main",
+    "pages/event_add/main",
     "pages/task/main",
-    "pages/addTask/main"
+    "pages/task_add/main",
+    "pages/tools/main",
+    "pages/user/main"
   ],
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/event/main",
+        "iconPath": "/static/images/tabbar/basics.png",
+        "selectedIconPath": "/static/images/tabbar/basics_cur.png",
+        "text": "记事"
+      },
+      {
+        "pagePath": "pages/tools/main",
+        "iconPath": "/static/images/tabbar/plugin.png",
+        "selectedIconPath": "/static/images/tabbar/plugin_cur.png",
+        "text": "工具"
+      },
+      {
+        "pagePath": "pages/user/main",
+        "iconPath": "/static/images/tabbar/about.png",
+        "selectedIconPath": "/static/images/tabbar/about_cur.png",
+        "text": "个人"
+      }
+    ]
+  },
   "window": {
     "navigationBarBackgroundColor": "#0081ff",
     "navigationBarTitleText": "ML TASK",

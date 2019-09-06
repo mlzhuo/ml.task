@@ -58,7 +58,6 @@ export default {};
   text-transform: Capitalize;
   margin-top: 20px;
   position: relative;
-  color: #fff;
 }
 
 .nav-name::before {
@@ -83,9 +82,6 @@ export default {};
   bottom: 0;
   right: 40px;
   opacity: 0.3;
-}
-.nav-li .cuIcon-favorfill {
-  color: #fff;
 }
 
 .nav-li text {

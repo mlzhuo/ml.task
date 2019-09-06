@@ -5,9 +5,13 @@
       <block slot="content">{{pageTitle}}</block>
     </cu-custom>
     <div class="container">
+      <view class="cu-form-group">
+        <view class="title">事件名称</view>
+        <input name="input" @input="titleInput" :value="title" />
+      </view>
       <view class="cu-form-group align-start">
-        <view class="title">记录描述</view>
-        <textarea maxlength="-1" @input="taskInput" :value="content"></textarea>
+        <view class="title">事件描述</view>
+        <textarea maxlength="-1" @input="descInput" :value="description"></textarea>
       </view>
       <view class="cu-form-group">
         <view class="title">是否优先</view>
@@ -17,9 +21,10 @@
           :class="level?'checked':''"
           :checked="level?true:false"
           color="#e54d42"
+          :value="level"
         ></switch>
       </view>
-      <button class="cu-btn block bg-green shadow lg add-btn" @click="taskOperation">{{pageTitle}}</button>
+      <button class="cu-btn block bg-gradual-blue shadow lg add-btn" @click="eventOperation">{{btnTitle}}</button>
     </div>
     <Loading v-if="isShowLoading"></Loading>
   </view>
@@ -27,67 +32,70 @@
 
 <script>
 import {
-  TASK_OPERATION,
-  IS_NEED_REFRESH_EVENT,
-  IS_NEED_REFRESH_TASK
+  GET_EVENT_BY_EVENT_ID,
+  EVENT_OPERATION,
+  IS_NEED_REFRESH_EVENT
 } from "@/store/mutation-types";
 export default {
   data() {
     return {
+      user_id: "",
       event_id: "",
-      content: "",
+      title: "",
+      pageTitle: "",
+      btnTitle: "",
+      description: "",
       level: false,
-      pageTitle: "添加",
-      task_id: "",
       isShowLoading: false
     };
   },
   onShow() {
-    const { event, task } = this.$store.state;
-    const event_id = event.currentEvent._id;
-    const task_id = task.currentTask._id;
-    this.event_id = event_id;
-    if (task_id) {
-      this.task_id = task_id;
+    const { user, event } = this.$store.state;
+    this.user_id = user.userInfo.userId;
+    this.event_id = event.currentEvent._id;
+    if (this.event_id) {
       this.pageTitle = "编辑";
-      this.getTaskInfo(task.currentTask);
+      this.btnTitle = "编辑";
+      this.getEventInfo(event.currentEvent);
     } else {
       this.pageTitle = "添加";
+      this.btnTitle = "添加";
     }
   },
   methods: {
-    taskInput(e) {
-      this.content = e.target.value;
+    titleInput(e) {
+      this.title = e.target.value;
+    },
+    descInput(e) {
+      this.description = e.target.value;
     },
     levelSwitch(e) {
       this.level = e.target.value;
     },
-    taskOperation() {
-      if (!this.content) {
+    eventOperation() {
+      if (!this.title) {
         this.showToast("请输入");
         return;
       }
+      if (this.title.replace(/[^\u0000-\u00ff]/g, "aa").length > 8) {
+        this.showToast("简单点，四个字就好");
+        return;
+      }
       this.isShowLoading = true;
-      const method = this.task_id ? "PUT" : "POST";
-      let data = {
-        content: this.content,
-        level: this.level ? 1 : 0,
-        task_id: this.task_id,
-        event_id: this.event_id
-      };
-      this.$store.dispatch(`task/${TASK_OPERATION}`, {
+      const method = this.event_id ? "PUT" : "POST";
+      this.$store.dispatch(`event/${EVENT_OPERATION}`, {
         method,
+        title: this.title,
+        description: this.description,
+        level: this.level ? 1 : 0,
+        user_id: this.user_id,
         event_id: this.event_id,
-        data,
         onSuccess: this.operationSuccess,
         onFailed: this.operationFailed
       });
     },
     operationSuccess(message) {
       this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
-      this.$store.commit(`task/${IS_NEED_REFRESH_TASK}`, {
-        [this.event_id]: { isNeed: true }
-      });
       this.isShowLoading = false;
       this.showToast(message);
       wx.navigateBack({ delta: 1 });
@@ -96,9 +104,10 @@ export default {
       this.isShowLoading = false;
       this.showToast("请重试");
     },
-    getTaskInfo(task) {
-      this.content = task.content;
-      this.level = task.level === 0 ? false : true;
+    getEventInfo(data) {
+      this.title = data.title;
+      this.description = data.description;
+      this.level = data.level === 0 ? false : true;
     }
   },
   onUnload() {
