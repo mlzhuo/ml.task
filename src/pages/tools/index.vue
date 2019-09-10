@@ -1,5 +1,5 @@
 <template>
-  <scroll-view scroll-y class="page">
+  <view>
     <cu-custom bgcolor="bg-gradual-purple" :isBack="false">
       <block slot="backText">返回</block>
       <block slot="content">工具</block>
@@ -7,7 +7,6 @@
     <view class="cu-card">
       <view
         class="cu-item bg-gradual-purple shadow-blur"
-        @tap="toChild"
         :data-url="item.url"
         v-for="(item,index) in list"
         :key="index"
@@ -15,9 +14,12 @@
         <image class="item-bg-img" :src="gender===2?item.female:item.male" />
         <view class="cardTitle">{{item.title}}</view>
       </view>
+      <view class="cu-item bg-grey light shadow-blur">
+        <view class="cardTitle">Coming soon</view>
+      </view>
     </view>
     <view class="cu-tabbar-height"></view>
-  </scroll-view>
+  </view>
 </template>
 
 <script>

@@ -25,6 +25,7 @@
         ></switch>
       </view>
       <button class="cu-btn block bg-gradual-blue shadow lg add-btn" @click="eventOperation">{{btnTitle}}</button>
+      <view class="cu-tabbar-height"></view>
     </div>
     <Loading v-if="isShowLoading"></Loading>
   </view>

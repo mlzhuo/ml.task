@@ -55,6 +55,7 @@
           </div>
         </div>
       </div>
+      <view class="cu-tabbar-height"></view>
     </view>
     <view class="cu-modal" :class="isShowModal?'show':''" @tap="hideModal">
       <view class="cu-dialog" @tap.stop>
@@ -79,6 +80,7 @@
 
 <script>
 import { formatDate } from "@/utils/index";
+import { config } from "@/config";
 import {
   GET_ALL_TASKS,
   DONE_TASK,
@@ -114,8 +116,8 @@ export default {
     this.date = formatDate(new Date(date)).fullDate;
     this.description = description;
     const { avatarUrl, nickName } = user.userInfo;
-    this.avatarUrl = avatarUrl;
-    this.nickName = nickName;
+    this.avatarUrl = avatarUrl || config.fileURL + "/ml-task-logo.png";
+    this.nickName = nickName || "我";
     const isNeedRefreshTask = event.isNeedRefreshTask;
     if (
       !event.tasks[this.event_id] ||

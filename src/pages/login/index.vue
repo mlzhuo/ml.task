@@ -7,13 +7,16 @@
         open-type="getUserInfo"
         @getuserinfo="bindGetUserInfo"
         @click="wxCanIUse"
-        class="wx-login-btn cu-btn bg-gradual-blue"
-      >登录</button>
+        class="cu-btn wx-login-btn"
+      >
+        <image :src="loginBtnUrl" mode="widthFix" class="response wechat-icon" />
+      </button>
+      <p class="login-tip">快速登录</p>
     </form>
     <view class="tip">
-      <p>版本 {{version}}</p>
-      <p>MPVue ColorUI</p>
-      <p>插画 undraw.co</p>
+      <p>v{{version}}</p>
+      <!-- <p>MPVue ColorUI</p>
+      <p>插画 undraw.co</p>-->
     </view>
     <Loading v-if="isShowLoading"></Loading>
   </view>
@@ -28,14 +31,18 @@ export default {
       isShowLoading: false,
       version: "1.0.0",
       fileURL: "",
-      bgUrl: ""
+      bgUrl: "",
+      loginBtnUrl: ""
     };
   },
-  mounted() {
-    this.getSetting();
+  onShow() {
     this.version = config.version;
     this.fileURL = config.fileURL;
     this.bgUrl = this.fileURL + "/login_bg_m.svg";
+    this.loginBtnUrl = this.fileURL + "/wechat.png";
+  },
+  mounted() {
+    this.getSetting();
   },
   methods: {
     formSubmit(e) {
@@ -117,5 +124,15 @@ form {
   height: 80px;
   margin: 100px auto 0;
   border-radius: 50%;
+  background-color: #fafafa;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.wechat-icon {
+  width: 100%;
+}
+.login-tip {
+  margin-top: 10px;
 }
 </style>

@@ -3,6 +3,10 @@ export default {};
 </script>
 
 <style lang="wxss">
+page,
+.page {
+  height: 100%;
+}
 .nav-list {
   display: flex;
   flex-wrap: wrap;

@@ -13,29 +13,27 @@
       >
         <text class="cuIcon-add"></text>添加事件
       </navigator>
-      <scroll-view scroll-y>
-        <view class="nav-list">
-          <navigator
-            hover-class="none"
-            class="nav-li"
-            :class="'bg-'+item.color"
-            :style="style"
-            navigateTo
-            v-for="item in events"
-            :key="item._id"
-            url="/pages/task/main"
-            @click="saveCurrentEvent(item)"
-            @longpress="showModal(item)"
-          >
-            <view class="nav-title">{{item.title}}</view>
-            <view
-              class="nav-name"
-            >{{(item.isDone || item.all) ? item.isDone + '/' + item.all : '0/0'}}</view>
-            <text :class="'cuIcon-' + item.cuIcon" class="icon"></text>
-          </navigator>
-        </view>
-        <view class="cu-tabbar-height"></view>
-      </scroll-view>
+      <view class="nav-list">
+        <navigator
+          hover-class="none"
+          class="nav-li"
+          :class="'bg-'+item.color"
+          :style="style"
+          navigateTo
+          v-for="item in events"
+          :key="item._id"
+          url="/pages/task/main"
+          @click="saveCurrentEvent(item)"
+          @longpress="showModal(item)"
+        >
+          <view class="nav-title">{{item.title}}</view>
+          <view
+            class="nav-name"
+          >{{(item.isDone || item.all) ? item.isDone + '/' + item.all : '0/0'}}</view>
+          <text :class="'cuIcon-' + item.cuIcon" class="icon"></text>
+        </navigator>
+      </view>
+      <view class="cu-tabbar-height"></view>
     </view>
     <view class="cu-modal" :class="isShowModal?'show':''" @tap="hideModal">
       <view class="cu-dialog" @tap.stop>
@@ -140,15 +138,11 @@ export default {
 </script>
 
 <style scoped>
-.page {
-  height: 100vh;
-  padding-top: 20px;
-}
 .icon {
   font-size: 16px;
 }
 .container {
-  padding: 16px;
+  padding: 15px 5px 5px;
 }
 .add-btn {
   margin-bottom: 20px;
