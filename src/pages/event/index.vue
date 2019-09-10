@@ -2,7 +2,7 @@
   <view>
     <cu-custom bgcolor="bg-gradual-blue" :isBack="false">
       <block slot="backText">返回</block>
-      <block slot="content">事件列表</block>
+      <block slot="content">事件</block>
     </cu-custom>
     <view class="container">
       <navigator
@@ -18,8 +18,9 @@
           <navigator
             hover-class="none"
             class="nav-li"
-            navigateTo
             :class="'bg-'+item.color"
+            :style="style"
+            navigateTo
             v-for="item in events"
             :key="item._id"
             url="/pages/task/main"
@@ -58,13 +59,13 @@
 </template>
 
 <script>
+import { config } from "@/config";
 import {
   GET_EVENTS_DATA,
   CLEAR_CURRENT_EVENT,
   STORE_EVENT_BY_EVENT_ID,
   IS_NEED_REFRESH_EVENT
 } from "@/store/mutation-types";
-let color = ["red", "orange", "cyan"];
 export default {
   data() {
     return {
@@ -74,7 +75,8 @@ export default {
       isShowReTry: false,
       isShowModal: false,
       longPressItemArr: ["编辑", "未完成功能 ^_^"],
-      longPressEventId: ""
+      longPressEventId: "",
+      style: ""
     };
   },
   onShow() {
@@ -84,14 +86,17 @@ export default {
       this.getData();
     }
   },
+  mounted() {
+    const navLiBg = config.fileURL + "/ml.nav-li.bg.png";
+    this.style = `background-image:url(${navLiBg})`;
+  },
   methods: {
     getData() {
       this.user_id = this.$store.state.user.userInfo.userId;
       this.$store.dispatch(`event/${GET_EVENTS_DATA}`, {
         user_id: this.user_id,
         onSuccess: this.onSuccess,
-        onFailed: this.onFailed,
-        color
+        onFailed: this.onFailed
       });
     },
     onSuccess() {

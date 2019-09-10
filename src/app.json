@@ -12,21 +12,21 @@
     "list": [
       {
         "pagePath": "pages/event/main",
-        "iconPath": "/static/images/tabbar/basics.png",
-        "selectedIconPath": "/static/images/tabbar/basics_cur.png",
-        "text": "记事"
+        "iconPath": "/static/images/tabbar/event.png",
+        "selectedIconPath": "/static/images/tabbar/event_active.png",
+        "text": ""
       },
       {
         "pagePath": "pages/tools/main",
-        "iconPath": "/static/images/tabbar/plugin.png",
-        "selectedIconPath": "/static/images/tabbar/plugin_cur.png",
-        "text": "工具"
+        "iconPath": "/static/images/tabbar/tools.png",
+        "selectedIconPath": "/static/images/tabbar/tools_active.png",
+        "text": ""
       },
       {
         "pagePath": "pages/user/main",
-        "iconPath": "/static/images/tabbar/about.png",
-        "selectedIconPath": "/static/images/tabbar/about_cur.png",
-        "text": "个人"
+        "iconPath": "/static/images/tabbar/user.png",
+        "selectedIconPath": "/static/images/tabbar/user_active.png",
+        "text": ""
       }
     ]
   },

@@ -12,7 +12,7 @@
         v-for="(item,index) in list"
         :key="index"
       >
-        <image class="item-bg-img" :src="item.img" />
+        <image class="item-bg-img" :src="gender===2?item.female:item.male" />
         <view class="cardTitle">{{item.title}}</view>
       </view>
     </view>
@@ -21,32 +21,50 @@
 </template>
 
 <script>
+import { config } from "@/config";
 export default {
   data() {
     return {
+      gender: 1,
       list: [
         {
           title: "打卡计划",
-          img: "/static/images/punch_f.svg",
+          male: "",
+          female: "",
           url: ""
         },
         {
           title: "倒计时",
-          img: "/static/images/countdown_f.svg",
+          male: "",
+          female: "",
           url: ""
         }
       ]
     };
   },
-  onShow() {},
-  mounted() {
+  onShow() {
     const { gender } = this.$store.state.user.userInfo;
-    if (gender && gender === 1) {
-      this.list.forEach(v => {
-        const temp = v.img.split("_");
-        v.img = temp[0] + "_m.svg";
-      });
-    }
+    this.gender = gender;
+  },
+  mounted() {
+    const fileURL = config.fileURL;
+    this.list.forEach(v => {
+      let male, female;
+      switch (v.title) {
+        case "打卡计划":
+          male = "/punch_m.svg";
+          female = "/punch_f.svg";
+          break;
+        case "倒计时":
+          male = "/countdown_m.svg";
+          female = "/countdown_f.svg";
+          break;
+        default:
+          break;
+      }
+      v.male = fileURL + male;
+      v.female = fileURL + female;
+    });
   },
   methods: {}
 };

@@ -27,12 +27,15 @@ export default {
     return {
       isShowLoading: false,
       version: "1.0.0",
-      bgUrl: "/static/images/login_bg_m.svg"
+      fileURL: "",
+      bgUrl: ""
     };
   },
   mounted() {
     this.getSetting();
     this.version = config.version;
+    this.fileURL = config.fileURL;
+    this.bgUrl = this.fileURL + "/login_bg_m.svg";
   },
   methods: {
     formSubmit(e) {
@@ -55,7 +58,7 @@ export default {
                 that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
                 const { gender } = res.userInfo;
                 if (gender === 2) {
-                  that.bgUrl = "/static/images/login_bg_f.svg";
+                  that.bgUrl = this.fileURL + "/login_bg_f.svg";
                 }
               }
             });

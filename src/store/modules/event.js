@@ -29,7 +29,7 @@ const getters = {}
 const actions = {
   async [GET_EVENTS_DATA](
     { commit, state },
-    { user_id, onSuccess, onFailed, color }
+    { user_id, onSuccess, onFailed }
   ) {
     const eventsResult = await jsonRequest('GET', `/${user_id}/events`)
     const tasksResult = await jsonRequest('GET', `/${user_id}/statistics`)
@@ -39,17 +39,12 @@ const actions = {
     }
     if (eventsResult.state && tasksResult.state) {
       let temp = []
-      let index = 0
       eventsResult.data.forEach(item => {
-        if (index >= color.length) {
-          index = 0
-        }
         item = {
           ...item,
-          color: color[index],
+          color: item.level === 0 ? 'cyan' : 'red',
           cuIcon: item.level === 0 ? '' : 'favorfill'
         }
-        index++
         temp.push(item)
       })
       for (const key in tasksResult.data) {
