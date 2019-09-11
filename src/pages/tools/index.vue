@@ -7,9 +7,9 @@
     <view class="cu-card">
       <view
         class="cu-item bg-gradual-purple shadow-blur"
-        :data-url="item.url"
         v-for="(item,index) in list"
         :key="index"
+        @click="toolsItemClick(item.url)"
       >
         <image class="item-bg-img" :src="gender===2?item.female:item.male" />
         <view class="cardTitle">{{item.title}}</view>
@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import { config } from "@/config";
 export default {
   data() {
     return {
@@ -49,7 +48,7 @@ export default {
     this.gender = gender;
   },
   mounted() {
-    const fileURL = config.fileURL;
+    const fileURL = this.$store.state.miniapp.config.fileURL;
     this.list.forEach(v => {
       let male, female;
       switch (v.title) {
@@ -68,7 +67,11 @@ export default {
       v.female = fileURL + female;
     });
   },
-  methods: {}
+  methods: {
+    toolsItemClick(url) {
+      this.showToast("开发中 ^_^");
+    }
+  }
 };
 </script>
 

@@ -14,7 +14,7 @@
       <p class="login-tip">快速登录</p>
     </form>
     <view class="tip">
-      <p>v{{version}}</p>
+      <p>{{version}}</p>
       <!-- <p>MPVue ColorUI</p>
       <p>插画 undraw.co</p>-->
     </view>
@@ -23,36 +23,65 @@
 </template>
 
 <script>
-import { LOGIN, SAVE_USER_INFO } from "@/store/mutation-types";
-import { config } from "@/config";
+import {
+  LOGIN,
+  SAVE_USER_INFO,
+  GET_VERSIONS,
+  LOAD_CONFIG
+} from "@/store/mutation-types";
 export default {
   data() {
     return {
       isShowLoading: false,
-      version: "1.0.0",
+      version: "",
       fileURL: "",
       bgUrl: "",
       loginBtnUrl: ""
     };
   },
   onShow() {
-    this.version = config.version;
-    this.fileURL = config.fileURL;
-    this.bgUrl = this.fileURL + "/login_bg_m.svg";
-    this.loginBtnUrl = this.fileURL + "/wechat.png";
+    this.getVersions();
+    this.loadingConfig();
   },
   mounted() {
     this.getSetting();
   },
   methods: {
+    loadingConfig() {
+      this.$store.dispatch(`miniapp/${LOAD_CONFIG}`, {
+        onSuccess: this.loadingConfigSuccess
+      });
+    },
+    loadingConfigSuccess(config) {
+      this.fileURL = config.fileURL;
+      this.bgUrl = this.fileURL + "/login_bg_m.svg";
+      this.loginBtnUrl = this.fileURL + "/wechat.png";
+    },
+    getVersions() {
+      this.$store.dispatch(`miniapp/${GET_VERSIONS}`, {
+        onSuccess: this.getVersionSuccess
+      });
+    },
+    getVersionSuccess() {
+      this.version = "v" + this.$store.state.miniapp.version;
+    },
     formSubmit(e) {
       const { formId } = e.target;
       this.isShowLoading = true;
       this.$store.dispatch(`user/${LOGIN}`, {
         loginFormObj: { formId, ...this.$store.state.user.userInfo },
-        onSuccess: this.onSuccess,
-        onFailed: this.onFailed
+        onSuccess: this.loginSuccess,
+        onFailed: this.loginFailed
       });
+    },
+    loginSuccess({ message }) {
+      this.showToast(message);
+      wx.reLaunch({ url: "/pages/event/main" });
+      this.isShowLoading = false;
+    },
+    loginFailed() {
+      this.showToast("登录超时");
+      this.isShowLoading = false;
     },
     getSetting() {
       const that = this;
@@ -90,15 +119,6 @@ export default {
           JSON.parse(e.mp.detail.rawData)
         );
       }
-    },
-    onSuccess({ message }) {
-      this.showToast(message);
-      wx.reLaunch({ url: "/pages/event/main" });
-      this.isShowLoading = false;
-    },
-    onFailed() {
-      this.showToast("登录超时");
-      this.isShowLoading = false;
     }
   }
 };

@@ -80,7 +80,6 @@
 
 <script>
 import { formatDate } from "@/utils/index";
-import { config } from "@/config";
 import {
   GET_ALL_TASKS,
   DONE_TASK,
@@ -116,7 +115,9 @@ export default {
     this.date = formatDate(new Date(date)).fullDate;
     this.description = description;
     const { avatarUrl, nickName } = user.userInfo;
-    this.avatarUrl = avatarUrl || config.fileURL + "/ml-task-logo.png";
+    this.avatarUrl =
+      avatarUrl ||
+      this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
     this.nickName = nickName || "我";
     const isNeedRefreshTask = event.isNeedRefreshTask;
     if (

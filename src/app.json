@@ -6,7 +6,9 @@
     "pages/task/main",
     "pages/task_add/main",
     "pages/tools/main",
-    "pages/user/main"
+    "pages/user/main",
+    "pages/user_update_list/main",
+    "pages/user_resource_from/main"
   ],
   "tabBar": {
     "list": [

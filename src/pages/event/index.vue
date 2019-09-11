@@ -57,7 +57,6 @@
 </template>
 
 <script>
-import { config } from "@/config";
 import {
   GET_EVENTS_DATA,
   CLEAR_CURRENT_EVENT,
@@ -85,7 +84,8 @@ export default {
     }
   },
   mounted() {
-    const navLiBg = config.fileURL + "/ml.nav-li.bg.png";
+    const navLiBg =
+      this.$store.state.miniapp.config.fileURL + "/ml.nav-li.bg.png";
     this.style = `background-image:url(${navLiBg})`;
   },
   methods: {

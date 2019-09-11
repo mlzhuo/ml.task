@@ -33,4 +33,14 @@ const formatDate = date => {
   }
 }
 
-export { formatNumber, formatTime, formatDate }
+const formatYMD = date => {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+
+  const t1 = [year, month, day].map(formatNumber).join('-')
+
+  return `${t1}`
+}
+
+export { formatNumber, formatTime, formatDate, formatYMD }

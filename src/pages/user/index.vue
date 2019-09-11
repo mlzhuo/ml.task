@@ -12,7 +12,7 @@
       </p>
     </view>
     <view class="cu-list menu sm-border card-menu margin-top">
-      <view class="cu-item arrow" @click="copyGithubUrl">
+      <view class="cu-item arrow" @click="copyUrl()">
         <view class="content">
           <text class="cuIcon-github text-grey"></text>
           <text class="text-grey">GitHub</text>
@@ -24,53 +24,53 @@
           </text>
         </view>
       </view>
-      <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url="../list/list" open-type="redirect">
+      <navigator url="/pages/user_update_list/main" hover-class="none" class="cu-item arrow">
+        <view class="content" hover-class="none">
           <text class="cuIcon-tagfill text-green"></text>
           <text class="text-grey">更新日志</text>
-        </navigator>
-        <view class="action">
-          <text class="text-grey text-sm">v{{version}}</text>
         </view>
-      </view>
-      <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url="../list/list" open-type="redirect">
+        <view class="action">
+          <text class="text-grey text-sm">{{version}}</text>
+        </view>
+      </navigator>
+      <navigator url="/pages/user_resource_from/main" hover-class="none" class="cu-item arrow">
+        <view class="content" hover-class="none">
           <text class="cuIcon-picfill text-orange"></text>
           <text class="text-grey">引用资源</text>
-        </navigator>
-      </view>
-      <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url="../list/list" open-type="redirect">
+        </view>
+      </navigator>
+      <navigator url hover-class="none" class="cu-item arrow">
+        <view class="content" hover-class="none">
           <text class="cuIcon-questionfill text-cyan"></text>
           <text class="text-grey">问题反馈</text>
-        </navigator>
-      </view>
-      <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url="../list/list" open-type="redirect">
+        </view>
+      </navigator>
+      <navigator url hover-class="none" class="cu-item arrow">
+        <view class="content" hover-class="none">
           <text class="cuIcon-discoverfill text-orange"></text>
           <text class="text-grey">关于</text>
-        </navigator>
-      </view>
+        </view>
+      </navigator>
     </view>
     <view class="cu-tabbar-height"></view>
   </view>
 </template>
 
 <script>
-import { config } from "@/config";
 export default {
   data() {
     return {
       logoUrl: "",
-      version: "1.0.0"
+      version: ""
     };
   },
   onShow() {
-    this.logoUrl = config.fileURL + "/ml-task-logo.png";
-    this.version = config.version;
+    this.logoUrl =
+      this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
+    this.version = "v" + this.$store.state.miniapp.version;
   },
   methods: {
-    copyGithubUrl() {
+    copyUrl() {
       wx.setClipboardData({ data: "https://github.com/mlzhuo/ml.task" });
     }
   }
