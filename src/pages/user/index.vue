@@ -57,6 +57,7 @@
 </template>
 
 <script>
+import { GET_VERSIONS } from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -67,9 +68,22 @@ export default {
   onShow() {
     this.logoUrl =
       this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
-    this.version = "v" + this.$store.state.miniapp.version;
+    const version = this.$store.state.miniapp.version;
+    if(version) {
+      this.version = "v" + version;
+    } else {
+      this.getVersions()
+    }
   },
   methods: {
+    getVersions() {
+      this.$store.dispatch(`miniapp/${GET_VERSIONS}`, {
+        onSuccess: this.getVersionSuccess
+      });
+    },
+    getVersionSuccess() {
+      this.version = "v" + this.$store.state.miniapp.version;
+    },
     copyUrl() {
       wx.setClipboardData({ data: "https://github.com/mlzhuo/ml.task" });
     }

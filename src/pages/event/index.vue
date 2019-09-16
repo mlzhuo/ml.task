@@ -52,7 +52,7 @@
       </view>
     </view>
     <Loading v-if="isShowLoading"></Loading>
-    <ReTry v-if="isShowReTry" :retryMethod="['getData']" @getData="getData()"></ReTry>
+    <ReTry v-if="isShowReTry"></ReTry>
   </view>
 </template>
 
@@ -90,9 +90,8 @@ export default {
   },
   methods: {
     getData() {
-      this.user_id = this.$store.state.user.userInfo.userId;
+      this.isShowLoading = true;
       this.$store.dispatch(`event/${GET_EVENTS_DATA}`, {
-        user_id: this.user_id,
         onSuccess: this.onSuccess,
         onFailed: this.onFailed
       });
@@ -134,6 +133,23 @@ export default {
       }
     }
   }
+  // computed: {
+  //   getLoadingStatus() {
+  //     const { isShowLoading, isShowReTry } = this.$store.state.miniapp;
+  //     return { isShowLoading, isShowReTry };
+  //   }
+  // },
+  // watch: {
+  //   getLoadingStatus: {
+  //     handler(val) {
+  //       const { isShowLoading, isShowReTry } = val;
+  //       this.isShowLoading = isShowLoading;
+  //       this.isShowReTry = isShowReTry;
+  //     },
+  //     deep: true,
+  //     immediate: true
+  //   }
+  // }
 };
 </script>
 

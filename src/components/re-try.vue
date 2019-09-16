@@ -11,18 +11,13 @@
 
 <script>
 export default {
-  props: ["retryMethod"],
   data() {
     return {};
   },
   methods: {
     retryClick() {
-      this.$parent.isShowLoading = true;
-      this.$parent.isShowReTry = false;
-      for (let i = 0; i < this.retryMethod.length; i++) {
-        const v = this.retryMethod[i];
-        this.$emit(v);
-      }
+      const { retryActionType, retryActionPayload } = this.$store.state.miniapp;
+      this.$store.dispatch(retryActionType, retryActionPayload);
     }
   }
 };

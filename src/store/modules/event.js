@@ -1,4 +1,6 @@
 import {
+  STORE_RETRY_ACTION_TYPE,
+  STORE_RETRY_ACTION_PAYLOAD,
   GET_EVENTS_DATA,
   STORE_ALL_EVENTS,
   EVENT_OPERATION,
@@ -11,7 +13,8 @@ import {
   STORE_TASK_BY_TASK_ID,
   CLEAR_CURRENT_TASK,
   TASK_OPERATION,
-  IS_NEED_REFRESH_TASK
+  IS_NEED_REFRESH_TASK,
+  // STORE_REQUEST_STATUS
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 import { formatDate } from '@/utils/index'
@@ -28,15 +31,29 @@ const getters = {}
 
 const actions = {
   async [GET_EVENTS_DATA](
-    { commit, state },
-    { user_id, onSuccess, onFailed }
+    { commit, state, rootState },
+    { onSuccess, onFailed }
   ) {
+    // commit(
+    //   `miniapp/${STORE_REQUEST_STATUS}`,
+    //   { isShowLoading: true, isShowReTry: false },
+    //   { root: true }
+    // )
+    const user_id = rootState.user.userInfo.userId
     const eventsResult = await jsonRequest('GET', `/${user_id}/events`)
-    const tasksResult = await jsonRequest('GET', `/${user_id}/statistics`)
     if (!eventsResult) {
       onFailed()
+      commit(`miniapp/${STORE_RETRY_ACTION_TYPE}`, `event/${GET_EVENTS_DATA}`, {
+        root: true
+      })
+      // commit(
+      //   `miniapp/${STORE_REQUEST_STATUS}`,
+      //   { isShowLoading: false, isShowReTry: true },
+      //   { root: true }
+      // )
       return
     }
+    const tasksResult = await jsonRequest('GET', `/${user_id}/statistics`)
     if (eventsResult.state && tasksResult.state) {
       let temp = []
       eventsResult.data.forEach(item => {
@@ -54,9 +71,22 @@ const actions = {
         event.all = all
       }
       commit(STORE_ALL_EVENTS, temp)
+      // commit(
+      //   `miniapp/${STORE_REQUEST_STATUS}`,
+      //   { isShowLoading: false, isShowReTry: false },
+      //   { root: true }
+      // )
       onSuccess()
     } else {
       onFailed()
+      commit(`miniapp/${STORE_RETRY_ACTION_TYPE}`, `event/${GET_EVENTS_DATA}`, {
+        root: true
+      })
+      // commit(
+      //   `miniapp/${STORE_REQUEST_STATUS}`,
+      //   { isShowLoading: false, isShowReTry: true },
+      //   { root: true }
+      // )
     }
   },
   async [EVENT_OPERATION](
@@ -156,7 +186,7 @@ const actions = {
     { commit, state },
     { method, event_id, data, onSuccess, onFailed }
   ) {
-    const result = await jsonRequest(method, `/${event_id}/tasks`, data)
+    const result = await jsonRequest(method, `/${event_id}/tasks`, data, commit)
     if (!result) {
       onFailed()
       return

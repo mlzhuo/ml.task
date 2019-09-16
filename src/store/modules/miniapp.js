@@ -7,7 +7,11 @@ import {
   GET_VERSIONS,
   STORE_VERSIONS,
   LOAD_CONFIG,
-  STORE_CONFIG
+  STORE_CONFIG,
+  STORE_RETRY_ACTION_TYPE,
+  STORE_RETRY_ACTION_PAYLOAD,
+  REQUEST_STATUS,
+  STORE_REQUEST_STATUS
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 import { config } from '@/config'
@@ -23,7 +27,7 @@ const state = {
   isShowReTry: false,
   retryActionType: '',
   retryActionPayload: '',
-  version: '1.0.0',
+  version: '',
   versions: [],
   config: {}
 }
@@ -47,6 +51,9 @@ const actions = {
   [LOAD_CONFIG]({ commit, state }, { onSuccess, onFailed }) {
     commit(STORE_CONFIG, config)
     onSuccess(config)
+  },
+  async [REQUEST_STATUS]({ commit, state }, { isShowLoading, isShowReTry }) {
+    commit(STORE_REQUEST_STATUS, { isShowLoading, isShowReTry })
   }
 }
 
@@ -76,6 +83,15 @@ const mutations = {
   [STORE_VERSIONS](state, versions) {
     state.version = versions.length && versions[0].version
     state.versions = versions
+  },
+  [STORE_RETRY_ACTION_TYPE](state, actionType) {
+    state.retryActionType = actionType
+  },
+  [STORE_RETRY_ACTION_PAYLOAD](state, actionPayload) {
+    state.retryActionPayload = actionPayload
+  },
+  [STORE_REQUEST_STATUS](state, requestStatus) {
+    state = Object.assign({}, state, requestStatus)
   }
 }
 

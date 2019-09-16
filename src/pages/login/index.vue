@@ -15,8 +15,6 @@
     </form>
     <view class="tip">
       <p>{{version}}</p>
-      <!-- <p>MPVue ColorUI</p>
-      <p>插画 undraw.co</p>-->
     </view>
     <Loading v-if="isShowLoading"></Loading>
   </view>
@@ -35,8 +33,8 @@ export default {
       isShowLoading: false,
       version: "",
       fileURL: "",
-      bgUrl: "",
-      loginBtnUrl: ""
+      bgUrl: "/static/images/login_bg_m.svg",
+      loginBtnUrl: "/static/images/login-btn-img.png"
     };
   },
   onShow() {
@@ -54,8 +52,7 @@ export default {
     },
     loadingConfigSuccess(config) {
       this.fileURL = config.fileURL;
-      this.bgUrl = this.fileURL + "/login_bg_m.svg";
-      this.loginBtnUrl = this.fileURL + "/wechat.png";
+      this.loginBtnUrl = this.fileURL + "/login-btn-img.png";
     },
     getVersions() {
       this.$store.dispatch(`miniapp/${GET_VERSIONS}`, {
@@ -76,8 +73,8 @@ export default {
     },
     loginSuccess({ message }) {
       this.showToast(message);
-      wx.reLaunch({ url: "/pages/event/main" });
       this.isShowLoading = false;
+      wx.reLaunch({ url: "/pages/event/main" });
     },
     loginFailed() {
       this.showToast("登录超时");
@@ -94,7 +91,9 @@ export default {
                 that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
                 const { gender } = res.userInfo;
                 if (gender === 2) {
-                  that.bgUrl = this.fileURL + "/login_bg_f.svg";
+                  that.bgUrl = that.fileURL + "/login_bg_f.svg";
+                } else {
+                  that.bgUrl = that.fileURL + "/login_bg_m.svg";
                 }
               }
             });
@@ -121,6 +120,19 @@ export default {
       }
     }
   }
+  // computed: {
+  //   getLoadingStatus() {
+  //     return this.$store.state.miniapp.isShowLoading;
+  //   }
+  // },
+  // watch: {
+  //   getLoadingStatus: {
+  //     handler(val) {
+  //       this.isShowLoading = val;
+  //     },
+  //     immediate: true
+  //   }
+  // }
 };
 </script>
 
