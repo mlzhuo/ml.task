@@ -1,9 +1,5 @@
 <template>
   <view>
-    <cu-custom bgcolor="bg-gradual-purple" :isBack="false">
-      <block slot="backText">返回</block>
-      <block slot="content">工具</block>
-    </cu-custom>
     <view class="cu-card">
       <view
         class="cu-item bg-gradual-purple shadow-blur"
@@ -32,18 +28,18 @@ export default {
           title: "打卡计划",
           male: "",
           female: "",
-          url: ""
+          url: "/pages/tools_punch/main"
         },
         {
           title: "倒计时",
           male: "",
           female: "",
-          url: ""
+          url: "/pages/tools_countdown/main"
         }
       ]
     };
   },
-  onShow() {
+  onLoad() {
     const { gender } = this.$store.state.user.userInfo;
     this.gender = gender;
   },
@@ -63,13 +59,15 @@ export default {
         default:
           break;
       }
-      v.male = fileURL + male;
-      v.female = fileURL + female;
+      v.male = "/static/images" + male;
+      v.female = "/static/images" + female;
+      // v.male = fileURL + male;
+      // v.female = fileURL + female;
     });
   },
   methods: {
     toolsItemClick(url) {
-      this.showToast("开发中 ^_^");
+      wx.navigateTo({ url });
     }
   }
 };

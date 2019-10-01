@@ -1,6 +1,6 @@
 <template>
   <view>
-    <image :src="bgUrl" mode="widthFix" class="response" />
+    <image :src="bgUrl" mode="widthFix" class="response" :style="style" />
     <form @submit="formSubmit" report-submit>
       <button
         form-type="submit"
@@ -33,6 +33,7 @@ export default {
       isShowLoading: false,
       version: "",
       fileURL: "",
+      style: "",
       bgUrl: "/static/images/login_bg_m.svg",
       loginBtnUrl: "/static/images/login-btn-img.png"
     };
@@ -40,6 +41,7 @@ export default {
   onShow() {
     this.getVersions();
     this.loadingConfig();
+    this.style = `max-height:${this.windowHeight * 0.35}px`;
   },
   mounted() {
     this.getSetting();
@@ -52,7 +54,7 @@ export default {
     },
     loadingConfigSuccess(config) {
       this.fileURL = config.fileURL;
-      this.loginBtnUrl = this.fileURL + "/login-btn-img.png";
+      // this.loginBtnUrl = this.fileURL && this.fileURL + "/login-btn-img.png";
     },
     getVersions() {
       this.$store.dispatch(`miniapp/${GET_VERSIONS}`, {
@@ -74,7 +76,7 @@ export default {
     loginSuccess({ message }) {
       this.showToast(message);
       this.isShowLoading = false;
-      wx.reLaunch({ url: "/pages/event/main" });
+      wx.reLaunch({ url: "/pages/index/main" });
     },
     loginFailed() {
       this.showToast("登录超时");
@@ -91,9 +93,11 @@ export default {
                 that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
                 const { gender } = res.userInfo;
                 if (gender === 2) {
-                  that.bgUrl = that.fileURL + "/login_bg_f.svg";
+                  // that.bgUrl = that.fileURL && that.fileURL + "/login_bg_f.svg";
+                  that.bgUrl = "/static/images/login_bg_f.svg";
                 } else {
-                  that.bgUrl = that.fileURL + "/login_bg_m.svg";
+                  // that.bgUrl = that.fileURL && that.fileURL + "/login_bg_m.svg";
+                  that.bgUrl = "/static/images/login_bg_m.svg";
                 }
               }
             });

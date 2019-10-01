@@ -22,6 +22,7 @@ page,
   background-position: center;
   position: relative;
   z-index: 1;
+  color: #fff;
 }
 
 .nav-li::after {
@@ -61,6 +62,7 @@ page,
   text-transform: Capitalize;
   margin-top: 20px;
   position: relative;
+  color: #fff;
 }
 
 .nav-name::before {
@@ -132,5 +134,36 @@ page,
 .container {
   height: 100%;
   box-sizing: border-box;
+  padding: 16px;
+}
+.cu-modal.show {
+  -webkit-overflow-scrolling: touch;
+}
+.add-btn {
+  margin-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%) !important;
+}
+
+.bg-ml-primary {
+  background-color: #4e73df;
+}
+.bg-ml-success {
+  background-color: #1cc88a;
+}
+.bg-ml-info {
+  background-color: #36b9cc;
+}
+.bg-ml-warning {
+  background-color: #f6c23e;
+}
+.bg-ml-danger {
+  background-color: #e74a3b;
+}
+.bg-ml-secondary {
+  background-color: #858796;
 }
 </style>

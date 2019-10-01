@@ -20,6 +20,7 @@ const formatTime = date => {
 
 const formatDate = date => {
   const year = date.getFullYear()
+  const currentYear = new Date().getFullYear()
   let month = formatNumber(date.getMonth() + 1)
   let day = formatNumber(date.getDate())
   let hours = formatNumber(date.getHours())
@@ -27,7 +28,8 @@ const formatDate = date => {
   let seconds = formatNumber(date.getSeconds())
   return {
     fullDate: `${year}年${month}月${day}日`,
-    date: month + '-' + day,
+    date:
+      year === currentYear ? month + '-' + day : year + '-' + month + '-' + day,
     time: hours + ':' + minutes,
     weekday: '周' + '日一二三四五六'.charAt(date.getDay())
   }

@@ -59,7 +59,7 @@ const actions = {
       eventsResult.data.forEach(item => {
         item = {
           ...item,
-          color: item.level === 0 ? 'cyan' : 'red',
+          color: item.level === 0 ? 'ml-info' : 'ml-danger',
           cuIcon: item.level === 0 ? '' : 'favorfill'
         }
         temp.push(item)

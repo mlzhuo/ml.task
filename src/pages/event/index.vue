@@ -1,9 +1,5 @@
 <template>
   <view>
-    <cu-custom bgcolor="bg-gradual-blue" :isBack="false">
-      <block slot="backText">返回</block>
-      <block slot="content">事件</block>
-    </cu-custom>
     <view class="container">
       <navigator
         hover-class="none"
@@ -63,6 +59,7 @@ import {
   STORE_EVENT_BY_EVENT_ID,
   IS_NEED_REFRESH_EVENT
 } from "@/store/mutation-types";
+import store from '@/store'
 export default {
   data() {
     return {
@@ -81,12 +78,23 @@ export default {
     const isNeedRefreshEvent = this.$store.state.event.isNeedRefreshEvent;
     if (isNeedRefreshEvent) {
       this.getData();
+    } else {
+      this.onSuccess()
+    }
+  },
+  onLoad() {
+    this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
+    const isNeedRefreshEvent = this.$store.state.event.isNeedRefreshEvent;
+    if (isNeedRefreshEvent) {
+      this.getData();
+    } else {
+      this.onSuccess()
     }
   },
   mounted() {
     const navLiBg =
       this.$store.state.miniapp.config.fileURL + "/ml.nav-li.bg.png";
-    this.style = `background-image:url(${navLiBg})`;
+    // this.style = `background-image:url(${navLiBg})`;
   },
   methods: {
     getData() {
@@ -159,13 +167,5 @@ export default {
 }
 .container {
   padding: 15px 5px 5px;
-}
-.add-btn {
-  margin-bottom: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
 }
 </style>

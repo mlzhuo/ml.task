@@ -1,37 +1,18 @@
 {
   "pages": [
     "pages/login/main",
+    "pages/index/main",
     "pages/event/main",
     "pages/event_add/main",
     "pages/task/main",
     "pages/task_add/main",
     "pages/tools/main",
+    "pages/tools_punch/main",
+    "pages/tools_countdown/main",
     "pages/user/main",
     "pages/user_update_list/main",
     "pages/user_resource_from/main"
   ],
-  "tabBar": {
-    "list": [
-      {
-        "pagePath": "pages/event/main",
-        "iconPath": "/static/images/tabbar/event.png",
-        "selectedIconPath": "/static/images/tabbar/event_active.png",
-        "text": ""
-      },
-      {
-        "pagePath": "pages/tools/main",
-        "iconPath": "/static/images/tabbar/tools.png",
-        "selectedIconPath": "/static/images/tabbar/tools_active.png",
-        "text": ""
-      },
-      {
-        "pagePath": "pages/user/main",
-        "iconPath": "/static/images/tabbar/user.png",
-        "selectedIconPath": "/static/images/tabbar/user_active.png",
-        "text": ""
-      }
-    ]
-  },
   "window": {
     "navigationBarBackgroundColor": "#0081ff",
     "navigationBarTitleText": "ML TASK",

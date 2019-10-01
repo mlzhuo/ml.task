@@ -1,10 +1,6 @@
 <template>
-  <view class="page">
-    <cu-custom bgcolor="bg-gradual-orange" :isBack="false">
-      <block slot="backText">返回</block>
-      <block slot="content">个人</block>
-    </cu-custom>
-    <view class="no-card top-view">
+  <view>
+    <view class="no-card top-view" :style="style">
       <image :src="logoUrl" class="logo" />
       <p class="description">
         “ ML 日常管理是一个日常记录的小程序，记事，打卡，倒计时等，更多功能在路上。 ”
@@ -61,18 +57,33 @@ import { GET_VERSIONS } from "@/store/mutation-types";
 export default {
   data() {
     return {
-      logoUrl: "",
-      version: ""
+      logoUrl: "/static/images/ml-task-logo.png",
+      version: "",
+      style: ""
     };
   },
   onShow() {
-    this.logoUrl =
-      this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
+    this.style = `height:${this.windowHeight * 0.35}px`;
+    // this.logoUrl =
+    //   this.$store.state.miniapp.config.fileURL &&
+    //   this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
     const version = this.$store.state.miniapp.version;
-    if(version) {
+    if (version) {
       this.version = "v" + version;
     } else {
-      this.getVersions()
+      this.getVersions();
+    }
+  },
+  onLoad() {
+    this.style = `height:${this.windowHeight * 0.35}px`;
+    // this.logoUrl =
+    //   this.$store.state.miniapp.config.fileURL &&
+    //   this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
+    const version = this.$store.state.miniapp.version;
+    if (version) {
+      this.version = "v" + version;
+    } else {
+      this.getVersions();
     }
   },
   methods: {

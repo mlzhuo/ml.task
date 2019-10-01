@@ -4,22 +4,33 @@
       <block slot="backText">返回</block>
       <block slot="content">引用资源</block>
     </cu-custom>
-    <view class="cu-list menu sm-border card-menu margin-top">
-      <!-- <navigator
-        v-for="item in versions"
-        :key="item.version"
-        url
-        hover-class="none"
-        class="cu-item arrow"
-      >
-        <view class="content" hover-class="none">
-          <text class="cuIcon-tagfill text-green"></text>
-          <text class="text-grey">{{item.version}} 更新日志</text>
+    <view class="bg-white radius shadow-lg container">
+      <view class="text-center margin-bottom text-lg">ML TASK 中引用的第三方资源</view>
+      <view
+        class="margin-bottom info-text"
+      >在小程序中使用的第三方资源如下，非常感谢，侵删。非常感谢开源贡献者，前人种树后人乘凉，特此将该小程序（ML 日常管理）开源。</view>
+      <view class="text-content">
+        <view class="cu-list menu sm-border card-menu margin-top">
+          <view class="cu-item" @click="copyUrl('colorui')">
+            <view class="content" hover-class="none">
+              <text class="cuIcon-tagfill text-orange"></text>
+              <text class="text-grey">ColorUI</text>
+            </view>
+            <view class="action">
+              <text class="text-grey text-sm">https://github.com/weilanwl/ColorUI</text>
+            </view>
+          </view>
+          <view class="cu-item" @click="copyUrl('undraw')">
+            <view class="content" hover-class="none">
+              <text class="cuIcon-tagfill text-orange"></text>
+              <text class="text-grey">插画</text>
+            </view>
+            <view class="action">
+              <text class="text-grey text-sm">https://undraw.co/</text>
+            </view>
+          </view>
         </view>
-        <view class="action">
-          <text class="text-grey text-sm">{{item.date}}</text>
-        </view>
-      </navigator>-->
+      </view>
     </view>
     <view class="cu-tabbar-height"></view>
   </view>
@@ -32,55 +43,35 @@ export default {
   },
   onShow() {},
   mounted() {},
-  methods: {}
+  methods: {
+    copyUrl(name) {
+      let url = "";
+      switch (name) {
+        case "colorui":
+          url = "https://github.com/weilanwl/ColorUI";
+          break;
+        case "undraw":
+          url = "https://undraw.co/";
+          break;
+        default:
+          break;
+      }
+      wx.setClipboardData({ data: url });
+    }
+  }
 };
 </script>
-
 <style scoped>
-.cardTitle {
-  color: #fff;
-  padding: 90rpx 60rpx;
-  font-size: 40rpx;
-  font-weight: 300;
-  transform: skew(-10deg, 0deg);
-  position: relative;
-  text-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.3);
+.cu-list.card-menu {
+  margin-left: 0;
+  margin-right: 0;
 }
-
-.cardTitle::before {
-  content: "";
-  position: absolute;
-  width: 60rpx;
-  height: 6rpx;
-  border-radius: 20rpx;
-  background-color: #fff;
-  display: block;
-  top: 60rpx;
-  left: 50rpx;
-  transform: skew(10deg, 0deg);
+.cu-list.menu > .cu-item {
+  padding: 0;
 }
-
-.cardTitle::after {
-  content: "";
-  position: absolute;
-  width: 140rpx;
-  border-radius: 6rpx;
-  height: 24rpx;
-  background-color: #fff;
-  display: block;
-  bottom: 76rpx;
-  left: 90rpx;
-  transform: skew(10deg, 0deg);
-  opacity: 0.1;
-}
-.cu-item {
-  position: relative;
-}
-.item-bg-img {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 25%;
+.info-text {
+  text-align: justify;
+  text-indent: 2em;
 }
 </style>
+

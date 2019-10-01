@@ -31,8 +31,8 @@ const actions = {
         if (result) {
           const { message, state, data } = result
           if (state) {
-            const { _id } = data
-            commit(LOGIN_SUCCESS, { userId: _id })
+            const { _id, openid } = data
+            commit(LOGIN_SUCCESS, { userId: _id, openid })
             onSuccess({ message })
           }
         } else {

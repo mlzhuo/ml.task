@@ -38,18 +38,17 @@
           v-for="item in daySortItem"
           :key="item._id"
           :class="{'cu-item':true,'text-blue':item.state===0?true:false}"
-          @longpress="showModal(item._id)"
+          @longpress="showModal(item._id, item)"
         >
           <div class="content light" :class="{'bg-gradual-blue': item.state===0}">
             <div v-if="item.state===0" class="cu-capsule radius">
               <div class="cu-tag bg-cyan borderRadius">{{item.time}}</div>
               <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon text-yellow"></text>
-              <text class="cuIcon-edit done-btn edit-btn text-white" @click="editTask(item)"></text>
               <text class="cuIcon-check done-btn text-white" @click="doneTask(event_id,item._id)"></text>
             </div>
             <div v-else class="cu-capsule radius">
-              <div class="cu-tag bg-grey">完成于</div>
-              <div class="cu-tag line-grey">{{item.edit_time}}</div>
+              <div class="cu-tag bg-grey borderRadius">{{item.edit_time}}</div>
+              <!-- <div class="cu-tag line-grey">{{item.edit_time}}</div> -->
             </div>
             <div :class="{'margin-top': true,'':item.state!==0?true:false }">{{item.content}}</div>
           </div>
@@ -64,7 +63,7 @@
             class="cu-item"
             v-for="(item,index) in longPressItemArr"
             :key="index"
-            @click="doSomething"
+            @click="doSomething(index)"
           >
             <label class="flex justify-between align-center flex-sub">
               <view class="flex-sub">{{item}}</view>
@@ -102,8 +101,8 @@ export default {
       isShowLoading: false,
       isShowReTry: false,
       isShowModal: false,
-      longPressItemArr: ["未完成功能 ^_^"],
-      longPressTaskId: ""
+      longPressItemArr: ["编辑", "未完成功能 ^_^"],
+      currentTask: {}
     };
   },
   onShow() {
@@ -170,20 +169,31 @@ export default {
       this.showToast(message);
       this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
     },
-    editTask(task) {
-      this.$store.commit(`event/${STORE_TASK_BY_TASK_ID}`, task);
+    editTask() {
       wx.navigateTo({ url: `/pages/task_add/main` });
     },
-    showModal(task_id) {
+    showModal(task_id, task) {
+      this.$store.commit(`event/${STORE_TASK_BY_TASK_ID}`, task);
+      this.currentTask = task;
       this.isShowModal = true;
-      this.longPressTaskId = task_id;
     },
     hideModal() {
       this.isShowModal = false;
     },
-    doSomething() {
+    doSomething(index) {
       this.isShowModal = false;
-      this.showToast("未完成功能 ^_^");
+      switch (index) {
+        case 0:
+          if (this.currentTask.state === 1) {
+            this.showToast("已完成事件不支持编辑");
+            return;
+          }
+          this.editTask();
+          break;
+        default:
+          this.showToast("未完成功能 ^_^");
+          break;
+      }
     }
   },
   onUnload() {
@@ -195,14 +205,6 @@ export default {
 <style scoped>
 .container {
   padding: 16px;
-}
-.add-btn {
-  margin-bottom: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
 }
 .cu-capsule {
   position: relative;
@@ -216,9 +218,6 @@ export default {
   line-height: 25px;
   text-align: center;
   font-weight: 700;
-}
-.cu-capsule .edit-btn {
-  right: 35px;
 }
 .cuIcon-favorfill {
   font-size: 20px;
