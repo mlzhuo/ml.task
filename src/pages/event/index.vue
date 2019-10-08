@@ -7,7 +7,7 @@
         navigateTo
         class="cu-btn bg-gradual-blue shadow-blur round lg add-btn"
       >
-        <text class="cuIcon-add"></text>添加事件
+        <text class="cuIcon-add"></text>添加分类
       </navigator>
       <view class="nav-list">
         <navigator

@@ -49,6 +49,10 @@ page,
   font-size: 20px;
   font-weight: 300;
   color: #fff;
+  width: 6em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .nav-title::first-letter {

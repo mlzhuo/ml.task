@@ -8,6 +8,7 @@
     "pages/task_add/main",
     "pages/tools/main",
     "pages/tools_punch/main",
+    "pages/tools_punch_add/main",
     "pages/tools_countdown/main",
     "pages/user/main",
     "pages/user_update_list/main",
