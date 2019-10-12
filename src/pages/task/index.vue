@@ -8,10 +8,12 @@
       <view class="cu-item shadow">
         <view class="cu-list menu-avatar">
           <view class="cu-item">
-            <view class="cu-avatar round lg" :style="{backgroundImage:'url('+avatarUrl+')'}"></view>
+            <view class="cu-avatar round lg">
+              <image :src="logoUrl" class="logo" />
+            </view>
             <view class="content flex-sub">
               <view>{{event_title}}</view>
-              <view class="text-gray text-sm flex justify-between">{{nickName}}创建于{{date}}</view>
+              <view class="text-gray text-sm flex justify-between">创建于{{date}}</view>
             </view>
           </view>
         </view>
@@ -94,8 +96,7 @@ export default {
       event_title: "",
       date: "",
       description: "",
-      avatarUrl: "",
-      nickName: "",
+      logoUrl: "/static/images/ml-task-logo.png",
       tasks: {},
       isNoTasks: true,
       isShowLoading: false,
@@ -113,11 +114,6 @@ export default {
     this.event_title = title;
     this.date = formatDate(new Date(date)).fullDate;
     this.description = description;
-    const { avatarUrl, nickName } = user.userInfo;
-    this.avatarUrl =
-      avatarUrl ||
-      this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
-    this.nickName = nickName || "我";
     const isNeedRefreshTask = event.isNeedRefreshTask;
     if (
       !event.tasks[this.event_id] ||
@@ -146,6 +142,7 @@ export default {
       this.tasks = tasks;
       this.checkTasks(tasks);
       this.isShowLoading = false;
+      this.isShowReTry = false;
     },
     getAllTasksFailed() {
       this.isShowLoading = false;
@@ -185,7 +182,7 @@ export default {
       switch (index) {
         case 0:
           if (this.currentTask.state === 1) {
-            this.showToast("已完成事件不支持编辑");
+            this.showToast("已完成记录不支持编辑");
             return;
           }
           this.editTask();
@@ -235,5 +232,14 @@ export default {
 .favorfillIcon {
   line-height: 24px;
   margin-left: 10px;
+}
+.cu-avatar {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.logo {
+  width: 100%;
+  height: 100%;
 }
 </style>

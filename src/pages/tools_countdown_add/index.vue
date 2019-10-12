@@ -6,22 +6,16 @@
     </cu-custom>
     <div class="container">
       <view class="cu-form-group">
-        <view class="title">打卡名称</view>
-        <input name="input" @input="nameInput" :value="name" />
+        <view class="title">倒计时名称</view>
+        <input name="input" @input="titleInput" :value="title" />
       </view>
       <view class="cu-form-group align-start">
-        <view class="title">打卡描述</view>
+        <view class="title">倒计时描述</view>
         <textarea maxlength="-1" @input="descInput" :value="description"></textarea>
       </view>
       <view class="cu-form-group">
-        <view class="title">开始日期</view>
-        <picker mode="date" :value="start_date" start="2015-09-01" @change="DateChangeStart">
-          <view class="picker">{{start_date}}</view>
-        </picker>
-      </view>
-      <view class="cu-form-group">
-        <view class="title">结束日期</view>
-        <picker mode="date" :value="end_date" start="2015-09-01" @change="DateChangeEnd">
+        <view class="title">目标日期</view>
+        <picker mode="date" :value="end_date" start="2015-09-01" @change="DateChange">
           <view class="picker">{{end_date}}</view>
         </picker>
       </view>
@@ -36,6 +30,11 @@
 </template>
 
 <script>
+import {
+  GET_EVENT_BY_EVENT_ID,
+  EVENT_OPERATION,
+  IS_NEED_REFRESH_EVENT
+} from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -49,19 +48,28 @@ export default {
       isShowLoading: false
     };
   },
-  onShow() {},
+  onShow() {
+    const { user, event } = this.$store.state;
+    this.user_id = user.userInfo.userId;
+    this.event_id = event.currentEvent._id;
+    if (this.event_id) {
+      this.pageTitle = "编辑";
+      this.btnTitle = "编辑";
+      this.getEventInfo(event.currentEvent);
+    } else {
+      this.pageTitle = "添加";
+      this.btnTitle = "添加";
+    }
+  },
   methods: {
-    nameInput(e) {
+    titleInput(e) {
       this.title = e.target.value;
     },
     descInput(e) {
       this.description = e.target.value;
     },
-    DateChangeStart(e) {
-      this.start_date = e.target.value;
-    },
-    DateChangeEnd(e) {
-      this.end_date = e.target.value;
+    DateChange(e) {
+      this.end_date = e.detail.value
     },
     eventOperation() {
       // if (!this.title) {

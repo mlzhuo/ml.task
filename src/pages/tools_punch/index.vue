@@ -9,7 +9,7 @@
     <view class="container">
       <navigator
         hover-class="none"
-        url="/pages/event_add/main"
+        url="/pages/tools_punch_add/main"
         navigateTo
         class="cu-btn bg-gradual-purple shadow-blur round lg add-btn"
       >
@@ -18,7 +18,6 @@
     </view>
   </view>
 </template>
-
 <script>
 export default {
   data() {

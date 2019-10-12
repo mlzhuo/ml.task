@@ -107,6 +107,7 @@ export default {
     onSuccess() {
       this.events = this.$store.state.event.events;
       this.isShowLoading = false;
+      this.isShowReTry = false;
       this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, false);
     },
     onFailed() {

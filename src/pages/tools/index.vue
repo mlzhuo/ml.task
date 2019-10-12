@@ -7,7 +7,7 @@
         :key="index"
         @click="toolsItemClick(item.url)"
       >
-        <image class="item-bg-img" :src="gender===2?item.female:item.male" />
+        <image class="item-bg-img" :src="item.img" />
         <view class="cardTitle">{{item.title}}</view>
       </view>
       <view class="cu-item bg-grey light shadow-blur">
@@ -22,48 +22,20 @@
 export default {
   data() {
     return {
-      gender: 1,
       list: [
         {
           title: "打卡计划",
           male: "",
-          female: "",
+          img: "/static/images/punch.svg",
           url: "/pages/tools_punch/main"
         },
         {
           title: "倒计时",
-          male: "",
-          female: "",
+          img: "/static/images/countdown.svg",
           url: "/pages/tools_countdown/main"
         }
       ]
     };
-  },
-  onLoad() {
-    const { gender } = this.$store.state.user.userInfo;
-    this.gender = gender;
-  },
-  mounted() {
-    const fileURL = this.$store.state.miniapp.config.fileURL;
-    this.list.forEach(v => {
-      let male, female;
-      switch (v.title) {
-        case "打卡计划":
-          male = "/punch_m.svg";
-          female = "/punch_f.svg";
-          break;
-        case "倒计时":
-          male = "/countdown_m.svg";
-          female = "/countdown_f.svg";
-          break;
-        default:
-          break;
-      }
-      v.male = "/static/images" + male;
-      v.female = "/static/images" + female;
-      // v.male = fileURL + male;
-      // v.female = fileURL + female;
-    });
   },
   methods: {
     toolsItemClick(url) {

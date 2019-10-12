@@ -8,7 +8,7 @@
       <view class="text-center margin-bottom text-lg">ML TASK 中引用的第三方资源</view>
       <view
         class="margin-bottom info-text"
-      >在小程序中使用的第三方资源如下，非常感谢，侵删。非常感谢开源贡献者，前人种树后人乘凉，特此将该小程序（ML 日常管理）开源。</view>
+      >在小程序中使用的第三方资源如下，非常感谢，侵删。<br>引用或者拓展发布，请注明原作者。</view>
       <view class="text-content">
         <view class="cu-list menu sm-border card-menu margin-top">
           <view class="cu-item" @click="copyUrl('colorui')">

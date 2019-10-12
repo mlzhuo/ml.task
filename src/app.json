@@ -10,6 +10,7 @@
     "pages/tools_punch/main",
     "pages/tools_punch_add/main",
     "pages/tools_countdown/main",
+    "pages/tools_countdown_add/main",
     "pages/user/main",
     "pages/user_update_list/main",
     "pages/user_resource_from/main"

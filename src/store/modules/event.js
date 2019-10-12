@@ -13,7 +13,7 @@ import {
   STORE_TASK_BY_TASK_ID,
   CLEAR_CURRENT_TASK,
   TASK_OPERATION,
-  IS_NEED_REFRESH_TASK,
+  IS_NEED_REFRESH_TASK
   // STORE_REQUEST_STATUS
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
@@ -46,6 +46,13 @@ const actions = {
       commit(`miniapp/${STORE_RETRY_ACTION_TYPE}`, `event/${GET_EVENTS_DATA}`, {
         root: true
       })
+      commit(
+        `miniapp/${STORE_RETRY_ACTION_PAYLOAD}`,
+        { onSuccess, onFailed },
+        {
+          root: true
+        }
+      )
       // commit(
       //   `miniapp/${STORE_REQUEST_STATUS}`,
       //   { isShowLoading: false, isShowReTry: true },
@@ -82,6 +89,13 @@ const actions = {
       commit(`miniapp/${STORE_RETRY_ACTION_TYPE}`, `event/${GET_EVENTS_DATA}`, {
         root: true
       })
+      commit(
+        `miniapp/${STORE_RETRY_ACTION_PAYLOAD}`,
+        { onSuccess, onFailed },
+        {
+          root: true
+        }
+      )
       // commit(
       //   `miniapp/${STORE_REQUEST_STATUS}`,
       //   { isShowLoading: false, isShowReTry: true },
@@ -120,6 +134,16 @@ const actions = {
     const result = await jsonRequest('GET', `/${event_id}/tasks`)
     if (!result) {
       onFailed()
+      commit(`miniapp/${STORE_RETRY_ACTION_TYPE}`, `event/${GET_ALL_TASKS}`, {
+        root: true
+      })
+      commit(
+        `miniapp/${STORE_RETRY_ACTION_PAYLOAD}`,
+        { event_id, onSuccess, onFailed },
+        {
+          root: true
+        }
+      )
       return
     }
     let temp = result.data
