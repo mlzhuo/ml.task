@@ -35,7 +35,10 @@
         </div>
       </div>
       <div class="cu-timeline" v-for="(daySortItem, key) in tasks" :key="key">
-        <div class="cu-time">{{key}} {{daySortItem[0].weekday}}</div>
+        <div class="cu-time">
+          <span style="font-size:20px">{{daySortItem[0].date_details.day}}</span>
+          / {{daySortItem[0].date_details.month}} {{daySortItem[0].date_details.year?'/ '+ daySortItem[0].date_details.year : ''}} {{daySortItem[0].weekday}}
+        </div>
         <div
           v-for="item in daySortItem"
           :key="item._id"
@@ -48,11 +51,13 @@
               <text v-if="item.level!==0" class="cuIcon-favorfill favorfillIcon text-yellow"></text>
               <text class="cuIcon-check done-btn text-white" @click="doneTask(event_id,item._id)"></text>
             </div>
-            <div v-else class="cu-capsule radius">
-              <div class="cu-tag bg-grey borderRadius">{{item.edit_time}}</div>
-              <!-- <div class="cu-tag line-grey">{{item.edit_time}}</div> -->
+            <div :class="{'radius':true,'margin-top': item.state===0?true:false}">
+              <p>{{item.content}}</p>
+              <p
+                v-if="item.state !== 0"
+                class="text-grey text-right margin-top"
+              >创建：{{item.time}}\n完成：{{item.edit_time}}</p>
             </div>
-            <div :class="{'margin-top': true,'':item.state!==0?true:false }">{{item.content}}</div>
           </div>
         </div>
       </div>
@@ -227,7 +232,8 @@ export default {
   margin: 0 16px !important;
 }
 .cu-timeline .cu-time {
-  width: 75px !important;
+  width: auto !important;
+  text-align: left !important;
 }
 .favorfillIcon {
   line-height: 24px;

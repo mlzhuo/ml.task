@@ -151,7 +151,9 @@ page,
   left: 50%;
   transform: translateX(-50%) !important;
 }
-
+.cu-timeline {
+  white-space: pre-wrap;
+}
 .bg-ml-primary {
   background-color: #4e73df;
 }

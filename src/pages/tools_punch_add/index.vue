@@ -9,25 +9,25 @@
         <view class="title">打卡名称</view>
         <input name="input" @input="nameInput" :value="name" />
       </view>
-      <view class="cu-form-group align-start">
-        <view class="title">打卡描述</view>
-        <textarea maxlength="-1" @input="descInput" :value="description"></textarea>
-      </view>
       <view class="cu-form-group">
         <view class="title">开始日期</view>
-        <picker mode="date" :value="start_date" start="2015-09-01" @change="DateChangeStart">
+        <picker mode="date" :value="start_date" :start="start_date" @change="DateChangeStart">
           <view class="picker">{{start_date}}</view>
         </picker>
       </view>
       <view class="cu-form-group">
         <view class="title">结束日期</view>
-        <picker mode="date" :value="end_date" start="2015-09-01" @change="DateChangeEnd">
+        <picker mode="date" :value="end_date" :start="start_date" @change="DateChangeEnd">
           <view class="picker">{{end_date}}</view>
         </picker>
       </view>
+      <view class="cu-form-group align-start">
+        <view class="title">打卡描述</view>
+        <textarea maxlength="-1" @input="descInput" :value="description"></textarea>
+      </view>
       <button
         class="cu-btn block bg-gradual-purple shadow lg add-btn"
-        @click="eventOperation"
+        @click="punchOperation"
       >{{btnTitle}}</button>
       <view class="cu-tabbar-height"></view>
     </div>
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { formatYMD } from "@/utils/index";
 export default {
   data() {
     return {
@@ -49,13 +50,22 @@ export default {
       isShowLoading: false
     };
   },
-  onShow() {},
+  onShow() {
+    const { user } = this.$store.state;
+    this.user_id = user.userInfo.userId;
+    const today = formatYMD(new Date());
+    this.start_date = today;
+    this.end_date = today;
+    this.pageTitle = "添加";
+    this.btnTitle = "添加";
+  },
   methods: {
     nameInput(e) {
       this.title = e.target.value;
     },
     descInput(e) {
       this.description = e.target.value;
+      console.log(this.description);
     },
     DateChangeStart(e) {
       this.start_date = e.target.value;
@@ -63,7 +73,7 @@ export default {
     DateChangeEnd(e) {
       this.end_date = e.target.value;
     },
-    eventOperation() {
+    punchOperation() {
       // if (!this.title) {
       //   this.showToast("请输入");
       //   return;
@@ -109,5 +119,8 @@ export default {
 }
 .add-btn {
   margin-top: 80px;
+}
+.cu-form-group.align-start {
+  border-bottom: 1rpx solid #eee;
 }
 </style>

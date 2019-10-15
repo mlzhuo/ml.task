@@ -152,6 +152,20 @@ const actions = {
       const formatDateObj = formatDate(new Date(item.date))
       item.weekday = formatDateObj.weekday
       item.date = formatDateObj.date
+      const dateArr = item.date.split('-')
+      if (item.date.length === 5) {
+        item.date_details = {
+          year: '',
+          month: dateArr[0],
+          day: dateArr[1]
+        }
+      } else {
+        item.date_details = {
+          year: dateArr[0],
+          month: dateArr[1],
+          day: dateArr[2]
+        }
+      }
       item.time = formatDateObj.time
       item.edit_time =
         formatDate(new Date(item.edit_time)).date === formatDateObj.date
