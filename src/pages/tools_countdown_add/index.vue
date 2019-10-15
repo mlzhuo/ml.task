@@ -9,19 +9,19 @@
         <view class="title">倒计时名称</view>
         <input name="input" @input="titleInput" :value="title" />
       </view>
+      <view class="cu-form-group">
+        <view class="title">目标日期</view>
+        <picker mode="date" :value="end_date" :start="picker_start_date" @change="DateChange">
+          <view class="picker">{{end_date}}</view>
+        </picker>
+      </view>
       <view class="cu-form-group align-start">
         <view class="title">倒计时描述</view>
         <textarea maxlength="-1" @input="descInput" :value="description"></textarea>
       </view>
-      <view class="cu-form-group">
-        <view class="title">目标日期</view>
-        <picker mode="date" :value="end_date" start="2015-09-01" @change="DateChange">
-          <view class="picker">{{end_date}}</view>
-        </picker>
-      </view>
       <button
         class="cu-btn block bg-gradual-purple shadow lg add-btn"
-        @click="eventOperation"
+        @click="countdownOperation"
       >{{btnTitle}}</button>
       <view class="cu-tabbar-height"></view>
     </div>
@@ -30,11 +30,7 @@
 </template>
 
 <script>
-import {
-  GET_EVENT_BY_EVENT_ID,
-  EVENT_OPERATION,
-  IS_NEED_REFRESH_EVENT
-} from "@/store/mutation-types";
+import { formatYMD } from "@/utils/index";
 export default {
   data() {
     return {
@@ -43,23 +39,19 @@ export default {
       btnTitle: "",
       name: "",
       description: "",
-      start_date: "",
       end_date: "",
+      picker_start_date: "",
       isShowLoading: false
     };
   },
   onShow() {
-    const { user, event } = this.$store.state;
+    const { user } = this.$store.state;
     this.user_id = user.userInfo.userId;
-    this.event_id = event.currentEvent._id;
-    if (this.event_id) {
-      this.pageTitle = "编辑";
-      this.btnTitle = "编辑";
-      this.getEventInfo(event.currentEvent);
-    } else {
-      this.pageTitle = "添加";
-      this.btnTitle = "添加";
-    }
+    const today = formatYMD(new Date());
+    this.picker_start_date = today;
+    this.end_date = today;
+    this.pageTitle = "添加";
+    this.btnTitle = "添加";
   },
   methods: {
     titleInput(e) {
@@ -69,26 +61,9 @@ export default {
       this.description = e.target.value;
     },
     DateChange(e) {
-      this.end_date = e.detail.value
+      this.end_date = e.target.value;
     },
-    eventOperation() {
-      // if (!this.title) {
-      //   this.showToast("请输入");
-      //   return;
-      // }
-      // this.isShowLoading = true;
-      // const method = this.event_id ? "PUT" : "POST";
-      // this.$store.dispatch(`event/${EVENT_OPERATION}`, {
-      //   method,
-      //   title: this.title,
-      //   description: this.description,
-      //   level: this.level ? 1 : 0,
-      //   user_id: this.user_id,
-      //   event_id: this.event_id,
-      //   onSuccess: this.operationSuccess,
-      //   onFailed: this.operationFailed
-      // });
-    },
+    countdownOperation() {},
     operationSuccess(message) {
       // this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
       // this.isShowLoading = false;
@@ -98,11 +73,6 @@ export default {
     operationFailed() {
       // this.isShowLoading = false;
       // this.showToast("请重试");
-    },
-    getEventInfo(data) {
-      // this.title = data.title;
-      // this.description = data.description;
-      // this.level = data.level === 0 ? false : true;
     }
   },
   onUnload() {
@@ -117,5 +87,8 @@ export default {
 }
 .add-btn {
   margin-top: 80px;
+}
+.cu-form-group.align-start {
+  border-bottom: 1rpx solid #eee;
 }
 </style>

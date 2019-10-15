@@ -11,13 +11,13 @@
       </view>
       <view class="cu-form-group">
         <view class="title">开始日期</view>
-        <picker mode="date" :value="start_date" :start="start_date" @change="DateChangeStart">
+        <picker mode="date" :value="start_date" :start="picker_start_date" @change="DateChangeStart">
           <view class="picker">{{start_date}}</view>
         </picker>
       </view>
       <view class="cu-form-group">
         <view class="title">结束日期</view>
-        <picker mode="date" :value="end_date" :start="start_date" @change="DateChangeEnd">
+        <picker mode="date" :value="end_date" :start="picker_start_date" @change="DateChangeEnd">
           <view class="picker">{{end_date}}</view>
         </picker>
       </view>
@@ -45,6 +45,7 @@ export default {
       btnTitle: "",
       name: "",
       description: "",
+      picker_start_date: "",
       start_date: "",
       end_date: "",
       isShowLoading: false
@@ -54,6 +55,7 @@ export default {
     const { user } = this.$store.state;
     this.user_id = user.userInfo.userId;
     const today = formatYMD(new Date());
+    this.picker_start_date = today;
     this.start_date = today;
     this.end_date = today;
     this.pageTitle = "添加";
@@ -74,22 +76,7 @@ export default {
       this.end_date = e.target.value;
     },
     punchOperation() {
-      // if (!this.title) {
-      //   this.showToast("请输入");
-      //   return;
-      // }
-      // this.isShowLoading = true;
-      // const method = this.event_id ? "PUT" : "POST";
-      // this.$store.dispatch(`event/${EVENT_OPERATION}`, {
-      //   method,
-      //   title: this.title,
-      //   description: this.description,
-      //   level: this.level ? 1 : 0,
-      //   user_id: this.user_id,
-      //   event_id: this.event_id,
-      //   onSuccess: this.operationSuccess,
-      //   onFailed: this.operationFailed
-      // });
+
     },
     operationSuccess(message) {
       // this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
@@ -100,11 +87,6 @@ export default {
     operationFailed() {
       // this.isShowLoading = false;
       // this.showToast("请重试");
-    },
-    getEventInfo(data) {
-      // this.title = data.title;
-      // this.description = data.description;
-      // this.level = data.level === 0 ? false : true;
     }
   },
   onUnload() {
