@@ -167,10 +167,17 @@ export default {
       this.isShowModal = true;
       this.longPressPunch = punch;
     },
+    hideModal() {
+      this.isShowModal = false;
+    },
     doSomething(index) {
       this.isShowModal = false;
       switch (index) {
         case 0:
+          if (this.longPressPunch.state === 1) {
+            this.showToast("已结束打卡不支持编辑");
+            return;
+          }
           this.$store.commit(
             `tools/${STORE_PUNCH_BY_PUNCH_ID}`,
             this.longPressPunch

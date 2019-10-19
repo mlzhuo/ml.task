@@ -32,7 +32,11 @@
         <view class="padding-xl">
           更新日期：{{currentVersion.date}}
           <br />
-          更新日志：{{currentVersion.description}}
+          <view
+            :class="{'padding-l-5em': index > 0}"
+            v-for="(item, index) in updateInfo"
+            :key="index"
+          >{{index===0 ? '更新日志：1. ' + item : index + 1 + '. ' + item}}</view>
         </view>
       </view>
     </view>
@@ -40,11 +44,13 @@
 </template>
 
 <script>
+import { formatVersionText } from "@/utils";
 export default {
   data() {
     return {
       versions: [],
       currentVersion: {},
+      updateInfo: [],
       isShowModal: false
     };
   },
@@ -55,6 +61,7 @@ export default {
   methods: {
     showCurrentModal(version) {
       this.currentVersion = version;
+      this.updateInfo = formatVersionText(this.currentVersion.description);
       this.isShowModal = true;
     }
   }
@@ -63,5 +70,8 @@ export default {
 <style scoped>
 .padding-xl {
   text-align: left;
+}
+.padding-l-5em {
+  padding-left: 5em;
 }
 </style>

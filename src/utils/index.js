@@ -44,5 +44,9 @@ const formatYMD = date => {
 
   return `${t1}`
 }
+const formatVersionText = str => {
+  const textArr = str.split(/;|；/)
+  return textArr
+}
 
-export { formatNumber, formatTime, formatDate, formatYMD }
+export { formatNumber, formatTime, formatDate, formatYMD, formatVersionText }

@@ -24,7 +24,11 @@
         <view class="padding-xl">
           更新日期：{{currentVersion.date}}
           <br />
-          更新日志：{{currentVersion.description}}
+          <view
+            :class="{'padding-l-5em': index > 0}"
+            v-for="(item, index) in updateInfo"
+            :key="index"
+          >{{index===0 ? '更新日志：1. ' + item : index + 1 + '. ' + item}}</view>
         </view>
       </view>
     </view>
@@ -39,6 +43,7 @@ import {
   GET_VERSIONS,
   LOAD_CONFIG
 } from "@/store/mutation-types";
+import { formatVersionText } from "@/utils";
 export default {
   data() {
     return {
@@ -46,6 +51,7 @@ export default {
       isShowModal: false,
       version: "",
       currentVersion: {},
+      updateInfo: [],
       fileURL: "",
       style: "",
       bgUrl: "/static/images/login_bg.svg",
@@ -78,6 +84,7 @@ export default {
     getVersionSuccess() {
       this.version = "v" + this.$store.state.miniapp.version;
       this.currentVersion = this.$store.state.miniapp.versions[0];
+      this.updateInfo = formatVersionText(this.currentVersion.description);
       try {
         var localVersion = wx.getStorageSync("version");
         if (localVersion && localVersion === this.version.replace("v", "")) {
@@ -199,5 +206,8 @@ form {
 }
 .padding-xl {
   text-align: left;
+}
+.padding-l-5em {
+  padding-left: 5em;
 }
 </style>
