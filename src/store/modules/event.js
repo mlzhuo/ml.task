@@ -34,11 +34,6 @@ const actions = {
     { commit, state, rootState },
     { onSuccess, onFailed }
   ) {
-    // commit(
-    //   `miniapp/${STORE_REQUEST_STATUS}`,
-    //   { isShowLoading: true, isShowReTry: false },
-    //   { root: true }
-    // )
     const user_id = rootState.user.userInfo.userId
     const eventsResult = await jsonRequest('GET', `/${user_id}/events`)
     if (!eventsResult) {
@@ -53,11 +48,6 @@ const actions = {
           root: true
         }
       )
-      // commit(
-      //   `miniapp/${STORE_REQUEST_STATUS}`,
-      //   { isShowLoading: false, isShowReTry: true },
-      //   { root: true }
-      // )
       return
     }
     const tasksResult = await jsonRequest('GET', `/${user_id}/statistics`)
@@ -78,11 +68,6 @@ const actions = {
         event.all = all
       }
       commit(STORE_ALL_EVENTS, temp)
-      // commit(
-      //   `miniapp/${STORE_REQUEST_STATUS}`,
-      //   { isShowLoading: false, isShowReTry: false },
-      //   { root: true }
-      // )
       onSuccess()
     } else {
       onFailed()
@@ -96,11 +81,6 @@ const actions = {
           root: true
         }
       )
-      // commit(
-      //   `miniapp/${STORE_REQUEST_STATUS}`,
-      //   { isShowLoading: false, isShowReTry: true },
-      //   { root: true }
-      // )
     }
   },
   async [EVENT_OPERATION](

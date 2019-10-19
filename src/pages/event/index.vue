@@ -63,7 +63,6 @@ import store from '@/store'
 export default {
   data() {
     return {
-      user_id: "",
       events: [],
       isShowLoading: true,
       isShowReTry: false,
@@ -92,13 +91,14 @@ export default {
     }
   },
   mounted() {
-    const navLiBg =
-      this.$store.state.miniapp.config.fileURL + "/ml.nav-li.bg.png";
+    // const navLiBg =
+      // this.$store.state.miniapp.config.fileURL + "/ml.nav-li.bg.png";
     // this.style = `background-image:url(${navLiBg})`;
   },
   methods: {
     getData() {
       this.isShowLoading = true;
+      this.isShowReTry = false;
       this.$store.dispatch(`event/${GET_EVENTS_DATA}`, {
         onSuccess: this.onSuccess,
         onFailed: this.onFailed

@@ -48,7 +48,9 @@ export default {
     const { user } = this.$store.state;
     this.user_id = user.userInfo.userId;
     const today = formatYMD(new Date());
-    this.picker_start_date = today;
+    this.picker_start_date = formatYMD(
+      new Date(new Date().getTime() + 24 * 3600 * 1000)
+    );
     this.end_date = today;
     this.pageTitle = "添加";
     this.btnTitle = "添加";

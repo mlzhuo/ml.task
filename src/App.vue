@@ -135,6 +135,9 @@ page,
     transform: translateY(0px);
   }
 }
+.cu-avatar {
+  background-color: transparent !important;
+}
 .container {
   height: 100%;
   box-sizing: border-box;
