@@ -10,7 +10,6 @@ ML日常管理小程序。MPVue + ColorUI
 ```js
 export const config = {
   apiURL: 'http://192.168.191.1:4001/api',
-  fileURL: 'https://192.168.191.1:4002/task'
 }
 
 ```

@@ -19,6 +19,10 @@
 </template>
 
 <script>
+import {
+  IS_NEED_REFRESH_TOOLS_OVERVIEW,
+  GET_TOOLS_OVERVIEW_DATA
+} from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -28,19 +32,44 @@ export default {
           male: "",
           img: "/static/images/punch.svg",
           url: "/pages/tools_punch/main"
-        },
-        {
-          title: "倒计时",
-          img: "/static/images/countdown.svg",
-          url: "/pages/tools_countdown/main"
         }
+        // {
+        //   title: "倒计时",
+        //   img: "/static/images/countdown.svg",
+        //   url: "/pages/tools_countdown/main"
+        // }
       ]
     };
+  },
+  onShow() {
+    const isNeedRefreshToolsOverview = this.$store.state.tools
+      .isNeedRefreshToolsOverview;
+    if (isNeedRefreshToolsOverview) {
+      this.getData();
+    } else {
+      // this.onSuccess();
+    }
+  },
+  onLoad() {
+    const isNeedRefreshToolsOverview = this.$store.state.tools
+      .isNeedRefreshToolsOverview;
+    if (isNeedRefreshToolsOverview) {
+      this.getData();
+    } else {
+      // this.onSuccess();
+    }
   },
   methods: {
     toolsItemClick(url) {
       wx.navigateTo({ url });
-    }
+    },
+    getData() {
+      console.log(1);
+      this.$store.dispatch(`tools/${GET_TOOLS_OVERVIEW_DATA}`, {
+        onSuccess: this.onSuccess
+      });
+    },
+    onSuccess() {}
   }
 };
 </script>

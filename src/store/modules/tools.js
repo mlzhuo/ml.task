@@ -6,10 +6,16 @@ import {
   CLEAR_CURRENT_PUNCH,
   IS_NEED_REFRESH_PUNCH,
   STORE_RETRY_ACTION_TYPE,
-  STORE_RETRY_ACTION_PAYLOAD
+  STORE_RETRY_ACTION_PAYLOAD,
+  DELETE_PUNCH,
+  IS_NEED_REFRESH_TOOLS_OVERVIEW,
+  GET_TOOLS_OVERVIEW_DATA,
+  STORE_TOOLS_OVERVIEW_DATA
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 const state = {
+  toolsOverviewData: '',
+  isNeedRefreshToolsOverview: true,
   punch: [],
   currentPunch: {},
   isNeedRefreshPunch: true
@@ -17,6 +23,17 @@ const state = {
 
 const getters = {}
 const actions = {
+  async [GET_TOOLS_OVERVIEW_DATA](
+    { commit, state, rootState },
+    { onSuccess, onFailed }
+  ) {
+    const result = 1
+    if (result) {
+      commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, false)
+      commit(STORE_TOOLS_OVERVIEW_DATA, result)
+      onSuccess()
+    }
+  },
   async [GET_PUNCH_DATA](
     { commit, state, rootState },
     { onSuccess, onFailed }
@@ -57,8 +74,24 @@ const actions = {
       onFailed()
       return
     }
+    commit(IS_NEED_REFRESH_PUNCH, true)
+    commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, true)
     const { message } = result
     onSuccess(message)
+  },
+  async [DELETE_PUNCH]({ commit, state, rootState }, { onSuccess, onFailed }) {
+    const user_id = rootState.user.userInfo.userId
+    const punch_id = state.currentPunch._id
+    const delResult = await jsonRequest(
+      'DELETE',
+      `/${user_id}/punch/${punch_id}`
+    )
+    if (delResult && delResult.state) {
+      commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, true)
+      onSuccess(delResult.message)
+    } else {
+      onFailed()
+    }
   }
 }
 const mutations = {
@@ -73,6 +106,12 @@ const mutations = {
   },
   [IS_NEED_REFRESH_PUNCH](state, isNeedRefreshPunch) {
     state.isNeedRefreshPunch = isNeedRefreshPunch
+  },
+  [IS_NEED_REFRESH_TOOLS_OVERVIEW](state, isNeedRefreshToolsOverview) {
+    state.isNeedRefreshToolsOverview = isNeedRefreshToolsOverview
+  },
+  [STORE_TOOLS_OVERVIEW_DATA](state, toolsOverviewData) {
+    state.toolsOverviewData = toolsOverviewData
   }
 }
 export default {

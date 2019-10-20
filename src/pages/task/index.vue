@@ -91,8 +91,7 @@ import {
   DONE_TASK,
   STORE_TASK_BY_TASK_ID,
   CLEAR_CURRENT_TASK,
-  IS_NEED_REFRESH_EVENT,
-  IS_NEED_REFRESH_TASK
+  DELETE_TASK
 } from "@/store/mutation-types";
 export default {
   data() {
@@ -107,7 +106,7 @@ export default {
       isShowLoading: false,
       isShowReTry: false,
       isShowModal: false,
-      longPressItemArr: ["编辑", "未完成功能 ^_^"],
+      longPressItemArr: ["编辑", "复制", "删除"],
       currentTask: {}
     };
   },
@@ -141,9 +140,6 @@ export default {
       });
     },
     getAllTasksSuccess(tasks) {
-      this.$store.commit(`event/${IS_NEED_REFRESH_TASK}`, {
-        [this.event_id]: { isNeed: false }
-      });
       this.tasks = tasks;
       this.checkTasks(tasks);
       this.isShowLoading = false;
@@ -169,10 +165,27 @@ export default {
     doneTaskSuccess(message) {
       this.getTasks(this.event_id);
       this.showToast(message);
-      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
     },
     editTask() {
       wx.navigateTo({ url: `/pages/task_add/main` });
+    },
+    delTask() {
+      this.isShowLoading = true;
+      this.isShowReTry = false;
+      this.$store.dispatch(`event/${DELETE_TASK}`, {
+        onSuccess: this.delSuccess,
+        onFailed: this.delFailed
+      });
+    },
+    delSuccess(message) {
+      this.getTasks(this.event_id);
+      this.isShowLoading = false;
+      this.isShowReTry = false;
+      this.showToast(message);
+    },
+    delFailed() {
+      this.isShowLoading = false;
+      this.showToast("删除失败，请重试");
     },
     showModal(task_id, task) {
       this.$store.commit(`event/${STORE_TASK_BY_TASK_ID}`, task);
@@ -192,8 +205,13 @@ export default {
           }
           this.editTask();
           break;
+        case 1:
+          wx.setClipboardData({ data: this.currentTask.content });
+          break;
+        case 2:
+          this.delTask();
+          break;
         default:
-          this.showToast("未完成功能 ^_^");
           break;
       }
     }

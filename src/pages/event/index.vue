@@ -57,9 +57,9 @@ import {
   GET_EVENTS_DATA,
   CLEAR_CURRENT_EVENT,
   STORE_EVENT_BY_EVENT_ID,
-  IS_NEED_REFRESH_EVENT
+  DELETE_EVENT
 } from "@/store/mutation-types";
-import store from '@/store'
+import store from "@/store";
 export default {
   data() {
     return {
@@ -67,7 +67,7 @@ export default {
       isShowLoading: true,
       isShowReTry: false,
       isShowModal: false,
-      longPressItemArr: ["编辑", "未完成功能 ^_^"],
+      longPressItemArr: ["编辑", "删除"],
       longPressEventId: "",
       style: ""
     };
@@ -78,7 +78,7 @@ export default {
     if (isNeedRefreshEvent) {
       this.getData();
     } else {
-      this.onSuccess()
+      this.onSuccess();
     }
   },
   onLoad() {
@@ -87,13 +87,10 @@ export default {
     if (isNeedRefreshEvent) {
       this.getData();
     } else {
-      this.onSuccess()
+      this.onSuccess();
     }
   },
   mounted() {
-    // const navLiBg =
-      // this.$store.state.miniapp.config.fileURL + "/ml.nav-li.bg.png";
-    // this.style = `background-image:url(${navLiBg})`;
   },
   methods: {
     getData() {
@@ -108,7 +105,6 @@ export default {
       this.events = this.$store.state.event.events;
       this.isShowLoading = false;
       this.isShowReTry = false;
-      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, false);
     },
     onFailed() {
       this.isShowLoading = false;
@@ -119,6 +115,24 @@ export default {
       wx.navigateTo({
         url: `/pages/event_add/main`
       });
+    },
+    delEvent() {
+      this.isShowLoading = true;
+      this.isShowReTry = false;
+      this.$store.dispatch(`event/${DELETE_EVENT}`, {
+        onSuccess: this.delSuccess,
+        onFailed: this.delFailed
+      });
+    },
+    delSuccess(message) {
+      this.getData();
+      this.isShowLoading = false;
+      this.isShowReTry = false;
+      this.showToast(message);
+    },
+    delFailed() {
+      this.isShowLoading = false;
+      this.showToast("删除失败，请重试");
     },
     saveCurrentEvent(event) {
       this.$store.commit(`event/${STORE_EVENT_BY_EVENT_ID}`, event);
@@ -136,29 +150,14 @@ export default {
         case 0:
           this.editEvent();
           break;
+        case 1:
+          this.delEvent();
+          break;
         default:
-          this.showToast("未完成功能 ^_^");
           break;
       }
     }
   }
-  // computed: {
-  //   getLoadingStatus() {
-  //     const { isShowLoading, isShowReTry } = this.$store.state.miniapp;
-  //     return { isShowLoading, isShowReTry };
-  //   }
-  // },
-  // watch: {
-  //   getLoadingStatus: {
-  //     handler(val) {
-  //       const { isShowLoading, isShowReTry } = val;
-  //       this.isShowLoading = isShowLoading;
-  //       this.isShowReTry = isShowReTry;
-  //     },
-  //     deep: true,
-  //     immediate: true
-  //   }
-  // }
 };
 </script>
 

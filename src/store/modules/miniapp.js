@@ -14,7 +14,6 @@ import {
   STORE_REQUEST_STATUS
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
-import { config } from '@/config'
 import { formatYMD } from '@/utils/index'
 const state = {
   navigationInfo: {
@@ -48,9 +47,12 @@ const actions = {
       onSuccess()
     }
   },
-  [LOAD_CONFIG]({ commit, state }, { onSuccess, onFailed }) {
-    commit(STORE_CONFIG, config)
-    onSuccess(config)
+  async [LOAD_CONFIG]({ commit, state }, { onSuccess }) {
+    const result = await jsonRequest('GET', '/config')
+    if (result && result.state) {
+      commit(STORE_CONFIG, result.data)
+      onSuccess(result.data)
+    }
   },
   async [REQUEST_STATUS]({ commit, state }, { isShowLoading, isShowReTry }) {
     commit(STORE_REQUEST_STATUS, { isShowLoading, isShowReTry })

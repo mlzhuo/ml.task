@@ -19,7 +19,10 @@
           color="#e54d42"
         ></switch>
       </view>
-      <button class="cu-btn block bg-gradual-blue shadow lg add-btn" @click="taskOperation">{{pageTitle}}</button>
+      <button
+        class="cu-btn block bg-gradual-blue shadow lg add-btn"
+        @click="taskOperation"
+      >{{pageTitle}}</button>
       <view class="cu-tabbar-height"></view>
     </div>
     <Loading v-if="isShowLoading"></Loading>
@@ -28,9 +31,7 @@
 
 <script>
 import {
-  TASK_OPERATION,
-  IS_NEED_REFRESH_EVENT,
-  IS_NEED_REFRESH_TASK
+  TASK_OPERATION
 } from "@/store/mutation-types";
 export default {
   data() {
@@ -85,10 +86,6 @@ export default {
       });
     },
     operationSuccess(message) {
-      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
-      this.$store.commit(`event/${IS_NEED_REFRESH_TASK}`, {
-        [this.event_id]: { isNeed: true }
-      });
       this.isShowLoading = false;
       this.showToast(message);
       wx.navigateBack({ delta: 1 });

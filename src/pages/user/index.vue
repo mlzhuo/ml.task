@@ -35,18 +35,18 @@
           <text class="text-grey">引用资源</text>
         </view>
       </navigator>
-      <navigator url hover-class="none" class="cu-item arrow">
+      <button hover-class="none" class="cu-item arrow feedback-btn" open-type="feedback">
         <view class="content" hover-class="none">
           <text class="cuIcon-questionfill text-cyan"></text>
           <text class="text-grey">问题反馈</text>
         </view>
-      </navigator>
-      <navigator url hover-class="none" class="cu-item arrow">
+      </button>
+      <!-- <navigator url hover-class="none" class="cu-item arrow">
         <view class="content" hover-class="none">
           <text class="cuIcon-discoverfill text-orange"></text>
           <text class="text-grey">关于</text>
         </view>
-      </navigator>
+      </navigator> -->
     </view>
     <view class="cu-tabbar-height"></view>
   </view>
@@ -64,9 +64,6 @@ export default {
   },
   onShow() {
     this.style = `height:${this.windowHeight * 0.35}px`;
-    // this.logoUrl =
-    //   this.$store.state.miniapp.config.fileURL &&
-    //   this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
     const version = this.$store.state.miniapp.version;
     if (version) {
       this.version = "v" + version;
@@ -76,9 +73,6 @@ export default {
   },
   onLoad() {
     this.style = `height:${this.windowHeight * 0.35}px`;
-    // this.logoUrl =
-    //   this.$store.state.miniapp.config.fileURL &&
-    //   this.$store.state.miniapp.config.fileURL + "/ml-task-logo.png";
     const version = this.$store.state.miniapp.version;
     if (version) {
       this.version = "v" + version;
@@ -133,5 +127,11 @@ export default {
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+}
+.feedback-btn {
+  text-align: left;
+}
+.feedback-btn::after {
+  border: none;
 }
 </style>

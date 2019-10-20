@@ -4,6 +4,7 @@ import {
   GET_EVENTS_DATA,
   STORE_ALL_EVENTS,
   EVENT_OPERATION,
+  DELETE_EVENT,
   STORE_EVENT_BY_EVENT_ID,
   CLEAR_CURRENT_EVENT,
   IS_NEED_REFRESH_EVENT,
@@ -13,6 +14,7 @@ import {
   STORE_TASK_BY_TASK_ID,
   CLEAR_CURRENT_TASK,
   TASK_OPERATION,
+  DELETE_TASK,
   IS_NEED_REFRESH_TASK
   // STORE_REQUEST_STATUS
 } from '../mutation-types'
@@ -68,6 +70,7 @@ const actions = {
         event.all = all
       }
       commit(STORE_ALL_EVENTS, temp)
+      commit(IS_NEED_REFRESH_EVENT, false)
       onSuccess()
     } else {
       onFailed()
@@ -107,8 +110,22 @@ const actions = {
       onFailed()
       return
     }
+    commit(IS_NEED_REFRESH_EVENT, true)
     const { message } = result
     onSuccess(message)
+  },
+  async [DELETE_EVENT]({ commit, state, rootState }, { onSuccess, onFailed }) {
+    const user_id = rootState.user.userInfo.userId
+    const event_id = state.currentEvent._id
+    const delResult = await jsonRequest(
+      'DELETE',
+      `/${user_id}/events/${event_id}`
+    )
+    if (delResult && delResult.state) {
+      onSuccess(delResult.message)
+    } else {
+      onFailed()
+    }
   },
   async [GET_ALL_TASKS]({ commit, state }, { event_id, onSuccess, onFailed }) {
     const result = await jsonRequest('GET', `/${event_id}/tasks`)
@@ -182,6 +199,9 @@ const actions = {
       objArray = isActiveTasks.concat(isDoneTasks)
       tempObj[item.date] = objArray
     })
+    commit(IS_NEED_REFRESH_TASK, {
+      [event_id]: { isNeed: false }
+    })
     commit(STORE_ALL_TASKS, { [event_id]: tempObj })
     onSuccess(tempObj)
   },
@@ -195,6 +215,7 @@ const actions = {
       state: 1
     })
     if (result.state) {
+      commit(IS_NEED_REFRESH_EVENT, true)
       onSuccess(result.message)
       return
     }
@@ -209,7 +230,25 @@ const actions = {
       onFailed()
       return
     }
+    commit(IS_NEED_REFRESH_EVENT, true)
+    commit(IS_NEED_REFRESH_TASK, {
+      [event_id]: { isNeed: true }
+    })
     onSuccess(result.message)
+  },
+  async [DELETE_TASK]({ commit, state, rootState }, { onSuccess, onFailed }) {
+    const task_id = state.currentTask._id
+    const event_id = state.currentEvent._id
+    const delResult = await jsonRequest(
+      'DELETE',
+      `/${event_id}/tasks/${task_id}`
+    )
+    if (delResult && delResult.state) {
+      commit(IS_NEED_REFRESH_EVENT, true)
+      onSuccess(delResult.message)
+    } else {
+      onFailed()
+    }
   }
 }
 

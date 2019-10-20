@@ -91,7 +91,8 @@ import {
   PUNCH_OPERATION,
   STORE_PUNCH_BY_PUNCH_ID,
   CLEAR_CURRENT_PUNCH,
-  IS_NEED_REFRESH_PUNCH
+  IS_NEED_REFRESH_PUNCH,
+  DELETE_PUNCH
 } from "@/store/mutation-types";
 import store from "@/store";
 import { formatYMD } from "@/utils";
@@ -102,7 +103,7 @@ export default {
       isShowReTry: false,
       punch: [],
       isShowModal: false,
-      longPressItemArr: ["编辑", "未完成功能 ^_^"],
+      longPressItemArr: ["编辑", "删除"],
       logoUrl: "/static/images/ml-task-logo.png",
       donePunchIconUrl: "/static/images/punch_icon.svg",
       longPressPunch: {}
@@ -163,9 +164,32 @@ export default {
       this.showToast("请重试");
     },
     punchDetails(punch_id) {},
+    delPunch() {
+      this.isShowLoading = true;
+      this.isShowReTry = false;
+      this.$store.dispatch(`tools/${DELETE_PUNCH}`, {
+        onSuccess: this.delSuccess,
+        onFailed: this.delFailed
+      });
+    },
+    delSuccess(message) {
+      this.$store.commit(`tools/${IS_NEED_REFRESH_PUNCH}`, true);
+      this.getData();
+      this.isShowLoading = false;
+      this.isShowReTry = false;
+      this.showToast(message);
+    },
+    delFailed() {
+      this.isShowLoading = false;
+      this.showToast("删除失败，请重试");
+    },
     showModal(punch) {
       this.isShowModal = true;
       this.longPressPunch = punch;
+      this.$store.commit(
+        `tools/${STORE_PUNCH_BY_PUNCH_ID}`,
+        this.longPressPunch
+      );
     },
     hideModal() {
       this.isShowModal = false;
@@ -178,16 +202,14 @@ export default {
             this.showToast("已结束打卡不支持编辑");
             return;
           }
-          this.$store.commit(
-            `tools/${STORE_PUNCH_BY_PUNCH_ID}`,
-            this.longPressPunch
-          );
           wx.navigateTo({
             url: `/pages/tools_punch_add/main`
           });
           break;
+        case 1:
+          this.delPunch();
+          break;
         default:
-          this.showToast("未完成功能 ^_^");
           break;
       }
     }

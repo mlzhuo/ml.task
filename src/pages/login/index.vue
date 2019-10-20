@@ -8,7 +8,7 @@
       <button form-type="submit" class="cu-btn wx-login-btn">
         <image :src="loginBtnUrl" mode="widthFix" class="response wechat-icon" />
       </button>
-      <p class="login-tip">快速登录</p>
+      <p class="login-tip">{{loginBtnText}}</p>
     </form>
     <view class="tip">
       <p>{{version}}</p>
@@ -28,7 +28,7 @@
             :class="{'padding-l-5em': index > 0}"
             v-for="(item, index) in updateInfo"
             :key="index"
-          >{{index===0 ? '更新日志：1. ' + item : index + 1 + '. ' + item}}</view>
+          >{{index===0 ? '更新日志： 1. ' + item : index + 1 + '. ' + item}}</view>
         </view>
       </view>
     </view>
@@ -52,10 +52,10 @@ export default {
       version: "",
       currentVersion: {},
       updateInfo: [],
-      fileURL: "",
       style: "",
       bgUrl: "/static/images/login_bg.svg",
-      loginBtnUrl: "/static/images/login-btn-img.png"
+      loginBtnUrl: "/static/images/login-btn-img.png",
+      loginBtnText: "快速登录"
     };
   },
   onShow() {
@@ -72,9 +72,13 @@ export default {
         onSuccess: this.loadingConfigSuccess
       });
     },
-    loadingConfigSuccess(config) {
-      this.fileURL = config.fileURL;
-      this.loginBtnUrl = this.fileURL && this.fileURL + "/login-btn-img.png";
+    loadingConfigSuccess(configData) {
+      if (configData && configData.config && configData.config.login) {
+        const { bg_url, btn_url, btn_text } = configData.config.login;
+        bg_url && (this.bgUrl = bg_url);
+        btn_url && (this.loginBtnUrl = btn_url);
+        btn_text && (this.loginBtnText = btn_text);
+      }
     },
     getVersions() {
       this.$store.dispatch(`miniapp/${GET_VERSIONS}`, {
@@ -126,10 +130,8 @@ export default {
     //             that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
     //             const { gender } = res.userInfo;
     //             if (gender === 2) {
-    //               // that.bgUrl = that.fileURL && that.fileURL + "/login_bg_f.svg";
     //               that.bgUrl = "/static/images/login_bg_f.svg";
     //             } else {
-    //               // that.bgUrl = that.fileURL && that.fileURL + "/login_bg_m.svg";
     //               that.bgUrl = "/static/images/login_bg_m.svg";
     //             }
     //           }
@@ -157,19 +159,6 @@ export default {
     //   }
     // }
   }
-  // computed: {
-  //   getLoadingStatus() {
-  //     return this.$store.state.miniapp.isShowLoading;
-  //   }
-  // },
-  // watch: {
-  //   getLoadingStatus: {
-  //     handler(val) {
-  //       this.isShowLoading = val;
-  //     },
-  //     immediate: true
-  //   }
-  // }
 };
 </script>
 
@@ -191,15 +180,19 @@ form {
 .wx-login-btn {
   width: 80px;
   height: 80px;
-  margin: 100px auto 0;
+  margin: 150px auto 0;
   border-radius: 50%;
-  background-color: #fafafa;
+  padding: 10px;
+  /* overflow: hidden; */
+  background-color: transparent;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 .wechat-icon {
   width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 .login-tip {
   margin-top: 10px;

@@ -36,7 +36,7 @@
             :class="{'padding-l-5em': index > 0}"
             v-for="(item, index) in updateInfo"
             :key="index"
-          >{{index===0 ? '更新日志：1. ' + item : index + 1 + '. ' + item}}</view>
+          >{{index===0 ? '更新日志： 1. ' + item : index + 1 + '. ' + item}}</view>
         </view>
       </view>
     </view>
@@ -55,6 +55,7 @@ export default {
     };
   },
   onShow() {
+    this.isShowModal = false;
     this.versions = this.$store.state.miniapp.versions;
   },
   mounted() {},

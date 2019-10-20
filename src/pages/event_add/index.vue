@@ -24,7 +24,10 @@
           :value="level"
         ></switch>
       </view>
-      <button class="cu-btn block bg-gradual-blue shadow lg add-btn" @click="eventOperation">{{btnTitle}}</button>
+      <button
+        class="cu-btn block bg-gradual-blue shadow lg add-btn"
+        @click="eventOperation"
+      >{{btnTitle}}</button>
       <view class="cu-tabbar-height"></view>
     </div>
     <Loading v-if="isShowLoading"></Loading>
@@ -32,11 +35,7 @@
 </template>
 
 <script>
-import {
-  GET_EVENT_BY_EVENT_ID,
-  EVENT_OPERATION,
-  IS_NEED_REFRESH_EVENT
-} from "@/store/mutation-types";
+import { EVENT_OPERATION } from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -92,7 +91,6 @@ export default {
       });
     },
     operationSuccess(message) {
-      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
       this.isShowLoading = false;
       this.showToast(message);
       wx.navigateBack({ delta: 1 });

@@ -4,7 +4,6 @@ import {
   LOGIN_FAILED,
   SAVE_USER_INFO,
   STORE_SAVE_USER_INFO
-  // STORE_REQUEST_STATUS
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
 const state = {
@@ -15,11 +14,6 @@ const getters = {}
 
 const actions = {
   [LOGIN]({ commit, state }, { loginFormObj, onSuccess, onFailed }) {
-    // commit(
-    //   `miniapp/${STORE_REQUEST_STATUS}`,
-    //   { isShowLoading: true, isShowReTry: false },
-    //   { root: true }
-    // )
     wx.login({
       timeout: 5000,
       async success(wxres) {
@@ -39,19 +33,9 @@ const actions = {
           commit(LOGIN_FAILED)
           onFailed()
         }
-        // commit(
-        //   `miniapp/${STORE_REQUEST_STATUS}`,
-        //   { isShowLoading: false, isShowReTry: false },
-        //   { root: true }
-        // )
       },
       fail() {
         commit(LOGIN_FAILED)
-        // commit(
-        //   `miniapp/${STORE_REQUEST_STATUS}`,
-        //   { isShowLoading: false, isShowReTry: false },
-        //   { root: true }
-        // )
         onFailed()
       }
     })
