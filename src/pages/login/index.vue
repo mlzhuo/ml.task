@@ -118,46 +118,46 @@ export default {
     loginFailed() {
       this.showToast("登录超时");
       this.isShowLoading = false;
+    },
+    getSetting() {
+      const that = this;
+      wx.getSetting({
+        success: function(res) {
+          if (res.authSetting["scope.userInfo"]) {
+            //用户已经授权过
+            wx.getUserInfo({
+              success: function(res) {
+                that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
+                const { gender } = res.userInfo;
+                if (gender === 2) {
+                  that.bgUrl = "/static/images/login_bg_f.svg";
+                } else {
+                  that.bgUrl = "/static/images/login_bg_m.svg";
+                }
+              }
+            });
+          }
+        }
+      });
+    },
+    wxCanIUse() {
+      //click事件首先触发
+      if (!wx.canIUse("button.open-type.getUserInfo")) {
+        wx.showToast({
+          title: "请升级微信版本",
+          duration: 2000
+        });
+      }
+    },
+    bindGetUserInfo(e) {
+      if (e.mp.detail.rawData) {
+        //允许授权
+        this.$store.dispatch(
+          `user/${SAVE_USER_INFO}`,
+          JSON.parse(e.mp.detail.rawData)
+        );
+      }
     }
-    // getSetting() {
-    //   const that = this;
-    //   wx.getSetting({
-    //     success: function(res) {
-    //       if (res.authSetting["scope.userInfo"]) {
-    //         //用户已经授权过
-    //         wx.getUserInfo({
-    //           success: function(res) {
-    //             that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
-    //             const { gender } = res.userInfo;
-    //             if (gender === 2) {
-    //               that.bgUrl = "/static/images/login_bg_f.svg";
-    //             } else {
-    //               that.bgUrl = "/static/images/login_bg_m.svg";
-    //             }
-    //           }
-    //         });
-    //       }
-    //     }
-    //   });
-    // },
-    // wxCanIUse() {
-    //   //click事件首先触发
-    //   if (!wx.canIUse("button.open-type.getUserInfo")) {
-    //     wx.showToast({
-    //       title: "请升级微信版本",
-    //       duration: 2000
-    //     });
-    //   }
-    // },
-    // bindGetUserInfo(e) {
-    //   if (e.mp.detail.rawData) {
-    //     //允许授权
-    //     this.$store.dispatch(
-    //       `user/${SAVE_USER_INFO}`,
-    //       JSON.parse(e.mp.detail.rawData)
-    //     );
-    //   }
-    // }
   }
 };
 </script>

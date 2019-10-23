@@ -17,13 +17,14 @@
       </navigator>
       <view
         class="cu-card dynamic"
+        :class="{'done-punch-item': item.state===1}"
         v-for="(item, index) in punch"
         :key="index"
         @longpress="showModal(item)"
       >
         <view class="cu-item shadow boxshadow">
-          <view class="cu-list menu-avatar">
-            <view class="cu-item">
+          <view class="cu-list menu-avatar cu-list-header">
+            <view class="cu-item cu-list-header">
               <view class="cu-avatar round lg">
                 <image :src="logoUrl" class="logo" />
               </view>
@@ -220,10 +221,16 @@ export default {
 .container {
   padding: 15px 5px 5px;
 }
+.cu-list-header {
+  height: 50px !important;
+}
 .boxshadow {
   box-shadow: 0 0 10px #ddd;
   position: relative;
   padding-bottom: 10px;
+}
+.boxshadow .title-text:nth-child(2) {
+  margin-top: 10px;
 }
 .logo {
   height: 100%;
@@ -241,5 +248,8 @@ export default {
 }
 .add-btn {
   margin-bottom: 5px;
+}
+.done-punch-item {
+  opacity: 0.3;
 }
 </style>
