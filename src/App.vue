@@ -160,19 +160,37 @@ page,
 .bg-ml-primary {
   background-color: #4e73df;
 }
+.ml-primary {
+  color: #4e73df;
+}
 .bg-ml-success {
   background-color: #1cc88a;
+}
+.ml-success {
+  color: #1cc88a;
 }
 .bg-ml-info {
   background-color: #36b9cc;
 }
+.ml-info {
+  color: #36b9cc;
+}
 .bg-ml-warning {
   background-color: #f6c23e;
+}
+.ml-warning {
+  color: #f6c23e;
 }
 .bg-ml-danger {
   background-color: #e74a3b;
 }
+.ml-danger {
+  color: #e74a3b;
+}
 .bg-ml-secondary {
   background-color: #858796;
+}
+.ml-secondary {
+  color: #858796;
 }
 </style>

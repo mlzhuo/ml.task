@@ -28,6 +28,9 @@ const actions = {
             const { _id, openid } = data
             commit(LOGIN_SUCCESS, { userId: _id, openid })
             onSuccess({ message })
+          } else {
+            commit(LOGIN_FAILED)
+            onFailed()
           }
         } else {
           commit(LOGIN_FAILED)

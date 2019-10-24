@@ -46,6 +46,8 @@
           <view class="title-text text-cut">
             进度：
             <span style="font-size:20px">{{item.okDays}}</span>
+            <span v-if="item.noOkDays">{{' / '}}</span>
+            <span class="ml-danger" v-if="item.noOkDays">{{item.noOkDays}}</span>
             / {{item.allDays}}
           </view>
           <view class="action-btns">
@@ -222,7 +224,7 @@ export default {
   padding: 15px 5px 5px;
 }
 .cu-list-header {
-  height: 50px !important;
+  height: 60px !important;
 }
 .boxshadow {
   box-shadow: 0 0 10px #ddd;

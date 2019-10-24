@@ -13,6 +13,7 @@ import {
   STORE_TOOLS_OVERVIEW_DATA
 } from '../mutation-types'
 import { jsonRequest } from '@/utils/api'
+import { formatYMD } from '@/utils/index'
 const state = {
   toolsOverviewData: '',
   isNeedRefreshToolsOverview: true,
@@ -54,6 +55,10 @@ const actions = {
       )
       return
     }
+    punchResult.data.forEach(v => {
+      v.start_date_format = v.start_date.slice(5).split('-')
+      v.end_date_format = v.end_date.slice(5).split('-')
+    })
     commit(STORE_ALL_PUNCH, punchResult.data)
     onSuccess()
   },
