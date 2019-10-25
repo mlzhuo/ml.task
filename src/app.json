@@ -9,6 +9,7 @@
     "pages/tools/main",
     "pages/tools_punch/main",
     "pages/tools_punch_add/main",
+    "pages/tools_punch_details/main",
     "pages/tools_countdown/main",
     "pages/tools_countdown_add/main",
     "pages/user/main",

@@ -18,8 +18,8 @@
       <view
         class="cu-card dynamic"
         :class="{'done-punch-item': item.state===1}"
-        v-for="(item, index) in punch"
-        :key="index"
+        v-for="item in punch"
+        :key="item._id"
         @longpress="showModal(item)"
       >
         <view class="cu-item shadow boxshadow">
@@ -43,12 +43,13 @@
             >{{item.end_date_format[1]}}</span>
             / {{item.end_date_format[0]}}
           </view>
-          <view class="title-text text-cut">
+          <view class="title-text text-cut fl" @click="punchDetails(item)">
             进度：
             <span style="font-size:20px">{{item.okDays}}</span>
             <span v-if="item.noOkDays">{{' / '}}</span>
             <span class="ml-danger" v-if="item.noOkDays">{{item.noOkDays}}</span>
             / {{item.allDays}}
+            <span class="cuIcon-right text-grey margin-left-sm"></span>
           </view>
           <view class="action-btns">
             <!-- <button class="cu-btn round bg-white" @click="punchDetails(item._id)">详情</button> -->
@@ -108,7 +109,6 @@ export default {
       isShowModal: false,
       longPressItemArr: ["编辑", "删除"],
       logoUrl: "/static/images/ml-task-logo.png",
-      donePunchIconUrl: "/static/images/punch_icon.svg",
       longPressPunch: {}
     };
   },
@@ -166,7 +166,12 @@ export default {
       this.isShowLoading = false;
       this.showToast("请重试");
     },
-    punchDetails(punch_id) {},
+    punchDetails(punch) {
+      this.$store.commit(`tools/${STORE_PUNCH_BY_PUNCH_ID}`, punch);
+      wx.navigateTo({
+        url: `/pages/tools_punch_details/main`
+      });
+    },
     delPunch() {
       this.isShowLoading = true;
       this.isShowReTry = false;
