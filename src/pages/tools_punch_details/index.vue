@@ -19,7 +19,7 @@
             <view class="date-item">五</view>
             <view class="date-item">六</view>
           </view>
-          <view class="week-item" v-for="(num,rowIndex) in 5" :key="rowIndex">
+          <view class="week-item" v-for="(num,rowIndex) in monthItem.length>35?6:5" :key="rowIndex">
             <view
               class="date-item"
               :class="{'not-in':!monthItem[rowIndex*7+culumIndex].isIn,'ml-success':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date],'ml-danger':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]&&punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]==='no'}"

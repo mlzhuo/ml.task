@@ -96,6 +96,14 @@ export default {
         this.showToast("请输入");
         return;
       }
+      if (
+        new Date(this.end_date).getTime() -
+          new Date(this.start_date).getTime() >
+        365 * 24 * 3600 * 1000
+      ) {
+        this.showToast("先定个小目标，最长一年");
+        return;
+      }
       this.isShowLoading = true;
       const method = this.punch_id ? "PUT" : "POST";
       let formData = {
@@ -130,8 +138,8 @@ export default {
       const startYear = formatYMD(new Date(punch.start_date)).slice(0, 5);
       const endYear = formatYMD(new Date(punch.end_date)).slice(0, 5);
       this.description = punch.description;
-      this.start_date = startYear + punch.start_date_format.join('-');
-      this.end_date = endYear + punch.end_date_format.join('-');
+      this.start_date = startYear + punch.start_date_format.join("-");
+      this.end_date = endYear + punch.end_date_format.join("-");
     }
   },
   onUnload() {
