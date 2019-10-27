@@ -25,14 +25,16 @@
               :class="{'not-in':!monthItem[rowIndex*7+culumIndex].isIn,'ml-success':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date],'ml-danger':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]&&punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]==='no'}"
               v-for="(date, culumIndex) in 7"
               :key="culumIndex"
+              @click="showPunchTime(yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date)"
             >
               <view
                 class="date-item-today bg-gradual-purple"
                 v-if="yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date === today"
-              >{{monthItem[rowIndex*7+culumIndex].date}}</view>
-              <view v-else>{{monthItem[rowIndex*7+culumIndex].date}}</view>
-              <!-- <view v-else>{{monthItem[rowIndex*7+culumIndex].date}}</view> -->
-              <!-- {{monthItem[rowIndex*7+culumIndex].date}} -->
+              >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
+              <view
+                v-else
+                :class="{'date-item-today': true,'date-item-today-check': yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date}"
+              >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
             </view>
           </view>
         </view>
@@ -43,17 +45,19 @@
 </template>
 
 <script>
-import { formatPunchDate, formatYMD } from "@/utils";
+import { formatPunchDate, formatYMD, formatTime } from "@/utils";
 export default {
   data() {
     return {
       punch: {},
       punchDate: {},
       punchHistory: {},
-      today: ""
+      today: "",
+      datePunchTime: {}
     };
   },
   onShow() {
+    this.datePunchTime = {};
     this.today = formatYMD(new Date());
     this.punch = this.$store.state.tools.currentPunch;
     const { start_date, end_date, punchHistory } = this.punch;
@@ -74,6 +78,23 @@ export default {
       punchHistoryCopy[date] = punchHistory[date] ? punchHistory[date] : "no";
     }
     this.punchHistory = punchHistoryCopy;
+  },
+  methods: {
+    showPunchTime(date) {
+      if (this.punchHistory[date] && this.punchHistory[date] !== "no") {
+        this.datePunchTime = {
+          date,
+          time: formatTime(new Date(this.punchHistory[date]))
+            .split(" ")[1]
+            .slice(0, 5)
+        };
+      } else if (this.punchHistory[date] && this.punchHistory[date] === "no") {
+        this.datePunchTime = {
+          date,
+          time: "😪"
+        };
+      }
+    }
   }
 };
 </script>
@@ -104,9 +125,11 @@ export default {
   height: 35px;
   width: 35px;
   border-radius: 50%;
-  color: #fff;
   display: block;
   margin: 0 auto;
+}
+.date-item-today-check {
+  border: 1rpx solid #1cc88a;
 }
 .not-in {
   opacity: 0.2;

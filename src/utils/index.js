@@ -94,7 +94,6 @@ const formatPunchDate = (startStr, endStr) => {
     if ((value === 5 || value === 6) && monthDateLen > 35) {
       renderMonthDay = 42
     }
-    console.log(key, value, monthDateLen, renderMonthDay)
     const pushItemLen = renderMonthDay - monthDateLen
     for (let i = 0; i < pushItemLen; i++) {
       dateObj[key].push({})
