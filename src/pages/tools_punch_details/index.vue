@@ -107,7 +107,7 @@ export default {
   box-shadow: 0 0 10px #ddd;
   position: relative;
   padding-bottom: 10px;
-  line-height: 35px;
+  line-height: 33px;
   text-align: center;
   margin-top: 5px;
 }

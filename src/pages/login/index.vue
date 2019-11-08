@@ -196,6 +196,10 @@ form {
 }
 .login-tip {
   margin-top: 10px;
+  max-width: 75%;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
 }
 .padding-xl {
   text-align: left;

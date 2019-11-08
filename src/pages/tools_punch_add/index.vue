@@ -99,7 +99,7 @@ export default {
       if (
         new Date(this.end_date).getTime() -
           new Date(this.start_date).getTime() >
-        365 * 24 * 3600 * 1000
+        366 * 24 * 3600 * 1000
       ) {
         this.showToast("先定个小目标，最长一年");
         return;
