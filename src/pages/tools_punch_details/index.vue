@@ -7,35 +7,64 @@
       </cu-custom>
     </view>
     <view class="container">
-      <view class="cu-card dynamic" v-for="(monthItem, yearMonth) in punchDate" :key="yearMonth">
-        <view class="month-title margin-top-sm margin-bottom-xs">{{yearMonth}}</view>
-        <view class="cu-item shadow boxshadow">
-          <view class="week-item">
-            <view class="date-item">日</view>
-            <view class="date-item">一</view>
-            <view class="date-item">二</view>
-            <view class="date-item">三</view>
-            <view class="date-item">四</view>
-            <view class="date-item">五</view>
-            <view class="date-item">六</view>
-          </view>
-          <view class="week-item" v-for="(num,rowIndex) in monthItem.length>35?6:5" :key="rowIndex">
+      <scroll-view scroll-x class="bg-white nav text-center">
+        <view
+          class="cu-item"
+          :class="index==tabIndex?'text-purple cur':''"
+          v-for="(item,index) in tabs"
+          :key="index"
+          @tap="tabSelect"
+          :data-id="index"
+        >{{item}}</view>
+      </scroll-view>
+      <view v-if="tabIndex===0">
+        <view class="cu-card dynamic" v-for="(monthItem, yearMonth) in punchDate" :key="yearMonth">
+          <view class="month-title margin-top-sm margin-bottom-xs">{{yearMonth}}</view>
+          <view class="cu-item shadow boxshadow">
+            <view class="week-item">
+              <view class="date-item">日</view>
+              <view class="date-item">一</view>
+              <view class="date-item">二</view>
+              <view class="date-item">三</view>
+              <view class="date-item">四</view>
+              <view class="date-item">五</view>
+              <view class="date-item">六</view>
+            </view>
             <view
-              class="date-item"
-              :class="{'not-in':!monthItem[rowIndex*7+culumIndex].isIn,'ml-success':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date],'ml-danger':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]&&punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]==='no'}"
-              v-for="(date, culumIndex) in 7"
-              :key="culumIndex"
-              @click="showPunchTime(yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date)"
+              class="week-item"
+              v-for="(num,rowIndex) in monthItem.length>35?6:5"
+              :key="rowIndex"
             >
               <view
-                class="date-item-today bg-gradual-purple"
-                v-if="yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date === today"
-              >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
-              <view
-                v-else
-                :class="{'date-item-today': true,'date-item-today-check': yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date}"
-              >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
+                class="date-item"
+                :class="{'not-in':!monthItem[rowIndex*7+culumIndex].isIn,'ml-success':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date],'ml-danger':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]&&punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]==='no'}"
+                v-for="(date, culumIndex) in 7"
+                :key="culumIndex"
+                @click="showPunchTime(yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date)"
+              >
+                <view
+                  class="date-item-today bg-gradual-purple"
+                  v-if="yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date === today"
+                >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
+                <view
+                  v-else
+                  :class="{'date-item-today': true,'date-item-today-check': yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date}"
+                >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
+              </view>
             </view>
+          </view>
+        </view>
+      </view>
+      <view v-if="tabIndex===1">
+        <view class="cu-card dynamic">
+          <view class="month-title margin-top-sm margin-bottom-xs">&nbsp;</view>
+          <view class="cu-item shadow boxshadow point-chart">
+            <mpvue-echarts
+              lazyLoad
+              :echarts="echarts"
+              :onInit="ecScatterInit"
+              ref="ecScatterChart"
+            />
           </view>
         </view>
       </view>
@@ -46,6 +75,10 @@
 
 <script>
 import { formatPunchDate, formatYMD, formatTime } from "@/utils";
+import * as echarts from "../../../static/js/echarts.min.js";
+import mpvueEcharts from "mpvue-echarts";
+import ecStat from "echarts-stat";
+let scatterChart;
 export default {
   data() {
     return {
@@ -53,8 +86,15 @@ export default {
       punchDate: {},
       punchHistory: {},
       today: "",
-      datePunchTime: {}
+      datePunchTime: {},
+      tabIndex: 0,
+      tabs: ["记录", "统计"],
+      echarts,
+      ecScatterOption: null
     };
+  },
+  components: {
+    mpvueEcharts
   },
   onShow() {
     this.datePunchTime = {};
@@ -94,6 +134,128 @@ export default {
           time: "😪"
         };
       }
+    },
+    tabSelect(e) {
+      if (this.tabIndex === e.currentTarget.dataset.id) {
+        return;
+      }
+      this.tabIndex = e.currentTarget.dataset.id;
+      this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60;
+      switch (e.currentTarget.dataset.id) {
+        case 1:
+          this.ecScatterRender();
+          break;
+        default:
+          break;
+      }
+    },
+    ecScatterInit(canvas, width, height) {
+      scatterChart = echarts.init(canvas, null, {
+        width: width,
+        height: height
+      });
+      canvas.setChart(scatterChart);
+      scatterChart.setOption(this.ecScatterOption);
+      return scatterChart;
+    },
+    getScatterOption() {
+      let data = [];
+      for (const key in this.punchHistory) {
+        const value = this.punchHistory[key];
+        const x = new Date(key).getTime();
+        const y =
+          value === "no"
+            ? null
+            : new Date(value).getHours() +
+              +(new Date(value).getMinutes() / 60).toFixed(2);
+        data.push([x, y]);
+      }
+      const myRegression = ecStat.regression("polynomial", data, 3);
+      myRegression.points.sort(function(a, b) {
+        return a[0] - b[0];
+      });
+      return {
+        title: {
+          text: "打卡时间分布",
+          textStyle: {
+            fontSize: 14,
+            fontWeight: "bold"
+          }
+        },
+        color: ["#b6a2de", "#ffb980"],
+        xAxis: {
+          type: "value",
+          min: data[0][0],
+          splitLine: {
+            show: false
+          },
+          axisLabel: {
+            formatter: function(value, index) {
+              var date = new Date(value);
+              var texts = [date.getMonth() + 1, date.getDate()];
+              if (index === 0) {
+                texts.unshift(date.getYear());
+              }
+              return texts.join("/");
+            }
+          }
+        },
+        yAxis: {
+          type: "value",
+          min: 6,
+          minInterval: 1,
+          splitLine: {
+            show: false
+          },
+          axisLabel: {
+            formatter: function(value, index) {
+              return value + ":00";
+            }
+          }
+        },
+        grid: {
+          top: "18%",
+          bottom: "2%",
+          left: "2%",
+          right: "8%",
+          containLabel: true
+        },
+        series: [
+          {
+            name: "scatter",
+            type: "scatter",
+            label: {
+              show: false
+            },
+            data: data
+          },
+          {
+            name: "line",
+            type: "line",
+            smooth: true,
+            showSymbol: false,
+            data: myRegression.points,
+            markPoint: {
+              itemStyle: {
+                normal: {
+                  color: "transparent"
+                }
+              },
+              data: [
+                {
+                  coord: myRegression.points[myRegression.points.length - 1]
+                }
+              ]
+            }
+          }
+        ]
+      };
+    },
+    ecScatterRender() {
+      this.ecScatterOption = this.getScatterOption();
+      this.$nextTick(() => {
+        this.$refs.ecScatterChart.init();
+      });
     }
   }
 };
@@ -101,7 +263,10 @@ export default {
 
 <style scoped>
 .container {
-  padding: 5px;
+  padding: 0 5px 5px;
+}
+.add-btn {
+  padding-bottom: 0;
 }
 .boxshadow {
   box-shadow: 0 0 10px #ddd;
@@ -137,5 +302,8 @@ export default {
 }
 .month-title {
   padding-left: 16px;
+}
+.point-chart {
+  height: 200px;
 }
 </style>
