@@ -55,7 +55,7 @@ export default {
       style: "",
       bgUrl: "/static/images/login_bg.svg",
       loginBtnUrl: "/static/images/login-btn-img.png",
-      loginBtnText: "快速登录"
+      loginBtnText: "微信登录"
     };
   },
   onShow() {

@@ -97,6 +97,7 @@ export default {
     mpvueEcharts
   },
   onShow() {
+    this.tabIndex = 0;
     this.datePunchTime = {};
     this.today = formatYMD(new Date());
     this.punch = this.$store.state.tools.currentPunch;

@@ -9,9 +9,7 @@
       >
         <image class="item-bg-img" :src="item.img" />
         <view class="cardTitle">{{item.title}}</view>
-      </view>
-      <view class="cu-item bg-grey light shadow-blur">
-        <view class="cardTitle">Coming soon</view>
+        <view class="subText">在进行：<span class="num">{{toolsOverviewData.punch.isActive}}</span>今日：<span class="num">{{toolsOverviewData.punch.toadyIsDone}}</span></view>
       </view>
     </view>
     <view class="cu-tabbar-height"></view>
@@ -26,6 +24,7 @@ import {
 export default {
   data() {
     return {
+      toolsOverviewData: {punch: {}},
       list: [
         {
           title: "打卡计划",
@@ -47,7 +46,7 @@ export default {
     if (isNeedRefreshToolsOverview) {
       this.getData();
     } else {
-      // this.onSuccess();
+      this.onSuccess();
     }
   },
   onLoad() {
@@ -56,7 +55,7 @@ export default {
     if (isNeedRefreshToolsOverview) {
       this.getData();
     } else {
-      // this.onSuccess();
+      this.onSuccess();
     }
   },
   methods: {
@@ -64,12 +63,14 @@ export default {
       wx.navigateTo({ url });
     },
     getData() {
-      console.log(1);
       this.$store.dispatch(`tools/${GET_TOOLS_OVERVIEW_DATA}`, {
         onSuccess: this.onSuccess
       });
     },
-    onSuccess() {}
+    onSuccess() {
+      const {toolsOverviewData} = this.$store.state.tools
+      this.toolsOverviewData = toolsOverviewData
+    }
   }
 };
 </script>
@@ -77,8 +78,8 @@ export default {
 <style scoped>
 .cardTitle {
   color: #fff;
-  padding: 90rpx 60rpx;
-  font-size: 40rpx;
+  padding: 45px 30px;
+  font-size: 20px;
   font-weight: 300;
   transform: skew(-10deg, 0deg);
   position: relative;
@@ -88,28 +89,41 @@ export default {
 .cardTitle::before {
   content: "";
   position: absolute;
-  width: 60rpx;
-  height: 6rpx;
-  border-radius: 20rpx;
+  width: 30px;
+  height: 3px;
+  border-radius: 10px;
   background-color: #fff;
   display: block;
-  top: 60rpx;
-  left: 50rpx;
+  top: 30px;
+  left: 25px;
   transform: skew(10deg, 0deg);
 }
 
 .cardTitle::after {
   content: "";
   position: absolute;
-  width: 140rpx;
-  border-radius: 6rpx;
-  height: 24rpx;
+  width: 70px;
+  border-radius: 3px;
+  height: 12px;
   background-color: #fff;
   display: block;
-  bottom: 76rpx;
-  left: 90rpx;
+  bottom: 38px;
+  left: 45px;
   transform: skew(10deg, 0deg);
   opacity: 0.1;
+}
+.subText {
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 30px;
+  bottom: 5px;
+}
+.subText .num {
+  font-size: 18px;
+  font-weight: 700;
+  padding-right: 15px;
 }
 .cu-item {
   position: relative;
