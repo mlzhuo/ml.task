@@ -77,6 +77,11 @@ export default {
         this.showToast("请输入");
         return;
       }
+      if (this.title.replace(/[^\u0000-\u00ff]/g, "aa").length > 60) {
+        this.showToast("分类名称不能超过30个字");
+        return;
+      }
+      this.clickRequestSubscribeMessage()
       this.isShowLoading = true;
       const method = this.event_id ? "PUT" : "POST";
       this.$store.dispatch(`event/${EVENT_OPERATION}`, {
@@ -103,6 +108,49 @@ export default {
       this.title = data.title;
       this.description = data.description;
       this.level = data.level === 0 ? false : true;
+    },
+    clickRequestSubscribeMessage() {
+      const that = this
+      wx.requestSubscribeMessage({
+        tmplIds: that.$store.state.user.userInfo.priTmplId,
+        success(res) {
+          for (var key in res) {
+            if (key !='errMsg') {
+              if (res[key] =='reject') {
+                wx.showModal({
+                  title:'订阅消息',
+                  content:'您已拒绝了订阅消息，如需重新订阅请前往设置打开。',
+                  confirmText:'去设置',
+                  //showCancel: false,
+                  success: res => {
+                    if (res.confirm) {
+                      wx.openSetting({})
+                    }
+                  }
+                })
+                return
+              }else{
+                wx.showToast({
+                  title:'订阅成功'
+                })
+              }
+            }
+          }
+        },
+        fail(err) {
+          wx.showModal({
+            title:'订阅消息',
+            content:'您关闭了“接收订阅信息”，请前往设置打开',
+            confirmText:'去设置',
+            showCancel:false,
+            success: res => {
+              if (res.confirm) {
+                wx.openSetting({})
+              }
+            }
+          })
+        }
+      });
     }
   },
   onUnload() {

@@ -154,7 +154,8 @@ page,
   left: 50%;
   transform: translateX(-50%) !important;
 }
-.cu-timeline {
+.cu-timeline,
+.cu-item .text-content {
   white-space: pre-wrap;
 }
 .bg-ml-primary {

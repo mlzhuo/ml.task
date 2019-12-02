@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/login/main",
     "pages/index/main",
     "pages/event/main",
     "pages/event_add/main",

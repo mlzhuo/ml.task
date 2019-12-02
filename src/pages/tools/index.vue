@@ -1,7 +1,7 @@
 <template>
   <view>
     <view class="cu-card">
-      <view
+      <!-- <view
         class="cu-item bg-gradual-purple shadow-blur"
         v-for="(item,index) in list"
         :key="index"
@@ -10,7 +10,16 @@
         <image class="item-bg-img" :src="item.img" />
         <view class="cardTitle">{{item.title}}</view>
         <view class="subText">在进行：<span class="num">{{toolsOverviewData.punch.isActive}}</span>今日：<span class="num">{{toolsOverviewData.punch.toadyIsDone}}</span></view>
+      </view> -->
+      <view
+        class="cu-item bg-gradual-purple shadow-blur"
+        @click="toolsItemClick(list[0].url)"
+      >
+        <image class="item-bg-img" :src="list[0].img" />
+        <view class="cardTitle">{{list[0].title}}</view>
+        <view class="subText">在进行：<span class="num">{{toolsOverviewData.punch.isActive}}</span>今日：<span class="num">{{toolsOverviewData.punch.toadyIsDone}}</span></view>
       </view>
+      
     </view>
     <view class="cu-tabbar-height"></view>
   </view>
@@ -28,15 +37,14 @@ export default {
       list: [
         {
           title: "打卡计划",
-          male: "",
           img: "/static/images/punch.svg",
           url: "/pages/tools_punch/main"
+        },
+        {
+          title: "倒计时",
+          img: "/static/images/countdown.svg",
+          url: "/pages/tools_countdown/main"
         }
-        // {
-        //   title: "倒计时",
-        //   img: "/static/images/countdown.svg",
-        //   url: "/pages/tools_countdown/main"
-        // }
       ]
     };
   },

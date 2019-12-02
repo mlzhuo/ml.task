@@ -80,7 +80,7 @@
       </view>
     </view>
     <Loading v-if="isShowLoading"></Loading>
-    <ReTry v-if="isShowReTry" :retryMethod="['getTasks']" @getTasks="getTasks(event_id)"></ReTry>
+    <ReTry v-if="isShowReTry" @click="retryGetData"></ReTry>
   </view>
 </template>
 
@@ -214,6 +214,12 @@ export default {
         default:
           break;
       }
+    },
+    retryGetData() {
+      this.isShowReTry = false
+      this.isShowLoading = true
+      const {retryActionPayload, retryActionType} = this.$store.state.miniapp
+      this.$store.dispatch(retryActionType, retryActionPayload);
     }
   },
   onUnload() {

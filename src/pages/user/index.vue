@@ -41,12 +41,12 @@
           <text class="text-grey">问题反馈</text>
         </view>
       </button>
-      <!-- <navigator url hover-class="none" class="cu-item arrow">
+      <navigator url hover-class="none" class="cu-item arrow">
         <view class="content" hover-class="none">
-          <text class="cuIcon-discoverfill text-orange"></text>
-          <text class="text-grey">关于</text>
+          <text class="cuIcon-settings text-grey"></text>
+          <text class="text-grey">设置</text>
         </view>
-      </navigator> -->
+      </navigator>
     </view>
     <view class="cu-tabbar-height"></view>
   </view>

@@ -22,6 +22,7 @@
 	"projectname": "ml.task",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
+	"libVersion": "2.9.4",
 	"condition": {
 		"search": {
 			"current": -1,

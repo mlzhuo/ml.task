@@ -62,7 +62,7 @@
               class="cu-btn round bg-white"
               v-else-if="item.today&&item.state===0"
               @click="donePunch(item._id, 1)"
-            >已打卡</button>
+            >今天已打卡</button>
             <button class="cu-btn round bg-white" v-else-if="item.state===1">已结束</button>
           </view>
         </view>
@@ -85,7 +85,7 @@
         </view>
       </view>
       <Loading v-if="isShowLoading"></Loading>
-      <ReTry v-if="isShowReTry"></ReTry>
+      <ReTry v-if="isShowReTry" @click="retryGetData"></ReTry>
     </view>
   </view>
 </template>
@@ -144,9 +144,10 @@ export default {
     },
     donePunch(punch_id, isDone) {
       if (isDone) {
-        this.showToast("已经打过卡了");
+        this.showToast("今天已经打过卡了");
         return;
       }
+      this.clickRequestSubscribeMessage()
       this.isShowLoading = true;
       const today = formatYMD(new Date());
       this.$store.dispatch(`tools/${PUNCH_OPERATION}`, {
@@ -220,6 +221,55 @@ export default {
         default:
           break;
       }
+    },
+    retryGetData() {
+      this.isShowReTry = false
+      this.isShowLoading = true
+      const {retryActionPayload, retryActionType} = this.$store.state.miniapp
+      this.$store.dispatch(retryActionType, retryActionPayload);
+    },
+    clickRequestSubscribeMessage() {
+      const that = this
+      wx.requestSubscribeMessage({
+        tmplIds: that.$store.state.user.userInfo.priTmplId,
+        success(res) {
+          for (var key in res) {
+            if (key !='errMsg') {
+              if (res[key] =='reject') {
+                wx.showModal({
+                  title:'订阅消息',
+                  content:'您已拒绝了订阅消息，如需重新订阅请前往设置打开。',
+                  confirmText:'去设置',
+                  //showCancel: false,
+                  success: res => {
+                    if (res.confirm) {
+                      wx.openSetting({})
+                    }
+                  }
+                })
+                return
+              }else{
+                wx.showToast({
+                  title:'订阅成功'
+                })
+              }
+            }
+          }
+        },
+        fail(err) {
+          wx.showModal({
+            title:'订阅消息',
+            content:'您关闭了“接收订阅信息”，请前往设置打开',
+            confirmText:'去设置',
+            showCancel:false,
+            success: res => {
+              if (res.confirm) {
+                wx.openSetting({})
+              }
+            }
+          })
+        }
+      });
     }
   }
 };

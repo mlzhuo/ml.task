@@ -104,6 +104,7 @@ export default {
         this.showToast("先定个小目标，最长一年");
         return;
       }
+      this.clickRequestSubscribeMessage()
       this.isShowLoading = true;
       const method = this.punch_id ? "PUT" : "POST";
       let formData = {
@@ -140,6 +141,49 @@ export default {
       this.description = punch.description;
       this.start_date = startYear + punch.start_date_format.join("-");
       this.end_date = endYear + punch.end_date_format.join("-");
+    },
+    clickRequestSubscribeMessage() {
+      const that = this
+      wx.requestSubscribeMessage({
+        tmplIds: that.$store.state.user.userInfo.priTmplId,
+        success(res) {
+          for (var key in res) {
+            if (key !='errMsg') {
+              if (res[key] =='reject') {
+                wx.showModal({
+                  title:'订阅消息',
+                  content:'您已拒绝了订阅消息，如需重新订阅请前往设置打开。',
+                  confirmText:'去设置',
+                  //showCancel: false,
+                  success: res => {
+                    if (res.confirm) {
+                      wx.openSetting({})
+                    }
+                  }
+                })
+                return
+              }else{
+                wx.showToast({
+                  title:'订阅成功'
+                })
+              }
+            }
+          }
+        },
+        fail(err) {
+          wx.showModal({
+            title:'订阅消息',
+            content:'您关闭了“接收订阅信息”，请前往设置打开',
+            confirmText:'去设置',
+            showCancel:false,
+            success: res => {
+              if (res.confirm) {
+                wx.openSetting({})
+              }
+            }
+          })
+        }
+      });
     }
   },
   onUnload() {

@@ -12,90 +12,97 @@ import {
   STORE_RETRY_ACTION_PAYLOAD,
   REQUEST_STATUS,
   STORE_REQUEST_STATUS
-} from '../mutation-types'
-import { jsonRequest } from '@/utils/api'
-import { formatYMD } from '@/utils/index'
+} from "../mutation-types";
+import { jsonRequest } from "@/utils/api";
+import { formatYMD } from "@/utils/index";
 const state = {
   navigationInfo: {
     isBack: false,
-    backText: '返回',
-    pageTitle: '',
+    backText: "返回",
+    pageTitle: "",
     isShow: true
   },
   isShowLoading: false,
   isShowReTry: false,
-  retryActionType: '',
-  retryActionPayload: '',
-  version: '',
+  retryActionType: "",
+  retryActionPayload: "",
+  version: "",
   versions: [],
   config: {}
-}
+};
 
-const getters = {}
+const getters = {};
 
 const actions = {
-  async [GET_VERSIONS]({ commit, state }, { onSuccess, onFailed }) {
-    const result = await jsonRequest('GET', '/version')
+  async [GET_VERSIONS]({ commit, state }, { limit, onSuccess, onFailed }) {
+    let url = "/version";
+    if (limit === 1) {
+      url = "/version?limit=1";
+    }
+    const result = await jsonRequest("GET", url);
     if (!result) {
-      return
+      return;
     }
     if (result.state) {
       const versions = result.data.map(v => {
-        return { ...v, date: formatYMD(new Date(v.date)) }
-      })
-      commit(STORE_VERSIONS, versions)
-      onSuccess()
+        return { ...v, date: formatYMD(new Date(v.date)) };
+      });
+      commit(STORE_VERSIONS, { versions, limit });
+      onSuccess();
     }
   },
   async [LOAD_CONFIG]({ commit, state }, { onSuccess }) {
-    const result = await jsonRequest('GET', '/config')
+    const result = await jsonRequest("GET", "/config");
     if (result && result.state) {
-      commit(STORE_CONFIG, result.data)
-      onSuccess(result.data)
+      commit(STORE_CONFIG, result.data);
+      onSuccess(result.data);
     }
   },
   async [REQUEST_STATUS]({ commit, state }, { isShowLoading, isShowReTry }) {
-    commit(STORE_REQUEST_STATUS, { isShowLoading, isShowReTry })
+    commit(STORE_REQUEST_STATUS, { isShowLoading, isShowReTry });
   }
-}
+};
 
 const mutations = {
   [STORE_CONFIG](state, config) {
-    state.config = config
+    state.config = config;
   },
   [SET_NAVIGATION](state, navigationInfo) {
     state.navigationInfo = Object.assign(
       {},
       state.navigationInfo,
       navigationInfo
-    )
+    );
   },
   [LOADING_START](state) {
-    state.isShowLoading = true
+    state.isShowLoading = true;
   },
   [LOADING_STOP](state) {
-    state.isShowLoading = false
+    state.isShowLoading = false;
   },
   [RETRY_SHOW](state) {
-    state.isShowReTry = true
+    state.isShowReTry = true;
   },
   [RETRY_HIDE](state) {
-    state.isShowReTry = false
+    state.isShowReTry = false;
   },
-  [STORE_VERSIONS](state, versions) {
-    state.version = versions.length && versions[0].version
-    state.versions = versions
+  [STORE_VERSIONS](state, payload) {
+    const { versions, limit } = payload;
+    if (!limit) {
+      state.version = versions.length && versions[0].version;
+    }
+    state.versions = versions;
   },
   [STORE_RETRY_ACTION_TYPE](state, actionType) {
-    state.retryActionType = actionType
+    state.retryActionType = actionType;
   },
   [STORE_RETRY_ACTION_PAYLOAD](state, actionPayload) {
-    state.retryActionPayload = actionPayload
+    state.retryActionPayload = actionPayload;
   },
   [STORE_REQUEST_STATUS](state, requestStatus) {
-    state = Object.assign({}, state, requestStatus)
+    state = Object.assign({}, state, requestStatus);
   }
-}
+};
 
 export default {
   namespaced: true,
@@ -103,4 +110,4 @@ export default {
   getters,
   actions,
   mutations
-}
+};
