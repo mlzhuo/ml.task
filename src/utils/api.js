@@ -11,7 +11,7 @@ export async function request(method, resource, body) {
       formatedBody,
       {
         method,
-        timeout: 5000,
+        timeout: 10000,
         headers: {
           'Content-Type': 'application/json'
         }

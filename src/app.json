@@ -11,6 +11,8 @@
     "pages/tools_punch_details/main",
     "pages/tools_countdown/main",
     "pages/tools_countdown_add/main",
+    "pages/tools_werun/main",
+    "pages/tools_werun_details/main",
     "pages/user/main",
     "pages/user_update_list/main",
     "pages/user_resource_from/main"

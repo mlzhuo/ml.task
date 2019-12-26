@@ -10,7 +10,10 @@ import {
   DELETE_PUNCH,
   IS_NEED_REFRESH_TOOLS_OVERVIEW,
   GET_TOOLS_OVERVIEW_DATA,
-  STORE_TOOLS_OVERVIEW_DATA
+  STORE_TOOLS_OVERVIEW_DATA,
+  GET_WERUN_DATA,
+  GET_WERUN_DATA_YEAR,
+  GET_WERUN_DATA_MONTH
 } from "../mutation-types";
 import { jsonRequest } from "@/utils/api";
 import { formatYMD } from "@/utils/index";
@@ -95,6 +98,52 @@ const actions = {
     if (delResult && delResult.state) {
       commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, true);
       onSuccess(delResult.message);
+    } else {
+      onFailed();
+    }
+  },
+  async [GET_WERUN_DATA](
+    { commit, state, rootState },
+    { encryptedData, iv, onSuccess, onFailed }
+  ) {
+    const { userId, openid, signature, rawData } = rootState.user.userInfo;
+    const result = await jsonRequest("POST", `/${userId}/werun`, {
+      user_id: userId,
+      encryptedData,
+      iv,
+      openid,
+      signature,
+      rawData
+    });
+    if (result && result.state) {
+      onSuccess(result.data);
+    } else {
+      onFailed();
+    }
+  },
+  async [GET_WERUN_DATA_YEAR](
+    { commit, state, rootState },
+    { year, onSuccess, onFailed }
+  ) {
+    const { userId } = rootState.user.userInfo;
+    const result = await jsonRequest("GET", `/${userId}/werun/${year}`);
+    if (result && result.state) {
+      onSuccess(result.data);
+    } else {
+      onFailed();
+    }
+  },
+  async [GET_WERUN_DATA_MONTH](
+    { commit, state, rootState },
+    { year, month, onSuccess, onFailed }
+  ) {
+    const { userId } = rootState.user.userInfo;
+    const result = await jsonRequest(
+      "GET",
+      `/${userId}/werun/${year}/${month}`
+    );
+    if (result && result.state) {
+      onSuccess(result.data);
     } else {
       onFailed();
     }

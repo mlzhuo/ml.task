@@ -128,12 +128,6 @@ export default {
             wx.getUserInfo({
               success: function(res) {
                 that.$store.dispatch(`user/${SAVE_USER_INFO}`, res.userInfo);
-                const { gender } = res.userInfo;
-                if (gender === 2) {
-                  that.bgUrl = "/static/images/login_bg_f.svg";
-                } else {
-                  that.bgUrl = "/static/images/login_bg_m.svg";
-                }
               }
             });
           }

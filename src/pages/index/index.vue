@@ -86,6 +86,9 @@ export default {
   components: { EventView, ToolsView, UserView },
   methods: {
     selectNavClick(index) {
+      if ((index === 1 || index === 2) && !this.$store.state.user.userInfo.userId) {
+        return
+      }
       this.selectNavIndex = index;
     }
   }

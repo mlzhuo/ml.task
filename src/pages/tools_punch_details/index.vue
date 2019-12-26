@@ -7,19 +7,26 @@
       </cu-custom>
     </view>
     <view class="container">
-      <scroll-view scroll-x class="bg-white nav text-center">
+      <!-- <scroll-view scroll-x class="bg-white nav text-center">
         <view
           class="cu-item"
-          :class="index==tabIndex?'text-purple cur':''"
-          v-for="(item,index) in tabs"
+          :class="index == tabIndex ? 'text-purple cur' : ''"
+          v-for="(item, index) in tabs"
           :key="index"
           @tap="tabSelect"
           :data-id="index"
-        >{{item}}</view>
-      </scroll-view>
-      <view v-if="tabIndex===0">
-        <view class="cu-card dynamic" v-for="(monthItem, yearMonth) in punchDate" :key="yearMonth">
-          <view class="month-title margin-top-sm margin-bottom-xs">{{yearMonth}}</view>
+          >{{ item }}</view
+        >
+      </scroll-view> -->
+      <view v-if="tabIndex === 0">
+        <view
+          class="cu-card dynamic"
+          v-for="(monthItem, yearMonth) in punchDate"
+          :key="yearMonth"
+        >
+          <view class="month-title margin-top-sm margin-bottom-xs">{{
+            yearMonth
+          }}</view>
           <view class="cu-item shadow boxshadow">
             <view class="week-item">
               <view class="date-item">日</view>
@@ -32,30 +39,44 @@
             </view>
             <view
               class="week-item"
-              v-for="(num,rowIndex) in monthItem.length>35?6:5"
+              v-for="(num, rowIndex) in monthItem.length > 35 ? 6 : 5"
               :key="rowIndex"
             >
               <view
                 class="date-item"
-                :class="{'not-in':!monthItem[rowIndex*7+culumIndex].isIn,'ml-success':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date],'ml-danger':punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]&&punchHistory[yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date]==='no'}"
+                :class="{
+                  'not-in': !monthItem[rowIndex * 7 + culumIndex].isIn,
+                  'ml-success':
+                    punchHistory[yearMonth + '-' + monthItem[rowIndex * 7 + culumIndex].date],
+                  'ml-danger':
+                    punchHistory[yearMonth +'-' +monthItem[rowIndex * 7 + culumIndex].date] &&
+                    punchHistory[yearMonth +'-' +monthItem[rowIndex * 7 + culumIndex].date] === 'no'
+                }"
                 v-for="(date, culumIndex) in 7"
                 :key="culumIndex"
-                @click="showPunchTime(yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date)"
+                @click="showPunchTime( yearMonth + '-' + monthItem[rowIndex * 7 + culumIndex].date)"
               >
                 <view
                   class="date-item-today bg-gradual-purple"
-                  v-if="yearMonth+'-'+monthItem[rowIndex*7+culumIndex].date === today"
-                >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
+                  v-if="yearMonth +'-' +monthItem[rowIndex * 7 + culumIndex].date ===today"
+                  >{{yearMonth +"-" +monthItem[rowIndex * 7 + culumIndex].date ===datePunchTime.date? datePunchTime.time: monthItem[rowIndex * 7 + culumIndex].date
+                  }}</view
+                >
                 <view
                   v-else
-                  :class="{'date-item-today': true,'date-item-today-check': yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date}"
-                >{{yearMonth + '-' + monthItem[rowIndex*7+culumIndex].date ===datePunchTime.date ? datePunchTime.time:monthItem[rowIndex*7+culumIndex].date}}</view>
+                  :class="{
+                    'date-item-today': true,
+                    'date-item-today-check':yearMonth +'-' +monthItem[rowIndex * 7 + culumIndex].date ===datePunchTime.date
+                  }"
+                  >{{yearMonth +"-" +monthItem[rowIndex * 7 + culumIndex].date ===datePunchTime.date? datePunchTime.time: monthItem[rowIndex * 7 + culumIndex].date
+                  }}</view
+                >
               </view>
             </view>
           </view>
         </view>
       </view>
-      <view v-if="tabIndex===1">
+      <view v-if="tabIndex === 1">
         <view class="cu-card dynamic">
           <view class="month-title margin-top-sm margin-bottom-xs">&nbsp;</view>
           <view class="cu-item shadow boxshadow point-chart">
@@ -74,7 +95,7 @@
 </template>
 
 <script>
-import { formatPunchDate, formatYMD, formatTime } from "@/utils";
+import { formatYMD, formatTime } from "@/utils";
 import * as echarts from "../../../static/js/echarts.min.js";
 import mpvueEcharts from "mpvue-echarts";
 import ecStat from "echarts-stat";
@@ -102,7 +123,7 @@ export default {
     this.today = formatYMD(new Date());
     this.punch = this.$store.state.tools.currentPunch;
     const { start_date, end_date, punchHistory } = this.punch;
-    const dateObj = formatPunchDate(start_date, end_date);
+    const dateObj = this.formatPunchDate(start_date, end_date);
     this.punchDate = dateObj;
     let allDates = [];
     Object.values(dateObj).forEach(v => {
@@ -161,8 +182,9 @@ export default {
     },
     getScatterOption() {
       let data = [];
-      for (const key in this.punchHistory) {
-        const value = this.punchHistory[key];
+      const punchHistory = this.punchHistory
+      for (const key in punchHistory) {
+        const value = punchHistory[key];
         const x = new Date(key).getTime();
         const y =
           value === "no"
@@ -171,6 +193,8 @@ export default {
               +(new Date(value).getMinutes() / 60).toFixed(2);
         data.push([x, y]);
       }
+      console.log(data);
+      
       const myRegression = ecStat.regression("polynomial", data, 3);
       myRegression.points.sort(function(a, b) {
         return a[0] - b[0];
@@ -186,7 +210,7 @@ export default {
         color: ["#b6a2de", "#ffb980"],
         xAxis: {
           type: "value",
-          min: data[0][0],
+          min: 'dataMin',
           splitLine: {
             show: false
           },
@@ -257,6 +281,60 @@ export default {
       this.$nextTick(() => {
         this.$refs.ecScatterChart.init();
       });
+    },
+    formatPunchDate(startStr, endStr) {
+      const start = startStr.split("-");
+      const firstDate = new Date(`${start[0]}-${start[1]}-01`).getTime();
+      const end = endStr.split("-");
+      const lastDate = new Date(end[0], end[1], 0).getTime();
+      let dateObj = {};
+      let startWeek = {};
+      const len = (lastDate - firstDate) / (24 * 3600 * 1000) + 1;
+      for (let i = 0; i < len; i++) {
+        const year =
+          new Date(firstDate + i * 24 * 3600 * 1000).getFullYear() + "";
+        let month = new Date(firstDate + i * 24 * 3600 * 1000).getMonth() + 1;
+        month = month < 10 ? "0" + month : month + "";
+        let date = new Date(firstDate + i * 24 * 3600 * 1000).getDate();
+        date = date < 10 ? "0" + date : date + "";
+        const time = new Date(`${year}-${month}-${date}`).getTime();
+        const isIn =
+          time <= new Date(endStr).getTime() &&
+          time >= new Date(startStr).getTime();
+        if (!dateObj[year + "-" + month]) {
+          const week = new Date(`${year}-${month}-01`).getDay();
+          startWeek[year + "-" + month] = week;
+          dateObj[year + "-" + month] = [];
+          dateObj[year + "-" + month].push({
+            fullDate: `${year}-${month}-${date}`,
+            date,
+            isIn
+          });
+        } else {
+          dateObj[year + "-" + month].push({
+            fullDate: `${year}-${month}-${date}`,
+            date,
+            isIn
+          });
+        }
+      }
+      for (const key in startWeek) {
+        const value = startWeek[key];
+        let monthDateLen = dateObj[key].length;
+        for (let i = 0; i < value; i++) {
+          dateObj[key].unshift({});
+        }
+        monthDateLen = dateObj[key].length;
+        let renderMonthDay = 35;
+        if ((value === 5 || value === 6) && monthDateLen > 35) {
+          renderMonthDay = 42;
+        }
+        const pushItemLen = renderMonthDay - monthDateLen;
+        for (let i = 0; i < pushItemLen; i++) {
+          dateObj[key].push({});
+        }
+      }
+      return dateObj;
     }
   }
 };

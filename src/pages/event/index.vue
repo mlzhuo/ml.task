@@ -14,7 +14,6 @@
           hover-class="none"
           class="nav-li"
           :class="'bg-' + item.color"
-          :style="style"
           navigateTo
           v-for="item in events"
           :key="item._id"
@@ -94,7 +93,6 @@ export default {
       isShowModal: false,
       longPressItemArr: ["编辑", "删除"],
       longPressEventId: "",
-      style: "",
       isShowUpdateModal: false,
       currentVersion: {},
       updateInfo: []
