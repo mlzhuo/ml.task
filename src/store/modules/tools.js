@@ -13,16 +13,24 @@ import {
   STORE_TOOLS_OVERVIEW_DATA,
   GET_WERUN_DATA,
   GET_WERUN_DATA_YEAR,
-  GET_WERUN_DATA_MONTH
+  GET_WERUN_DATA_MONTH,
+  STORE_WERUN_DATA_YEAR,
+  STORE_WERUN_DATA_MONTH,
+  GET_ALL_COUNTDOWN,
+  STORE_ALL_COUNTDOWN,
+  STORE_CURRENT_COUNTDOWN,
+  COUNTDOWN_OPERATION,
+  DELETE_COUNTDOWN
 } from "../mutation-types";
-import { jsonRequest } from "@/utils/api";
+import { $axios } from "@/utils/api";
 import { formatYMD } from "@/utils/index";
 const state = {
   toolsOverviewData: {},
   isNeedRefreshToolsOverview: true,
   punch: [],
   currentPunch: {},
-  isNeedRefreshPunch: true
+  isNeedRefreshPunch: true,
+  countdown: []
 };
 
 const getters = {};
@@ -32,7 +40,10 @@ const actions = {
     { onSuccess, onFailed }
   ) {
     const user_id = rootState.user.userInfo.userId;
-    const result = await jsonRequest("GET", `/${user_id}/tools_data_overview`);
+    const result = await $axios({
+      method: "GET",
+      url: `/${user_id}/tools_data_overview`
+    });
     if (result) {
       commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, false);
       commit(STORE_TOOLS_OVERVIEW_DATA, result.data);
@@ -44,7 +55,10 @@ const actions = {
     { onSuccess, onFailed }
   ) {
     const user_id = rootState.user.userInfo.userId;
-    const punchResult = await jsonRequest("GET", `/${user_id}/punch`);
+    const punchResult = await $axios({
+      method: "GET",
+      url: `/${user_id}/punch`
+    });
     if (!punchResult) {
       onFailed();
       commit(`miniapp/${STORE_RETRY_ACTION_TYPE}`, `tools/${GET_PUNCH_DATA}`, {
@@ -78,7 +92,11 @@ const actions = {
         today: formData.today
       };
     }
-    const result = await jsonRequest(method, `/${user_id}/punch`, obj);
+    const result = await $axios({
+      method,
+      url: `/${user_id}/punch`,
+      data: obj
+    });
     if (!result) {
       onFailed();
       return;
@@ -91,10 +109,10 @@ const actions = {
   async [DELETE_PUNCH]({ commit, state, rootState }, { onSuccess, onFailed }) {
     const user_id = rootState.user.userInfo.userId;
     const punch_id = state.currentPunch._id;
-    const delResult = await jsonRequest(
-      "DELETE",
-      `/${user_id}/punch/${punch_id}`
-    );
+    const delResult = await $axios({
+      method: "DELETE",
+      url: `/${user_id}/punch/${punch_id}`
+    });
     if (delResult && delResult.state) {
       commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, true);
       onSuccess(delResult.message);
@@ -107,13 +125,17 @@ const actions = {
     { encryptedData, iv, onSuccess, onFailed }
   ) {
     const { userId, openid, signature, rawData } = rootState.user.userInfo;
-    const result = await jsonRequest("POST", `/${userId}/werun`, {
-      user_id: userId,
-      encryptedData,
-      iv,
-      openid,
-      signature,
-      rawData
+    const result = await $axios({
+      method: "POST",
+      url: `/${userId}/werun`,
+      data: {
+        user_id: userId,
+        encryptedData,
+        iv,
+        openid,
+        signature,
+        rawData
+      }
     });
     if (result && result.state) {
       onSuccess(result.data);
@@ -126,7 +148,10 @@ const actions = {
     { year, onSuccess, onFailed }
   ) {
     const { userId } = rootState.user.userInfo;
-    const result = await jsonRequest("GET", `/${userId}/werun/${year}`);
+    const result = await $axios({
+      method: "GET",
+      url: `/${userId}/werun/${year}`
+    });
     if (result && result.state) {
       onSuccess(result.data);
     } else {
@@ -138,14 +163,46 @@ const actions = {
     { year, month, onSuccess, onFailed }
   ) {
     const { userId } = rootState.user.userInfo;
-    const result = await jsonRequest(
-      "GET",
-      `/${userId}/werun/${year}/${month}`
-    );
+    const result = await $axios({
+      method: "GET",
+      url: `/${userId}/werun/${year}/${month}`
+    });
     if (result && result.state) {
       onSuccess(result.data);
     } else {
       onFailed();
+    }
+  },
+  async [GET_ALL_COUNTDOWN](
+    { commit, state, rootState },
+    { onSuccess, onFailed }
+  ) {
+    const { userId } = rootState.user.userInfo;
+    const result = await $axios({ method: "GET", url: `/${userId}/countdown` });
+    if (result && result.state) {
+      onSuccess && onSuccess(result.message);
+      commit(STORE_ALL_COUNTDOWN, result.data);
+    } else {
+      onFailed && onFailed();
+    }
+  },
+  async [COUNTDOWN_OPERATION](
+    { commit, state, rootState },
+    { method, obj, onSuccess, onFailed }
+  ) {
+    const { userId } = rootState.user.userInfo;
+    const result = await $axios({
+      method,
+      url: `/${userId}/countdown`,
+      data: {
+        ...obj,
+        user_id: userId
+      }
+    });
+    if (result && result.state) {
+      onSuccess && onSuccess(result.message);
+    } else {
+      onFailed && onFailed();
     }
   }
 };
@@ -167,6 +224,9 @@ const mutations = {
   },
   [STORE_TOOLS_OVERVIEW_DATA](state, toolsOverviewData) {
     state.toolsOverviewData = toolsOverviewData;
+  },
+  [STORE_ALL_COUNTDOWN](state, countdown) {
+    state.countdown = countdown;
   }
 };
 export default {

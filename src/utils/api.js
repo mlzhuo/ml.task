@@ -1,40 +1,38 @@
-import { config } from '@/config'
-import Fly from 'flyio/dist/npm/wx'
-
-const flyFetch = new Fly()
-
-export async function request(method, resource, body) {
-  try {
-    const formatedBody = body ? JSON.stringify(body) : undefined
-    const fetchResponse = await flyFetch.request(
-      config.apiURL + resource,
-      formatedBody,
-      {
-        method,
-        timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+import { config } from "@/config";
+import axios from "axios";
+axios.defaults.adapter = function(config) {
+  return new Promise((resolve, reject) => {
+    let data = config.method === "get" ? config.params : config.data;
+    wx.request({
+      url: config.url,
+      method: config.method,
+      data: data,
+      header: config.headers,
+      success: res => {
+        return resolve(res);
+      },
+      fail: err => {
+        return reject(err);
       }
-    )
-    return fetchResponse
-  } catch (e) {
-    console.log('request exception:', e)
-  }
-}
+    });
+  });
+};
 
-export async function jsonRequest(method, resource, body) {
+export async function $axios({ method, url, data, headers }) {
   try {
-    const response = await request(method, resource, body)
-    if (!response) {
-      return
-    }
-    if (response.statusText === 'request:ok') {
-      return response.data
-    } else {
-      console.log('apiError:')
-    }
+    const response = await axios({
+      url: config.apiURL + url,
+      method,
+      timeout: 10000,
+      headers: {
+        "Content-Type": "application/json",
+        // Authorization: `Bearer ${token}`,
+        ...headers
+      },
+      data
+    });
+    return response.data;
   } catch (e) {
-    console.error('jsonRequest exception:', e)
+    console.error("$axios exception:", e);
   }
 }

@@ -7,7 +7,7 @@ import {
   STORE_RETRY_ACTION_TYPE,
   STORE_RETRY_ACTION_PAYLOAD
 } from "../mutation-types";
-import { jsonRequest } from "@/utils/api";
+import { $axios } from "@/utils/api";
 const state = {
   userInfo: {}
 };
@@ -19,11 +19,11 @@ const actions = {
     wx.login({
       timeout: 5000,
       async success(wxres) {
-        const result = await jsonRequest(
-          "POST",
-          "/login",
-          Object.assign({}, { code: wxres.code })
-        );
+        const result = await $axios({
+          method: "POST",
+          url: "/login",
+          data: Object.assign({}, { code: wxres.code })
+        });
         if (result && result.state) {
           const { message, data } = result;
           const { _id, openid, priTmplId } = data;

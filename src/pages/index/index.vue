@@ -81,7 +81,18 @@ export default {
       ]
     };
   },
-  onShow() {},
+  onShow() {
+    // wx.cloud.init({
+    //   env: 'ml-task', traceUser: true
+    // })
+    // wx.cloud.callFunction({
+    //   name: 'getOpenId',
+    //   data: {},
+    //   complete: (res) => {
+    //     console.log('callFunction test result: ', res)
+    //   },
+    // })
+  },
   mounted() {},
   components: { EventView, ToolsView, UserView },
   methods: {

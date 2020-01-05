@@ -64,7 +64,7 @@ export default {
       isShowReTry: false
     };
   },
-  onShow() {
+  mounted() {
     const that = this;
     that.isShowLoading = true;
     wx.getWeRunData({

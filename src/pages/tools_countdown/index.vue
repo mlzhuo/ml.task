@@ -17,17 +17,21 @@
       </navigator>
 
       <view class="cu-tabbar-height"></view>
-      <view class="cu-modal" :class="isShowModal?'show':''" @tap="hideModal">
+      <view
+        class="cu-modal"
+        :class="isShowModal ? 'show' : ''"
+        @tap="hideModal"
+      >
         <view class="cu-dialog" @tap.stop>
           <view class="cu-list menu text-left">
             <view
               class="cu-item"
-              v-for="(item,index) in longPressItemArr"
+              v-for="(item, index) in longPressItemArr"
               :key="index"
               @click="doSomething(index)"
             >
               <label class="flex justify-between align-center flex-sub">
-                <view class="flex-sub">{{item}}</view>
+                <view class="flex-sub">{{ item }}</view>
               </label>
             </view>
           </view>
@@ -40,10 +44,12 @@
 </template>
 
 <script>
+import { formatYMD } from "@/utils/index";
+import { GET_ALL_COUNTDOWN } from "@/store/mutation-types";
 export default {
   data() {
     return {
-      isShowLoading: true,
+      isShowLoading: false,
       isShowReTry: false,
       countdown: [],
       isShowModal: false,
@@ -52,9 +58,20 @@ export default {
       longPressPunch: {}
     };
   },
-  onShow() {},
+  onShow() {
+    this.getCountdown()
+  },
   mounted() {},
-  methods: {}
+  methods: {
+    getCountdown() {
+      this.$store.dispatch(`tools/${GET_ALL_COUNTDOWN}`, {
+        onSuccess: this.onSuccess,
+        onFailed: this.onFailed
+      });
+    },
+    onSuccess() {},
+    onFailed() {}
+  }
 };
 </script>
 <style scoped>

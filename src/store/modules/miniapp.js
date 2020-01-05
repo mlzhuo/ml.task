@@ -13,7 +13,7 @@ import {
   REQUEST_STATUS,
   STORE_REQUEST_STATUS
 } from "../mutation-types";
-import { jsonRequest } from "@/utils/api";
+import { $axios } from "@/utils/api";
 import { formatYMD } from "@/utils/index";
 const state = {
   navigationInfo: {
@@ -39,7 +39,7 @@ const actions = {
     if (limit === 1) {
       url = "/version?limit=1";
     }
-    const result = await jsonRequest("GET", url);
+    const result = await $axios({ method: "GET", url });
     if (!result) {
       return;
     }
@@ -52,7 +52,7 @@ const actions = {
     }
   },
   async [LOAD_CONFIG]({ commit, state }, { onSuccess }) {
-    const result = await jsonRequest("GET", "/config");
+    const result = await $axios({method:"GET", url:"/config"});
     if (result && result.state) {
       commit(STORE_CONFIG, result.data);
       onSuccess(result.data);

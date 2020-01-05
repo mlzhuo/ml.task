@@ -75,8 +75,8 @@ export default {
         {
           index: 1,
           title: "倒计时",
-          img: "/static/images/countdown.svg"
-          // url: "/pages/tools_countdown/main"
+          img: "/static/images/countdown.svg",
+          url: "/pages/tools_countdown/main"
         },
         {
           index: 2,

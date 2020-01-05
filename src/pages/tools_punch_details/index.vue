@@ -7,7 +7,7 @@
       </cu-custom>
     </view>
     <view class="container">
-      <!-- <scroll-view scroll-x class="bg-white nav text-center">
+      <scroll-view scroll-x class="bg-white nav text-center">
         <view
           class="cu-item"
           :class="index == tabIndex ? 'text-purple cur' : ''"
@@ -17,7 +17,7 @@
           :data-id="index"
           >{{ item }}</view
         >
-      </scroll-view> -->
+      </scroll-view>
       <view v-if="tabIndex === 0">
         <view
           class="cu-card dynamic"
@@ -95,11 +95,11 @@
 </template>
 
 <script>
-import { formatYMD, formatTime } from "@/utils";
+import { formatYMD, formatTime, formatPunchDate } from "@/utils";
 import * as echarts from "../../../static/js/echarts.min.js";
 import mpvueEcharts from "mpvue-echarts";
 import ecStat from "echarts-stat";
-let scatterChart;
+let scatterChart, ecScatterOption;
 export default {
   data() {
     return {
@@ -110,8 +110,7 @@ export default {
       datePunchTime: {},
       tabIndex: 0,
       tabs: ["记录", "统计"],
-      echarts,
-      ecScatterOption: null
+      echarts
     };
   },
   components: {
@@ -123,7 +122,7 @@ export default {
     this.today = formatYMD(new Date());
     this.punch = this.$store.state.tools.currentPunch;
     const { start_date, end_date, punchHistory } = this.punch;
-    const dateObj = this.formatPunchDate(start_date, end_date);
+    const dateObj = formatPunchDate(start_date, end_date);
     this.punchDate = dateObj;
     let allDates = [];
     Object.values(dateObj).forEach(v => {
@@ -177,7 +176,7 @@ export default {
         height: height
       });
       canvas.setChart(scatterChart);
-      scatterChart.setOption(this.ecScatterOption);
+      scatterChart.setOption(ecScatterOption);
       return scatterChart;
     },
     getScatterOption() {
@@ -218,9 +217,9 @@ export default {
             formatter: function(value, index) {
               var date = new Date(value);
               var texts = [date.getMonth() + 1, date.getDate()];
-              if (index === 0) {
-                texts.unshift(date.getYear());
-              }
+              // if (index === 0) {
+              //   texts.unshift(date.getYear());
+              // }
               return texts.join("/");
             }
           }
@@ -277,64 +276,10 @@ export default {
       };
     },
     ecScatterRender() {
-      this.ecScatterOption = this.getScatterOption();
+      ecScatterOption = this.getScatterOption();
       this.$nextTick(() => {
         this.$refs.ecScatterChart.init();
       });
-    },
-    formatPunchDate(startStr, endStr) {
-      const start = startStr.split("-");
-      const firstDate = new Date(`${start[0]}-${start[1]}-01`).getTime();
-      const end = endStr.split("-");
-      const lastDate = new Date(end[0], end[1], 0).getTime();
-      let dateObj = {};
-      let startWeek = {};
-      const len = (lastDate - firstDate) / (24 * 3600 * 1000) + 1;
-      for (let i = 0; i < len; i++) {
-        const year =
-          new Date(firstDate + i * 24 * 3600 * 1000).getFullYear() + "";
-        let month = new Date(firstDate + i * 24 * 3600 * 1000).getMonth() + 1;
-        month = month < 10 ? "0" + month : month + "";
-        let date = new Date(firstDate + i * 24 * 3600 * 1000).getDate();
-        date = date < 10 ? "0" + date : date + "";
-        const time = new Date(`${year}-${month}-${date}`).getTime();
-        const isIn =
-          time <= new Date(endStr).getTime() &&
-          time >= new Date(startStr).getTime();
-        if (!dateObj[year + "-" + month]) {
-          const week = new Date(`${year}-${month}-01`).getDay();
-          startWeek[year + "-" + month] = week;
-          dateObj[year + "-" + month] = [];
-          dateObj[year + "-" + month].push({
-            fullDate: `${year}-${month}-${date}`,
-            date,
-            isIn
-          });
-        } else {
-          dateObj[year + "-" + month].push({
-            fullDate: `${year}-${month}-${date}`,
-            date,
-            isIn
-          });
-        }
-      }
-      for (const key in startWeek) {
-        const value = startWeek[key];
-        let monthDateLen = dateObj[key].length;
-        for (let i = 0; i < value; i++) {
-          dateObj[key].unshift({});
-        }
-        monthDateLen = dateObj[key].length;
-        let renderMonthDay = 35;
-        if ((value === 5 || value === 6) && monthDateLen > 35) {
-          renderMonthDay = 42;
-        }
-        const pushItemLen = renderMonthDay - monthDateLen;
-        for (let i = 0; i < pushItemLen; i++) {
-          dateObj[key].push({});
-        }
-      }
-      return dateObj;
     }
   }
 };
