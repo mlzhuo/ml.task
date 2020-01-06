@@ -1,5 +1,9 @@
 <template>
   <view>
+    <cu-custom bgcolor="bg-gradual-orange" :isBack="false">
+      <block slot="backText">返回</block>
+      <block slot="content">我的</block>
+    </cu-custom>
     <view class="no-card top-view" :style="style">
       <image :src="logoUrl" class="logo" />
       <p class="description">
@@ -62,16 +66,7 @@ export default {
       style: ""
     };
   },
-  onShow() {
-    this.style = `height:${this.windowHeight * 0.35}px`;
-    const version = this.$store.state.miniapp.version;
-    if (version) {
-      this.version = "v" + version;
-    } else {
-      this.getVersions();
-    }
-  },
-  onLoad() {
+  created() {
     this.style = `height:${this.windowHeight * 0.35}px`;
     const version = this.$store.state.miniapp.version;
     if (version) {

@@ -1,5 +1,9 @@
 <template>
   <view>
+    <cu-custom bgcolor="bg-gradual-blue" :isBack="false">
+      <block slot="backText">返回</block>
+      <block slot="content">记录</block>
+    </cu-custom>
     <view class="container">
       <navigator
         hover-class="none"
@@ -99,27 +103,6 @@ export default {
     };
   },
   onShow() {
-    const versions = this.$store.state.miniapp.versions;
-    if (!versions.length) {
-      this.getVersions();
-    }
-    const { userInfo } = this.$store.state.user;
-    const isNeedLogin =
-      Object.keys(userInfo).length === 0 ||
-      (userInfo && (!userInfo.openid || !userInfo.userId));
-    if (isNeedLogin) {
-      this.Login();
-      return;
-    }
-    this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
-    const isNeedRefreshEvent = this.$store.state.event.isNeedRefreshEvent;
-    if (isNeedRefreshEvent) {
-      this.getData();
-    } else {
-      this.onSuccess();
-    }
-  },
-  onLoad() {
     const versions = this.$store.state.miniapp.versions;
     if (!versions.length) {
       this.getVersions();

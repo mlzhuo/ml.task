@@ -1,5 +1,9 @@
 <template>
   <view>
+    <cu-custom bgcolor="bg-gradual-purple" :isBack="false">
+      <block slot="backText">返回</block>
+      <block slot="content">工具</block>
+    </cu-custom>
     <view class="cu-card">
       <!-- <view
         class="cu-item bg-gradual-purple shadow-blur"
@@ -76,7 +80,7 @@ export default {
           index: 1,
           title: "倒计时",
           img: "/static/images/countdown.svg",
-          url: "/pages/tools_countdown/main"
+          // url: "/pages/tools_countdown/main"
         },
         {
           index: 2,
@@ -94,15 +98,6 @@ export default {
     };
   },
   onShow() {
-    const isNeedRefreshToolsOverview = this.$store.state.tools
-      .isNeedRefreshToolsOverview;
-    if (isNeedRefreshToolsOverview) {
-      this.getData();
-    } else {
-      this.onSuccess();
-    }
-  },
-  onLoad() {
     const isNeedRefreshToolsOverview = this.$store.state.tools
       .isNeedRefreshToolsOverview;
     if (isNeedRefreshToolsOverview) {

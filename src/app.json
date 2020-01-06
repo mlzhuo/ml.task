@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/index/main",
     "pages/event/main",
     "pages/event_add/main",
     "pages/task/main",
@@ -22,5 +21,32 @@
     "navigationBarTitleText": "ML TASK",
     "navigationStyle": "custom",
     "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999",
+    "backgroundColor": "#fafafa",
+    "selectedColor": "#333",
+    "borderStyle": "white",
+    "list": [
+      {
+        "text": "",
+        "pagePath": "pages/event/main",
+        "iconPath": "static/images/tabbar/event.png",
+        "selectedIconPath": "static/images/tabbar/event_active.png"
+      },
+      {
+        "text": "",
+        "pagePath": "pages/tools/main",
+        "iconPath": "static/images/tabbar/tools.png",
+        "selectedIconPath": "static/images/tabbar/tools_active.png"
+      },
+      {
+        "text": "",
+        "pagePath": "pages/user/main",
+        "iconPath": "static/images/tabbar/user.png",
+        "selectedIconPath": "static/images/tabbar/user_active.png"
+      }
+    ],
+    "position": "bottom"
   }
 }
