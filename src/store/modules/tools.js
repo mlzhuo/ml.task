@@ -20,7 +20,8 @@ import {
   STORE_ALL_COUNTDOWN,
   STORE_CURRENT_COUNTDOWN,
   COUNTDOWN_OPERATION,
-  DELETE_COUNTDOWN
+  DELETE_COUNTDOWN,
+  CLEAR_CURRENT_COUNTDOWN
 } from "../mutation-types";
 import { $axios } from "@/utils/api";
 import { formatYMD } from "@/utils/index";
@@ -30,7 +31,8 @@ const state = {
   punch: [],
   currentPunch: {},
   isNeedRefreshPunch: true,
-  countdown: []
+  countdown: [],
+  currentCountdown: {}
 };
 
 const getters = {};
@@ -180,7 +182,7 @@ const actions = {
     const { userId } = rootState.user.userInfo;
     const result = await $axios({ method: "GET", url: `/${userId}/countdown` });
     if (result && result.state) {
-      onSuccess && onSuccess(result.message);
+      onSuccess && onSuccess(result.data);
       commit(STORE_ALL_COUNTDOWN, result.data);
     } else {
       onFailed && onFailed();
@@ -201,6 +203,20 @@ const actions = {
     });
     if (result && result.state) {
       onSuccess && onSuccess(result.message);
+    } else {
+      onFailed && onFailed();
+    }
+  },
+  async [DELETE_COUNTDOWN]({ commit, state, rootState }, { onSuccess, onFailed }){
+    const user_id = rootState.user.userInfo.userId;
+    const countdown_id = state.currentCountdown._id
+    const delResult = await $axios({
+      method: "DELETE",
+      url: `/${user_id}/countdown/${countdown_id}`
+    });
+    if (delResult && delResult.state) {
+      commit(IS_NEED_REFRESH_TOOLS_OVERVIEW, true);
+      onSuccess && onSuccess(delResult.message);
     } else {
       onFailed && onFailed();
     }
@@ -227,6 +243,12 @@ const mutations = {
   },
   [STORE_ALL_COUNTDOWN](state, countdown) {
     state.countdown = countdown;
+  },
+  [STORE_CURRENT_COUNTDOWN](state, countdown) {
+    state.currentCountdown = countdown;
+  },
+  [CLEAR_CURRENT_COUNTDOWN](state) {
+    state.currentCountdown = {};
   }
 };
 export default {

@@ -1,9 +1,9 @@
-const formatNumber = n => {
+export const formatNumber = n => {
   const str = n.toString();
   return str[1] ? str : `0${str}`;
 };
 
-const formatTime = date => {
+export const formatTime = date => {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -18,7 +18,7 @@ const formatTime = date => {
   return `${t1} ${t2}`;
 };
 
-const formatDate = date => {
+export const formatDate = date => {
   const year = date.getFullYear();
   const currentYear = new Date().getFullYear();
   let month = formatNumber(date.getMonth() + 1);
@@ -35,7 +35,7 @@ const formatDate = date => {
   };
 };
 
-const formatYMD = date => {
+export const formatYMD = date => {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -44,12 +44,13 @@ const formatYMD = date => {
 
   return `${t1}`;
 };
-const formatVersionText = str => {
+
+export const formatVersionText = str => {
   const textArr = str.split(/;|；/);
   return textArr;
 };
 
-const splitNum = num => {
+export const splitNum = num => {
   var str = "";
   if (typeof num == "number") {
     str = num.toString();
@@ -62,7 +63,7 @@ const splitNum = num => {
   return str.replace(re, ",");
 };
 
-const formatPunchDate = (startStr, endStr) => {
+export const formatPunchDate = (startStr, endStr) => {
   const start = startStr.split("-");
   const firstDate = new Date(`${start[0]}-${start[1]}-01`).getTime();
   const end = endStr.split("-");
@@ -116,12 +117,39 @@ const formatPunchDate = (startStr, endStr) => {
   return dateObj;
 };
 
-export {
-  formatNumber,
-  formatTime,
-  formatDate,
-  formatYMD,
-  formatVersionText,
-  splitNum,
-  formatPunchDate
+export const diffTime = (target_date) => {
+  var diff = target_date.getTime() - new Date().getTime();
+  var days = Math.floor(diff / (24 * 3600 * 1000));
+  var leave1 = diff % (24 * 3600 * 1000); //计算天数后剩余的毫秒数
+  var hours = Math.floor(leave1 / (3600 * 1000));
+  var leave2 = leave1 % (3600 * 1000); //计算小时数后剩余的毫秒数
+  var minutes = Math.floor(leave2 / (60 * 1000));
+  var leave3 = leave2 % (60 * 1000); //计算分钟数后剩余的毫秒数
+  var seconds = Math.floor(leave3 / 1000);
+  days = days > 0 ? `${days}天` : ''
+  hours = hours > 0 ? `${hours}时` : ''
+  minutes = minutes > 0 ? `${minutes}分` : ''
+  seconds = `${seconds}秒`
+  // var returnStr = seconds + "秒前";
+  // if (minutes > 0) {
+  //   returnStr = minutes + "分钟前"; //+ returnStr;
+  // }
+  // if (hours > 0) {
+  //   returnStr = hours + "小时前"; // + returnStr;
+  // }
+  // if (days > 0) {
+  //   returnStr = days + "天前"; //+ returnStr;
+  // }
+  return `${days}${hours}${minutes}${seconds}`;
 };
+
+// export {
+//   formatNumber,
+//   formatTime,
+//   formatDate,
+//   formatYMD,
+//   formatVersionText,
+//   splitNum,
+//   formatPunchDate,
+//   diffTime
+// };

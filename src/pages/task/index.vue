@@ -194,6 +194,7 @@ export default {
     },
     hideModal() {
       this.isShowModal = false;
+      this.$store.commit(`event/${CLEAR_CURRENT_TASK}`);
     },
     doSomething(index) {
       this.isShowModal = false;

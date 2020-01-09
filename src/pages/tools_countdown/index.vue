@@ -15,7 +15,23 @@
       >
         <text class="cuIcon-add"></text>添加倒计时
       </navigator>
-
+      <view v-if="countdowns.length">
+        <view
+          class="cu-item shadow-blur countdown-item"
+          v-for="item in countdowns"
+          :key="item._id"
+          @longpress="showModal(item)"
+        >
+          <countdownView
+            :isShowTitle="true"
+            :targetDate="item.target_date"
+            :countdownName="item.name"
+            :isComplete="item.state"
+            :countdownId="item._id"
+            @doneCountdown="doneCountdown"
+          ></countdownView>
+        </view>
+      </view>
       <view class="cu-tabbar-height"></view>
       <view
         class="cu-modal"
@@ -44,39 +60,97 @@
 </template>
 
 <script>
-import { formatYMD } from "@/utils/index";
-import { GET_ALL_COUNTDOWN } from "@/store/mutation-types";
+import {
+  GET_ALL_COUNTDOWN,
+  COUNTDOWN_OPERATION,
+  STORE_CURRENT_COUNTDOWN,
+  DELETE_COUNTDOWN,
+  CLEAR_CURRENT_COUNTDOWN
+} from "@/store/mutation-types";
+import countdownView from "@/components/countdownView";
 export default {
   data() {
     return {
       isShowLoading: false,
       isShowReTry: false,
-      countdown: [],
+      countdowns: [],
       isShowModal: false,
       longPressItemArr: ["编辑", "删除"],
       logoUrl: "/static/images/ml-task-logo.png",
-      longPressPunch: {}
+      currentCountdown: {}
     };
   },
+  components: {
+    countdownView
+  },
   onShow() {
-    this.getCountdown()
+    this.$store.commit(`tools/${CLEAR_CURRENT_COUNTDOWN}`);
+    this.getCountdown();
   },
   mounted() {},
   methods: {
     getCountdown() {
+      this.countdowns = []
       this.$store.dispatch(`tools/${GET_ALL_COUNTDOWN}`, {
         onSuccess: this.onSuccess,
         onFailed: this.onFailed
       });
     },
-    onSuccess() {},
-    onFailed() {}
+    onSuccess(data) {
+      this.countdowns = [...data];
+    },
+    onFailed() {},
+    doneCountdown(countdown_id) {
+      this.$store.dispatch(`tools/${COUNTDOWN_OPERATION}`, {
+        method: "PUT",
+        obj: { state: 1, countdown_id },
+        onSuccess: this.getCountdown
+      });
+    },
+    showModal(countdown) {
+      this.$store.commit(`tools/${STORE_CURRENT_COUNTDOWN}`, countdown);
+      this.currentCountdown = countdown;
+      this.isShowModal = true;
+    },
+    hideModal() {
+      this.$store.commit(`tools/${CLEAR_CURRENT_COUNTDOWN}`);
+      this.isShowModal = false;
+    },
+    delCountdown() {
+      this.$store.dispatch(`tools/${DELETE_COUNTDOWN}`, {
+        onSuccess: this.delCountdownSuccess,
+        onFail: this.delCountdownFail
+      });
+    },
+    delCountdownSuccess(msg) {
+      this.showToast(msg);
+      this.getCountdown()
+    },
+    delCountdownFail() {
+      this.showToast("删除失败，请重试");
+    },
+    editCountdown() {
+      wx.navigateTo({ url: "/pages/tools_countdown_add/main" });
+    },
+    doSomething(index) {
+      this.isShowModal = false;
+      switch (index) {
+        case 0:
+          this.editCountdown();
+          break;
+        case 1:
+          this.delCountdown();
+          break;
+        default:
+          break;
+      }
+    }
   }
 };
 </script>
 <style scoped>
 .container {
-  padding: 15px 5px 5px;
+  padding: 15px;
 }
 .cu-list-header {
   height: 60px !important;
@@ -103,10 +177,10 @@ export default {
   bottom: 10px;
   text-align: right;
 }
-.add-btn {
-  margin-bottom: 5px;
-}
 .done-punch-item {
   opacity: 0.3;
+}
+.countdown-item {
+  height: 100px;
 }
 </style>

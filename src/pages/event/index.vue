@@ -206,6 +206,7 @@ export default {
     },
     hideModal() {
       this.isShowModal = false;
+      this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
     },
     doSomething(index) {
       this.isShowModal = false;

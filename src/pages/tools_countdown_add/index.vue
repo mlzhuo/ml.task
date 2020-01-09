@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { formatYMD } from "@/utils/index";
+import { formatYMD, formatTime } from "@/utils/index";
 import { COUNTDOWN_OPERATION } from "@/store/mutation-types";
 export default {
   data() {
@@ -58,14 +58,23 @@ export default {
     };
   },
   onShow() {
-    const { user } = this.$store.state;
+    const { user, tools } = this.$store.state;
     this.user_id = user.userInfo.userId;
-    const today = formatYMD(new Date());
-    this.end_date = formatYMD(
-      new Date(new Date().getTime() + 24 * 3600 * 1000)
-    );
-    this.pageTitle = "添加";
-    this.btnTitle = "添加";
+    const { currentCountdown } = tools;
+    if (currentCountdown._id) {
+      this.end_date = formatYMD(new Date(currentCountdown.target_date));
+      this.end_time = formatTime(new Date(currentCountdown.target_date))
+        .split(" ")[1]
+        .slice(0, 5);
+      this.pageTitle = "编辑";
+      this.btnTitle = "编辑";
+    } else {
+      this.end_date = formatYMD(
+        new Date(new Date().getTime() + 24 * 3600 * 1000)
+      );
+      this.pageTitle = "添加";
+      this.btnTitle = "添加";
+    }
   },
   methods: {
     nameInput(e) {
@@ -85,15 +94,22 @@ export default {
         this.showToast("输入倒计时名称");
         return;
       }
+      this.clickRequestSubscribeMessage()
       this.isShowLoading = true;
       const target_date = `${this.end_date} ${this.end_time}:00`;
+      const obj = {
+        target_date,
+        name: this.name,
+        description: this.description
+      };
+      let method = "POST";
+      if (this.btnTitle === "编辑") {
+        obj.countdown_id = this.$store.state.tools.currentCountdown._id;
+        method = "PUT";
+      }
       this.$store.dispatch(`tools/${COUNTDOWN_OPERATION}`, {
-        method: "POST",
-        obj: {
-          target_date,
-          name: this.name,
-          description: this.description
-        },
+        method,
+        obj,
         onSuccess: this.operationSuccess,
         onFailed: this.operationFailed
       });
@@ -109,6 +125,49 @@ export default {
     operationFailed() {
       this.isShowLoading = false;
       this.showToast("请重试");
+    },
+    clickRequestSubscribeMessage() {
+      const that = this
+      wx.requestSubscribeMessage({
+        tmplIds: that.$store.state.user.userInfo.priTmplId,
+        success(res) {
+          for (var key in res) {
+            if (key !='errMsg') {
+              if (res[key] =='reject') {
+                wx.showModal({
+                  title:'订阅消息',
+                  content:'您已拒绝了订阅消息，如需重新订阅请前往设置打开。',
+                  confirmText:'去设置',
+                  //showCancel: false,
+                  success: res => {
+                    if (res.confirm) {
+                      wx.openSetting({})
+                    }
+                  }
+                })
+                return
+              }else{
+                wx.showToast({
+                  title:'订阅成功'
+                })
+              }
+            }
+          }
+        },
+        fail(err) {
+          wx.showModal({
+            title:'订阅消息',
+            content:'您关闭了“接收订阅信息”，请前往设置打开',
+            confirmText:'去设置',
+            showCancel:false,
+            success: res => {
+              if (res.confirm) {
+                wx.openSetting({})
+              }
+            }
+          })
+        }
+      });
     }
   },
   onUnload() {
