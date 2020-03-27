@@ -68,6 +68,8 @@ export default {
         .slice(0, 5);
       this.pageTitle = "编辑";
       this.btnTitle = "编辑";
+      this.name = currentCountdown.name
+      this.description = currentCountdown.description
     } else {
       this.end_date = formatYMD(
         new Date(new Date().getTime() + 24 * 3600 * 1000)

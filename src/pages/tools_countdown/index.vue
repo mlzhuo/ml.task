@@ -17,17 +17,13 @@
       </navigator>
       <view v-if="countdowns.length">
         <view
-          class="cu-item shadow-blur countdown-item"
+          class="cu-item shadow-blur "
           v-for="item in countdowns"
           :key="item._id"
           @longpress="showModal(item)"
         >
           <countdownView
-            :isShowTitle="true"
-            :targetDate="item.target_date"
-            :countdownName="item.name"
-            :isComplete="item.state"
-            :countdownId="item._id"
+            :countdown="item"
             @doneCountdown="doneCountdown"
           ></countdownView>
         </view>
@@ -136,6 +132,10 @@ export default {
       this.isShowModal = false;
       switch (index) {
         case 0:
+          if (this.currentCountdown.state === 1) {
+            this.showToast("已结束倒计时不支持编辑");
+            return;
+          }
           this.editCountdown();
           break;
         case 1:
@@ -150,7 +150,7 @@ export default {
 </script>
 <style scoped>
 .container {
-  padding: 15px;
+  padding: 15px 5px 5px;
 }
 .cu-list-header {
   height: 60px !important;
@@ -176,11 +176,5 @@ export default {
   right: 10px;
   bottom: 10px;
   text-align: right;
-}
-.done-punch-item {
-  opacity: 0.3;
-}
-.countdown-item {
-  height: 100px;
 }
 </style>

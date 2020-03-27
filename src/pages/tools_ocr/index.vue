@@ -1,64 +1,13 @@
 <template>
   <view>
-    <cu-custom bgcolor="bg-gradual-purple" :isBack="false">
+    <cu-custom bgcolor="bg-gradual-purple" :isBack="true">
       <block slot="backText">返回</block>
-      <block slot="content">工具</block>
+      <block slot="content">OCR</block>
     </cu-custom>
     <view class="cu-card">
-      <!-- <view
-        class="cu-item bg-gradual-purple shadow-blur"
-        v-for="(item,index) in toolsList"
-        :key="index"
-        @click="toolsItemClick(item.url)"
-      >
-        <image class="item-bg-img" :src="item.img" />
-        <view class="cardTitle">{{item.title}}</view>
-        <view class="subText">在进行：<span class="num">{{toolsOverviewData.punch.isActive}}</span>今日：<span class="num">{{toolsOverviewData.punch.toadyIsDone}}</span></view>
-      </view> -->
-      <view
-        class="cu-item bg-gradual-purple shadow-blur"
-        @click="toolsItemClick(0)"
-      >
-        <image class="item-bg-img" :src="toolsList[0].img" />
-        <view class="cardTitle">{{ toolsList[0].title }}</view>
-        <view class="subText" v-if="toolsOverviewData.punch.isActive > 0"
-          >在进行：<span class="num">{{
-            toolsOverviewData.punch.isActive
-          }}</span
-          >今日：<span class="num">{{
-            toolsOverviewData.punch.todayIsDone
-          }}</span></view
-        >
-      </view>
-
-      <view
-        class="cu-item bg-gradual-purple shadow-blur"
-        @click="toolsItemClick(1)"
-      >
-        <image class="item-bg-img" :src="toolsList[1].img" />
-        <view class="cardTitle">{{ toolsList[1].title }}</view>
-        <view class="subText" v-if="toolsOverviewData.punch.isActive > 0"
-          >在进行：<span class="num">{{
-            toolsOverviewData.countdown.isActive
-          }}</span
-          >最近：<span class="num">
-            <!-- {{toolsOverviewData.countdown.target_date}} -->
-            {{time}}
-          </span></view
-        >
-      </view>
-      <view
-        class="cu-item bg-gradual-purple shadow-blur"
-        @click="toolsItemClick(2)"
-      >
-        <image class="item-bg-img" :src="toolsList[2].img" />
-        <view class="cardTitle">{{ toolsList[2].title }}</view>
-      </view>
       <button
         class="cu-item bg-gradual-purple shadow-blur"
-        @click="toolsItemClick(3)"
         open-type="getUserInfo"
-        @getuserinfo="bindGetUserInfo"
       >
         <image class="item-bg-img" :src="toolsList[3].img" />
         <view class="cardTitle">{{ toolsList[3].title }}</view>
@@ -74,13 +23,10 @@ import {
   GET_TOOLS_OVERVIEW_DATA,
   SAVE_USER_INFO
 } from "@/store/mutation-types";
-import { formatYMD, diffTime } from "@/utils/index";
-let timer = null;
 export default {
   data() {
     return {
-      toolsOverviewData: { punch: {}, countdown: {} },
-      time: '',
+      toolsOverviewData: { punch: {} },
       toolsList: [
         {
           index: 0,
@@ -97,8 +43,8 @@ export default {
         {
           index: 2,
           title: "OCR文字识别",
-          img: "/static/images/ocr.svg",
-          url: "/pages/tools_ocr/main"
+          img: "/static/images/ocr.svg"
+          // url: "/pages/tools_countdown/main"
         },
         {
           index: 3,
@@ -188,25 +134,6 @@ export default {
           rawData
         });
       }
-    },
-    startTimer() {
-      if(timer){
-        clearInterval(timer)
-      }
-      timer = setInterval(() => {
-        this.time = diffTime(new Date(this.toolsOverviewData.countdown.mostResent.target_date));
-      }, 1000);
-    }
-  },
-  watch: {
-    toolsOverviewData: {
-      handler(newVal) {
-        if (newVal.countdown.mostResent) {
-          this.startTimer();
-        }
-      },
-      immediate: true,
-      deep: true
     }
   }
 };

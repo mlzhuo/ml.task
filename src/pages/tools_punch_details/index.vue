@@ -129,7 +129,7 @@ export default {
       allDates = [...allDates, ...v];
     });
     const toTodayLen =
-      (new Date().getTime() - new Date(start_date).getTime()) /
+      (new Date(end_date).getTime() - new Date(start_date).getTime()) /
       (24 * 3600 * 1000);
     let punchHistoryCopy = { ...punchHistory };
     for (let i = 0; i < toTodayLen; i++) {
@@ -192,7 +192,7 @@ export default {
               +(new Date(value).getMinutes() / 60).toFixed(2);
         data.push([x, y]);
       }
-      console.log(data);
+      // console.log(data);
       
       const myRegression = ecStat.regression("polynomial", data, 3);
       myRegression.points.sort(function(a, b) {
@@ -210,6 +210,7 @@ export default {
         xAxis: {
           type: "value",
           min: 'dataMin',
+          max: 'dataMax',
           splitLine: {
             show: false
           },
