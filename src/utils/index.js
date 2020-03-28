@@ -117,7 +117,7 @@ export const formatPunchDate = (startStr, endStr) => {
   return dateObj;
 };
 
-export const diffTime = (target_date) => {
+export const diffTime = target_date => {
   var diff = target_date.getTime() - new Date().getTime();
   var days = Math.floor(diff / (24 * 3600 * 1000));
   var leave1 = diff % (24 * 3600 * 1000); //计算天数后剩余的毫秒数
@@ -126,10 +126,10 @@ export const diffTime = (target_date) => {
   var minutes = Math.floor(leave2 / (60 * 1000));
   var leave3 = leave2 % (60 * 1000); //计算分钟数后剩余的毫秒数
   var seconds = Math.floor(leave3 / 1000);
-  days = days > 0 ? `${days}天` : ''
-  hours = hours > 0 ? `${hours}时` : ''
-  minutes = minutes > 0 ? `${minutes}分` : ''
-  seconds = `${seconds}秒`
+  days = days > 0 ? `${days}天` : "";
+  hours = hours > 0 ? `${hours}时` : "";
+  minutes = minutes > 0 ? `${minutes}分` : "";
+  seconds = `${seconds}秒`;
   // var returnStr = seconds + "秒前";
   // if (minutes > 0) {
   //   returnStr = minutes + "分钟前"; //+ returnStr;
@@ -141,6 +141,65 @@ export const diffTime = (target_date) => {
   //   returnStr = days + "天前"; //+ returnStr;
   // }
   return `${days}${hours}${minutes}${seconds}`;
+};
+
+export const formatTask = temp => {
+  let tempObj = {};
+  temp.forEach(item => {
+    const formatDateObj = formatDate(new Date(item.date));
+    item.weekday = formatDateObj.weekday;
+    item.date = formatDateObj.date;
+    const dateArr = item.date.split("-");
+    if (item.date.length === 5) {
+      item.date_details = {
+        year: "",
+        month: dateArr[0],
+        day: dateArr[1]
+      };
+    } else {
+      item.date_details = {
+        year: dateArr[0],
+        month: dateArr[1],
+        day: dateArr[2]
+      };
+    }
+    item.time = formatDateObj.time;
+    item.edit_time =
+      formatDate(new Date(item.edit_time)).date === formatDateObj.date
+        ? formatDate(new Date(item.edit_time)).time
+        : formatDate(new Date(item.edit_time)).date +
+          " " +
+          formatDate(new Date(item.edit_time)).time;
+  });
+  temp.forEach(item => {
+    var objArray = tempObj[item.date] || [];
+    objArray.push(item);
+    let isActiveTasks = objArray.filter(v => v.state === 0);
+    let isDoneTasks = objArray.filter(v => v.state === 1);
+    isActiveTasks.sort((a, b) => {
+      if (a.level === b.level) {
+        return (
+          new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
+        );
+      } else {
+        return b.level - a.level;
+      }
+    });
+    isDoneTasks.sort((a, b) => {
+      const editTimeA =
+        a.edit_time.split(" ").length === 2
+          ? new Date(a.edit_time)
+          : new Date(a.date + " " + a.edit_time);
+      const editTimeB =
+        b.edit_time.split(" ").length === 2
+          ? new Date(b.edit_time)
+          : new Date(b.date + " " + b.edit_time);
+      return editTimeB - editTimeA;
+    });
+    objArray = isActiveTasks.concat(isDoneTasks);
+    tempObj[item.date] = objArray;
+  });
+  return tempObj;
 };
 
 // export {

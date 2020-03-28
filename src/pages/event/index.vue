@@ -13,6 +13,19 @@
       >
         <text class="cuIcon-add"></text>添加分类
       </navigator>
+      <!-- <button
+        class="cu-btn bg-white shadow-blur round sm add-btn change-type filter-icon"
+        v-show="showList"
+      >
+        <text class="cuIcon-filter" style="font-size:14px"></text>
+      </button>
+      <button
+        class="cu-btn bg-white shadow-blur round sm add-btn change-type"
+        @click="changeType()"
+      >
+        <text class="cuIcon-cascades" style="font-size:14px" v-if="showList"></text>
+        <text class="cuIcon-sort" style="font-size:14px" v-if="!showList"></text>
+      </button> -->
       <view class="nav-list">
         <navigator
           hover-class="none"
@@ -99,10 +112,11 @@ export default {
       longPressEventId: "",
       isShowUpdateModal: false,
       currentVersion: {},
-      updateInfo: []
+      updateInfo: [],
+      showList: false
     };
   },
-  onShow() {
+  created() {
     const versions = this.$store.state.miniapp.versions;
     if (!versions.length) {
       this.getVersions();
@@ -115,6 +129,8 @@ export default {
       this.Login();
       return;
     }
+  },
+  onShow() {
     this.$store.commit(`event/${CLEAR_CURRENT_EVENT}`);
     const isNeedRefreshEvent = this.$store.state.event.isNeedRefreshEvent;
     if (isNeedRefreshEvent) {
@@ -226,6 +242,9 @@ export default {
       this.isShowLoading = true;
       const { retryActionPayload, retryActionType } = this.$store.state.miniapp;
       this.$store.dispatch(retryActionType, retryActionPayload);
+    },
+    changeType() {
+      this.showList = !this.showList
     }
   }
 };
@@ -237,11 +256,24 @@ export default {
 }
 .container {
   padding: 15px 5px 5px;
+  position: relative;
 }
 .padding-xl {
   text-align: left;
 }
 .padding-l-5em {
   padding-left: 5em;
+}
+.change-type {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  left: auto;
+  right: 5px;
+  top: 20px;
+  border: 1px solid #efefef;
+}
+.filter-icon {
+  right: 50px;
 }
 </style>

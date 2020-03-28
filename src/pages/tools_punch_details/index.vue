@@ -129,7 +129,7 @@ export default {
       allDates = [...allDates, ...v];
     });
     const toTodayLen =
-      (new Date(end_date).getTime() - new Date(start_date).getTime()) /
+      (new Date().getTime() - new Date(start_date).getTime()) /
       (24 * 3600 * 1000);
     let punchHistoryCopy = { ...punchHistory };
     for (let i = 0; i < toTodayLen; i++) {
@@ -198,6 +198,7 @@ export default {
       myRegression.points.sort(function(a, b) {
         return a[0] - b[0];
       });
+      const {end_date} = this.punch
       return {
         title: {
           text: "打卡时间分布",
@@ -210,7 +211,7 @@ export default {
         xAxis: {
           type: "value",
           min: 'dataMin',
-          max: 'dataMax',
+          max: +new Date(end_date),
           splitLine: {
             show: false
           },

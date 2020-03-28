@@ -25,7 +25,7 @@
           >在进行：<span class="num">{{
             toolsOverviewData.punch.isActive
           }}</span
-          >今日：<span class="num">{{
+          >今日打卡：<span class="num">{{
             toolsOverviewData.punch.todayIsDone
           }}</span></view
         >
@@ -37,14 +37,11 @@
       >
         <image class="item-bg-img" :src="toolsList[1].img" />
         <view class="cardTitle">{{ toolsList[1].title }}</view>
-        <view class="subText" v-if="toolsOverviewData.punch.isActive > 0"
+        <view class="subText" v-if="toolsOverviewData.countdown.isActive > 0"
           >在进行：<span class="num">{{
             toolsOverviewData.countdown.isActive
           }}</span
-          >最近：<span class="num">
-            <!-- {{toolsOverviewData.countdown.target_date}} -->
-            {{time}}
-          </span></view
+          >最近：<span class="num">{{ time }}</span></view
         >
       </view>
       <view
@@ -80,7 +77,7 @@ export default {
   data() {
     return {
       toolsOverviewData: { punch: {}, countdown: {} },
-      time: '',
+      time: "",
       toolsList: [
         {
           index: 0,
@@ -190,11 +187,13 @@ export default {
       }
     },
     startTimer() {
-      if(timer){
-        clearInterval(timer)
+      if (timer) {
+        clearInterval(timer);
       }
       timer = setInterval(() => {
-        this.time = diffTime(new Date(this.toolsOverviewData.countdown.mostResent.target_date));
+        this.time = diffTime(
+          new Date(this.toolsOverviewData.countdown.mostResent.target_date)
+        );
       }, 1000);
     }
   },

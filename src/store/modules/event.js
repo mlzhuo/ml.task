@@ -10,6 +10,7 @@ import {
   IS_NEED_REFRESH_EVENT,
   GET_ALL_TASKS,
   STORE_ALL_TASKS,
+  STORE_ALL_TASKS_ORIGINAL,
   DONE_TASK,
   STORE_TASK_BY_TASK_ID,
   CLEAR_CURRENT_TASK,
@@ -19,12 +20,13 @@ import {
   // STORE_REQUEST_STATUS
 } from "../mutation-types";
 import { $axios } from "@/utils/api";
-import { formatDate } from "@/utils/index";
+import { formatTask } from "@/utils/index";
 const state = {
   events: [],
   currentEvent: {},
   isNeedRefreshEvent: true,
   tasks: {},
+  tasksOriginal: [],
   currentTask: {},
   isNeedRefreshTask: {}
 };
@@ -154,64 +156,11 @@ const actions = {
       return;
     }
     let temp = result.data;
-    let tempObj = {};
-    temp.forEach(item => {
-      const formatDateObj = formatDate(new Date(item.date));
-      item.weekday = formatDateObj.weekday;
-      item.date = formatDateObj.date;
-      const dateArr = item.date.split("-");
-      if (item.date.length === 5) {
-        item.date_details = {
-          year: "",
-          month: dateArr[0],
-          day: dateArr[1]
-        };
-      } else {
-        item.date_details = {
-          year: dateArr[0],
-          month: dateArr[1],
-          day: dateArr[2]
-        };
-      }
-      item.time = formatDateObj.time;
-      item.edit_time =
-        formatDate(new Date(item.edit_time)).date === formatDateObj.date
-          ? formatDate(new Date(item.edit_time)).time
-          : formatDate(new Date(item.edit_time)).date +
-            " " +
-            formatDate(new Date(item.edit_time)).time;
-    });
-    temp.forEach(item => {
-      var objArray = tempObj[item.date] || [];
-      objArray.push(item);
-      let isActiveTasks = objArray.filter(v => v.state === 0);
-      let isDoneTasks = objArray.filter(v => v.state === 1);
-      isActiveTasks.sort((a, b) => {
-        if (a.level === b.level) {
-          return (
-            new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
-          );
-        } else {
-          return b.level - a.level;
-        }
-      });
-      isDoneTasks.sort((a, b) => {
-        const editTimeA =
-          a.edit_time.split(" ").length === 2
-            ? new Date(a.edit_time)
-            : new Date(a.date + " " + a.edit_time);
-        const editTimeB =
-          b.edit_time.split(" ").length === 2
-            ? new Date(b.edit_time)
-            : new Date(b.date + " " + b.edit_time);
-        return editTimeB - editTimeA;
-      });
-      objArray = isActiveTasks.concat(isDoneTasks);
-      tempObj[item.date] = objArray;
-    });
+    let tempObj = formatTask(temp);
     commit(IS_NEED_REFRESH_TASK, {
       [event_id]: { isNeed: false }
     });
+    commit(STORE_ALL_TASKS_ORIGINAL, temp);
     commit(STORE_ALL_TASKS, { [event_id]: tempObj });
     onSuccess(tempObj);
   },
@@ -281,6 +230,9 @@ const mutations = {
   },
   [STORE_ALL_TASKS](state, tasks) {
     state.tasks = Object.assign({}, state.tasks, tasks);
+  },
+  [STORE_ALL_TASKS_ORIGINAL](state, tasks) {
+    state.tasksOriginal = tasks;
   },
   [STORE_TASK_BY_TASK_ID](state, task) {
     state.currentTask = task;

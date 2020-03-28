@@ -117,12 +117,10 @@ export default {
       });
     },
     operationSuccess(message) {
-      // this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
+      this.$store.commit(`event/${IS_NEED_REFRESH_EVENT}`, true);
       this.isShowLoading = false;
       this.showToast(message);
       wx.navigateBack({ delta: 1 });
-      // this.showToast(message);
-      // wx.navigateBack({ delta: 1 });
     },
     operationFailed() {
       this.isShowLoading = false;

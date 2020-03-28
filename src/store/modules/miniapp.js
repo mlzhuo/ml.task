@@ -35,10 +35,7 @@ const getters = {};
 
 const actions = {
   async [GET_VERSIONS]({ commit, state }, { limit, onSuccess, onFailed }) {
-    let url = "/version";
-    if (limit === 1) {
-      url = "/version?limit=1";
-    }
+    let url = limit && limit === 1 ? "/version?limit=1" : "/version";
     const result = await $axios({ method: "GET", url });
     if (!result) {
       return;
@@ -52,7 +49,7 @@ const actions = {
     }
   },
   async [LOAD_CONFIG]({ commit, state }, { onSuccess }) {
-    const result = await $axios({method:"GET", url:"/config"});
+    const result = await $axios({ method: "GET", url: "/config" });
     if (result && result.state) {
       commit(STORE_CONFIG, result.data);
       onSuccess(result.data);
