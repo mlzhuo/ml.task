@@ -4,205 +4,137 @@
       <block slot="backText">返回</block>
       <block slot="content">OCR</block>
     </cu-custom>
-    <view class="cu-card">
-      <button
-        class="cu-item bg-gradual-purple shadow-blur"
-        open-type="getUserInfo"
-      >
-        <image class="item-bg-img" :src="toolsList[3].img" />
-        <view class="cardTitle">{{ toolsList[3].title }}</view>
-      </button>
+    <view class="container">
+      <view class="grid margin-bottom text-center col-2">
+        <view
+          class="padding grid-item"
+          v-for="(item, index) in list"
+          :key="index"
+        >
+          <view class="inner-item" v-if="index === 0" @click="ocrText">
+            <text class="icon" :class="item.icon" style="font-size:30px"></text>
+            <text class="text">{{ item.title }}</text>
+          </view>
+          <ocr-navigator
+            :certificateType="item.type"
+            :opposite="false"
+            @success="ocrSuccess"
+            v-else
+          >
+            <view class="inner-item">
+              <text
+                class="icon"
+                :class="item.icon"
+                style="font-size:30px"
+              ></text>
+              <text class="text">{{ item.title }}</text>
+            </view>
+          </ocr-navigator>
+        </view>
+      </view>
     </view>
     <view class="cu-tabbar-height"></view>
   </view>
 </template>
 
 <script>
-import {
-  IS_NEED_REFRESH_TOOLS_OVERVIEW,
-  GET_TOOLS_OVERVIEW_DATA,
-  SAVE_USER_INFO
-} from "@/store/mutation-types";
 export default {
   data() {
     return {
-      toolsOverviewData: { punch: {} },
-      toolsList: [
+      list: [
         {
           index: 0,
-          title: "打卡计划",
-          img: "/static/images/punch.svg",
-          url: "/pages/tools_punch/main"
+          title: "文本",
+          icon: "cuIcon-font"
         },
         {
           index: 1,
-          title: "倒计时",
-          img: "/static/images/countdown.svg",
-          url: "/pages/tools_countdown/main"
+          title: "身份证",
+          icon: "cuIcon-profile",
+          type: "idCard"
         },
         {
           index: 2,
-          title: "OCR文字识别",
-          img: "/static/images/ocr.svg"
-          // url: "/pages/tools_countdown/main"
+          title: "银行卡",
+          icon: "cuIcon-vipcard",
+          type: "bankCard"
         },
         {
           index: 3,
-          title: "微信运动报告",
-          img: "/static/images/wechatrun.svg",
-          url: "/pages/tools_werun/main"
+          title: "驾驶证",
+          icon: "cuIcon-deliver",
+          type: "drivingLicense"
+        },
+        {
+          index: 4,
+          title: "营业执照",
+          icon: "cuIcon-form",
+          type: "businessLicense"
         }
       ]
     };
   },
-  onShow() {
-    const isNeedRefreshToolsOverview = this.$store.state.tools
-      .isNeedRefreshToolsOverview;
-    if (isNeedRefreshToolsOverview) {
-      this.getData();
-    } else {
-      this.onSuccess();
-    }
-  },
-  mounted() {
-    // this.getSetting();
-  },
+  onShow() {},
+  mounted() {},
   methods: {
-    toolsItemClick(index) {
-      switch (index) {
-        // case 3:
-        //   this.wxCanIUse();
-        //   wx.navigateTo({ url: this.toolsList[index].url });
-        //   break;
-        default:
-          if (this.toolsList[index].url) {
-            wx.navigateTo({ url: this.toolsList[index].url });
-          } else {
-            this.showToast("暂未上线");
-          }
-          break;
-      }
+    itemClick(index) {},
+    ocrSuccess(e) {
+      console.log(e);
     },
-    getData() {
-      this.$store.dispatch(`tools/${GET_TOOLS_OVERVIEW_DATA}`, {
-        onSuccess: this.onSuccess
-      });
-    },
-    onSuccess() {
-      const { toolsOverviewData } = this.$store.state.tools;
-      this.toolsOverviewData = toolsOverviewData;
-    },
-    getSetting() {
-      const that = this;
-      wx.getSetting({
-        success: function(res) {
-          if (res.authSetting["scope.userInfo"]) {
-            wx.getUserInfo({
-              withCredentials: true,
-              success: function(res) {
-                const { encryptedData, iv, rawData, signature } = res;
-                that.$store.dispatch(`user/${SAVE_USER_INFO}`, {
-                  ...JSON.parse(rawData),
-                  encryptedData,
-                  iv,
-                  signature,
-                  rawData
-                });
-              }
-            });
-          }
+    ocrText() {
+      wx.chooseImage({
+        count: 1,
+        sizeType: ["original", "compressed"],
+        sourceType: ["album", "camera"],
+        success(res) {
+          // tempFilePath可以作为img标签的src属性显示图片
+          const tempFilePaths = res.tempFilePaths;
+          console.log(tempFilePaths);
+          wx.cloud.callFunction({
+            name: "ocrPrintedText",
+            data: {
+              imgUrl: tempFilePaths
+            },
+            complete: console.log()
+          });
         }
       });
-    },
-    wxCanIUse() {
-      //click事件首先触发
-      if (!wx.canIUse("button.open-type.getUserInfo")) {
-        wx.showToast({
-          title: "请升级微信版本",
-          duration: 2000
-        });
-      }
-    },
-    bindGetUserInfo(e) {
-      if (e.mp.detail.errMsg === "getUserInfo:ok") {
-        const { encryptedData, iv, rawData, signature } = e.mp.detail;
-        this.$store.dispatch(`user/${SAVE_USER_INFO}`, {
-          ...JSON.parse(rawData),
-          encryptedData,
-          iv,
-          signature,
-          rawData
-        });
-      }
     }
   }
 };
 </script>
 
 <style scoped>
-.cardTitle {
-  color: #fff;
-  padding: 45px 30px;
-  font-size: 20px;
-  font-weight: 300;
-  transform: skew(-10deg, 0deg);
+.grid-item {
+  height: 120px;
   position: relative;
-  text-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.3);
+  border-right: 1px solid #efefef;
+  border-bottom: 1px solid #efefef;
 }
-
-.cardTitle::before {
-  content: "";
-  position: absolute;
-  width: 30px;
-  height: 3px;
-  border-radius: 10px;
-  background-color: #fff;
-  display: block;
-  top: 30px;
-  left: 25px;
-  transform: skew(10deg, 0deg);
-}
-
-.cardTitle::after {
-  content: "";
-  position: absolute;
-  width: 70px;
-  border-radius: 3px;
-  height: 12px;
-  background-color: #fff;
-  display: block;
-  bottom: 38px;
-  left: 45px;
-  transform: skew(10deg, 0deg);
-  opacity: 0.1;
-}
-.subText {
-  position: absolute;
+.inner-item {
   width: 100%;
-  height: 30px;
-  line-height: 30px;
-  padding: 0 30px;
-  bottom: 5px;
-}
-.subText .num {
-  font-size: 18px;
-  font-weight: 700;
-  padding-right: 15px;
-}
-.cu-item {
-  position: relative;
-  overflow: hidden;
-  padding: 0;
-  text-align: left;
-}
-button {
-  line-height: inherit;
-}
-.item-bg-img {
-  /* width: 80%; */
-  height: 70%;
+  height: 100%;
+  top: 0;
+  left: 0;
   position: absolute;
-  top: 15%;
-  right: -25%;
+}
+.grid-item:nth-child(2n + 1) {
+  border-left: 1px solid #efefef;
+}
+.grid-item:nth-child(1),
+.grid-item:nth-child(2) {
+  border-top: 1px solid #efefef;
+}
+.icon {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.text {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>

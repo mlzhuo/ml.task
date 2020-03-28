@@ -23,6 +23,10 @@ wx.getSystemInfo({
   }
 });
 
+wx.cloud.init({
+  env: 'ml-task'
+})
+
 Vue.prototype.showToast = (title, icon) => {
   wx.showToast({
     title,
