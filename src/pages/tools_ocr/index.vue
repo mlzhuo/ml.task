@@ -81,22 +81,32 @@ export default {
     ocrSuccess(e) {
       console.log(e);
     },
-    ocrText() {
-      wx.chooseImage({
+    async ocrText() {
+      const chooseImageRes = await wx.chooseImage({
         count: 1,
         sizeType: ["original", "compressed"],
-        sourceType: ["album", "camera"],
-        success(res) {
-          // tempFilePath可以作为img标签的src属性显示图片
-          const tempFilePaths = res.tempFilePaths;
-          console.log(tempFilePaths);
-          wx.cloud.callFunction({
-            name: "ocrPrintedText",
-            data: {
-              imgUrl: tempFilePaths
-            },
-            complete: console.log()
-          });
+        sourceType: ["album", "camera"]
+      });
+      const tempFilePath = chooseImageRes.tempFilePaths[0];
+      const uploadFileRes = await wx.cloud.uploadFile({
+        cloudPath: "ocrPrintTextPicTemp/" + tempFilePath.split("://")[1],
+        filePath: tempFilePath
+      });
+      this.getImgUrl(uploadFileRes.fileID);
+    },
+    async getImgUrl(url) {
+      let that = this;
+      const getTempFileURLRes = await wx.cloud.getTempFileURL({
+        fileList: [url]
+      });
+      let imgUrl = getTempFileURLRes.fileList[0].tempFileURL;
+      wx.cloud.callFunction({
+        name: "ocrPrintedText",
+        data: {
+          imgUrl
+        },
+        success: res => {
+          console.log(res);
         }
       });
     }
