@@ -18,8 +18,7 @@
           <text class="text-grey">GitHub</text>
         </view>
         <view class="action">
-          <text class="text-grey text-sm">
-            欢迎Star <text class="cuIcon-favorfill text-yellow"></text>
+          <text class="text-grey text-sm">欢迎Star <text class="cuIcon-favorfill text-yellow"></text>
           </text>
         </view>
       </view>
