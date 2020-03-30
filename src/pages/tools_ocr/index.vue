@@ -11,65 +11,48 @@
           v-for="(item, index) in list"
           :key="index"
         >
-          <view class="inner-item" v-if="index === 0" @click="ocrText">
+          <view class="inner-item" @click="ocrAction(index)">
             <text class="icon" :class="item.icon" style="font-size:30px"></text>
             <text class="text">{{ item.title }}</text>
           </view>
-          <ocr-navigator
-            :certificateType="item.type"
-            :opposite="false"
-            @success="ocrSuccess"
-            v-else
-          >
-            <view class="inner-item">
-              <text
-                class="icon"
-                :class="item.icon"
-                style="font-size:30px"
-              ></text>
-              <text class="text">{{ item.title }}</text>
-            </view>
-          </ocr-navigator>
         </view>
       </view>
     </view>
+    <Loading v-if="isShowLoading"></Loading>
     <view class="cu-tabbar-height"></view>
   </view>
 </template>
 
 <script>
+import { STORE_OCR_RESULT } from "@/store/mutation-types";
 export default {
   data() {
     return {
+      isShowLoading: false,
       list: [
         {
-          index: 0,
+          title: "银行卡",
+          icon: "cuIcon-vipcard"
+        },
+        {
+          title: "营业执照",
+          icon: "cuIcon-form"
+        },
+        {
+          title: "身份证",
+          icon: "cuIcon-profile"
+        },
+        {
           title: "文本",
           icon: "cuIcon-font"
         },
         {
-          index: 1,
-          title: "身份证",
-          icon: "cuIcon-profile",
-          type: "idCard"
-        },
-        {
-          index: 2,
-          title: "银行卡",
-          icon: "cuIcon-vipcard",
-          type: "bankCard"
-        },
-        {
-          index: 3,
           title: "驾驶证",
-          icon: "cuIcon-deliver",
-          type: "drivingLicense"
+          icon: "cuIcon-deliver"
         },
         {
-          index: 4,
-          title: "营业执照",
-          icon: "cuIcon-form",
-          type: "businessLicense"
+          title: "行驶证",
+          icon: "cuIcon-deliver"
         }
       ]
     };
@@ -77,37 +60,71 @@ export default {
   onShow() {},
   mounted() {},
   methods: {
-    itemClick(index) {},
-    ocrSuccess(e) {
-      console.log(e);
-    },
-    async ocrText() {
+    async ocrAction(index) {
       const chooseImageRes = await wx.chooseImage({
         count: 1,
         sizeType: ["original", "compressed"],
         sourceType: ["album", "camera"]
       });
       const tempFilePath = chooseImageRes.tempFilePaths[0];
+      this.isShowLoading = true
       const uploadFileRes = await wx.cloud.uploadFile({
-        cloudPath: "ocrPrintTextPicTemp/" + tempFilePath.split("://")[1],
+        cloudPath: `ocrPicTemp/${tempFilePath.split("://")[1]}`,
         filePath: tempFilePath
       });
-      this.getImgUrl(uploadFileRes.fileID);
+      this.getImgUrl(uploadFileRes.fileID, index);
     },
-    async getImgUrl(url) {
-      let that = this;
+    async getImgUrl(url, index) {
       const getTempFileURLRes = await wx.cloud.getTempFileURL({
         fileList: [url]
       });
-      let imgUrl = getTempFileURLRes.fileList[0].tempFileURL;
+      const { fileID, tempFileURL } = getTempFileURLRes.fileList[0];
+      this.startOcr(index, tempFileURL, fileID);
+    },
+    startOcr(index, imgUrl, fileID) {
+      const that = this;
+      let name = "";
+      switch (index) {
+        case 0:
+          name = "ocrBankcard";
+          break;
+        case 1:
+          name = "ocrBusinessLicense";
+          break;
+        case 2:
+          name = "ocrIdcard";
+          break;
+        case 3:
+          name = "ocrPrintedText";
+          break;
+        case 4:
+          name = "ocrDriverLicense";
+          break;
+        case 5:
+          name = "ocrVehicleLicense";
+          break;
+        default:
+          break;
+      }
       wx.cloud.callFunction({
-        name: "ocrPrintedText",
+        name,
         data: {
           imgUrl
         },
         success: res => {
           console.log(res);
+          that.ocrSuccess(res, fileID);
         }
+      });
+    },
+    ocrSuccess(ocrResult, fileID) {
+      this.isShowLoading = false
+      this.$store.commit(`tools/${STORE_OCR_RESULT}`, ocrResult);
+      wx.navigateTo({
+        url: "/pages/tools_ocr_result/main"
+      });
+      wx.cloud.deleteFile({
+        fileList: [fileID]
       });
     }
   }

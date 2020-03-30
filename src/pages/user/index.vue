@@ -19,8 +19,7 @@
         </view>
         <view class="action">
           <text class="text-grey text-sm">
-            欢迎Star
-            <text class="cuIcon-favorfill text-yellow"></text>
+            欢迎Star <text class="cuIcon-favorfill text-yellow"></text>
           </text>
         </view>
       </view>
@@ -70,7 +69,7 @@ export default {
     this.style = `height:${this.windowHeight * 0.35}px`;
     const version = this.$store.state.miniapp.version;
     if (version) {
-      this.version = "v" + version;
+      this.version = "v " + version;
     } else {
       this.getVersions();
     }
@@ -82,7 +81,7 @@ export default {
       });
     },
     getVersionSuccess() {
-      this.version = "v" + this.$store.state.miniapp.version;
+      this.version = "v " + this.$store.state.miniapp.version;
     },
     copyUrl() {
       wx.setClipboardData({ data: "https://github.com/mlzhuo/ml.task" });

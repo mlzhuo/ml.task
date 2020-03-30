@@ -12,6 +12,7 @@
     "pages/tools_countdown_add/main",
     "pages/tools_werun/main",
     "pages/tools_ocr/main",
+    "pages/tools_ocr_result/main",
     "pages/tools_werun_details/main",
     "pages/user/main",
     "pages/user_update_list/main",
@@ -49,14 +50,5 @@
       }
     ],
     "position": "bottom"
-  },
-  "plugins": {
-    "ocr-plugin": {
-      "version": "3.0.1",
-      "provider": "wx4418e3e031e551be"
-    }
-  },
-  "usingComponents": {
-    "ocr-navigator": "plugin://ocr-plugin/ocr-navigator"
   }
 }

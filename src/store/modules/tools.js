@@ -21,7 +21,9 @@ import {
   STORE_CURRENT_COUNTDOWN,
   COUNTDOWN_OPERATION,
   DELETE_COUNTDOWN,
-  CLEAR_CURRENT_COUNTDOWN
+  CLEAR_CURRENT_COUNTDOWN,
+  STORE_OCR_RESULT,
+  CLEAR_OCR_RESULT
 } from "../mutation-types";
 import { $axios } from "@/utils/api";
 import { formatYMD } from "@/utils/index";
@@ -32,7 +34,8 @@ const state = {
   currentPunch: {},
   isNeedRefreshPunch: true,
   countdown: [],
-  currentCountdown: {}
+  currentCountdown: {},
+  ocrResult: {}
 };
 
 const getters = {};
@@ -207,9 +210,12 @@ const actions = {
       onFailed && onFailed();
     }
   },
-  async [DELETE_COUNTDOWN]({ commit, state, rootState }, { onSuccess, onFailed }){
+  async [DELETE_COUNTDOWN](
+    { commit, state, rootState },
+    { onSuccess, onFailed }
+  ) {
     const user_id = rootState.user.userInfo.userId;
-    const countdown_id = state.currentCountdown._id
+    const countdown_id = state.currentCountdown._id;
     const delResult = await $axios({
       method: "DELETE",
       url: `/${user_id}/countdown/${countdown_id}`
@@ -249,6 +255,12 @@ const mutations = {
   },
   [CLEAR_CURRENT_COUNTDOWN](state) {
     state.currentCountdown = {};
+  },
+  [STORE_OCR_RESULT](state, ocrResult) {
+    state.ocrResult = ocrResult;
+  },
+  [CLEAR_OCR_RESULT](state) {
+    state.ocrResult = {};
   }
 };
 export default {
